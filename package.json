@@ -1,0 +1,23 @@
+{
+  "name": "gw2apibot",
+  "version": "0.0.1",
+  "description": "A bot to play around with API",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "myself",
+  "license": "MIT",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "discord.js": "^11.2.1",
+    "discord.js-commando": "^0.9.0",
+    "gw2api-client": "^5.6.5",
+    "sqlite": "^2.8.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.11.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0"
+  }
+}
