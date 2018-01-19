@@ -1,13 +1,13 @@
 const fs = require("fs");
 const discord = require("discord.js");
-const {token, owner, prefix} = require("./bot_config.json");
+const { token, owner, prefix } = require("./bot_config.json");
 const commandFiles = fs.readdirSync("./commands");
 
 // Get an instance of Discord Client
 const bot = new discord.Client({
   commandPrefix: prefix,
   disableEveryone: true,
-  owner
+  owner,
 });
 bot.commands = new discord.Collection();
 for (const file of commandFiles) {
@@ -31,29 +31,16 @@ bot.on("message", message => {
   const command = bot.commands.get(commandName);
 
   if (command.args && !args.length) {
-  return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
+    return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
   }
 
   try {
     command.execute(message, args);
-  } catch (error) {
+  }
+  catch (error) {
     console.error(error);
     message.reply("There was an error trying to execute that command!");
   }
 });
 
 bot.login(token);
-
-// bot.on("message", message => {
-//   if (message.content === `${prf}dungeons`) {
-//     api.dungeons().all().then(result => console.log(result)).catch(err => console.log(err));
-//     }
-// });
-
-// bot.on("message", message => {
-//   if (message.content === `${config.prefix}raids`) {
-//     api.account().raids().get().
-//       then(result => message.reply(result));
-//   }
-// });
-
