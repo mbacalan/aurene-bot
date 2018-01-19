@@ -4,3 +4,4 @@ starter.js
 bot_config.json
 settings.sqlite3
 .eslintrc.json
+giveawayEntries.json
