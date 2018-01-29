@@ -9,6 +9,8 @@ const bot = new discord.Client({
   disableEveryone: true,
   owner,
 });
+
+// Register commands
 bot.commands = new discord.Collection();
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -16,9 +18,12 @@ for (const file of commandFiles) {
 }
 
 bot.on("ready", async () => {
-  await console.log(`Client ready; logged in as ${bot.user.username}#${bot.user.discriminator} (${bot.user.id})`);
-  await bot.user.setGame("Guild Wars 2");
+  await console.log(`Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`);
+  await console.log(`Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`);
+  await bot.user.setActivity("Guild Wars 2");
   await console.log(`Bot's presence is set to: ${bot.user.presence.game.name}`);
+  await console.log(`Bot is in: ${bot.guilds.size} servers`);
+  await console.log("Awaiting orders...");
 });
 
 bot.on("message", message => {
