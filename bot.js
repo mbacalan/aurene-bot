@@ -29,10 +29,11 @@ bot.on("ready", async () => {
 bot.on("message", message => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-  const args = message.content.slice(prefix.length).split(/\s+/);
+  const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
 
   if (!bot.commands.has(commandName)) return;
+
   const command = bot.commands.get(commandName);
 
   if (command.args && !args.length) {
@@ -43,7 +44,7 @@ bot.on("message", message => {
     command.execute(message, args);
   } catch (error) {
     console.error(error);
-    message.reply("There was an error trying to execute that command!");
+    message.reply("there was an error trying to execute that command!");
   }
 });
 
