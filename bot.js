@@ -32,7 +32,6 @@ bot.on("message", message => {
   const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
 
-  if (!bot.commands.has(commandName)) return;
   // Check commands by name and alias
   const command = bot.commands.get(commandName)
     || bot.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
