@@ -33,9 +33,12 @@ bot.on("message", message => {
   const commandName = args.shift().toLowerCase();
 
   if (!bot.commands.has(commandName)) return;
+  // Check commands by name and alias
+  const command = bot.commands.get(commandName)
+    || bot.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-  const command = bot.commands.get(commandName);
-
+  if (!command) return;
+  // Check if command has args and/or usage, reply accordingly
   if (command.args && !args.length) {
     let reply = `You didn't provide any arguments, ${message.author}!`;
 
