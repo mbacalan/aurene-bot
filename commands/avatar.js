@@ -1,5 +1,6 @@
 module.exports = {
   name: "avatar",
+  aliases: ["avt", "icon"],
   description: "Get the avatar of a user",
   execute(message) {
     try {

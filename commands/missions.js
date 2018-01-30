@@ -1,5 +1,6 @@
 module.exports = {
   name: "missions",
+  aliases: ["gm", "guildmissions", "mission"],
   description: "Get useful info about Guild Missions",
   execute(message, args) {
     try {
