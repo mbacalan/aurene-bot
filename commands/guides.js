@@ -2,6 +2,7 @@ module.exports = {
   name: "guide",
   description: "Get some guide links for the raid boss of your choice",
   args: true,
+  usage: "bossname",
   execute(message, args) {
     try {
       if (args[0] === "cairn" || args[0] === "cairncer") {

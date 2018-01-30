@@ -3,8 +3,10 @@ const entries = JSON.parse(fs.readFileSync("./giveawayEntries.json", "utf8"));
 
 module.exports = {
   name: "giveaway",
+  aliases: ["giffaway", "lottery", "fortunetest"],
   description: "Create, enter and view giveaways",
   args: true,
+  usage: "enter OR create",
   execute(message, args) {
     try {
       const userId = entries[message.author.id];
