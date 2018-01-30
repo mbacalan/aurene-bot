@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.2.1",
-    "sqlite": "^2.8.0"
+    "sequelize": "^4.32.2"
   },
   "devDependencies": {
     "eslint": "^4.11.0"
