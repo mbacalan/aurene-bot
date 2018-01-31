@@ -6,7 +6,6 @@ const commandFiles = fs.readdirSync("./commands");
 // Get an instance of Discord Client
 const bot = new discord.Client({
   commandPrefix: prefix,
-  disableEveryone: true,
   owner,
 });
 
