@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { prefix } = require("../bot_config.json");
 const entries = JSON.parse(fs.readFileSync("./giveawayData.json", "utf8"));
 
 module.exports = {
@@ -15,12 +16,8 @@ module.exports = {
         if (!activeGiveaway) {
           message.reply("what would you like to giveaway?");
 
-          const filter = m => m.content.startsWith(">");
+          const filter = m => m.content.startsWith(prefix);
           const collector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
-
-          collector.on("collect", m => {
-            console.log(`Collected ${m.content}`);
-          });
 
           collector.on("end", collected => {
             entries["currentGiveaway"] = {
@@ -28,11 +25,10 @@ module.exports = {
               username: message.author.username,
               discriminator: message.author.discriminator,
               creatingTime: `${message.createdAt}`,
-              item: collected.content,
+              item: collected.first().content,
             };
             fs.writeFile("./giveawayData.json", JSON.stringify(entries, null, "\t"));
-            return message.channel.send(`@everyone, ${message.author} is giving away ${collected.content}!
-            Use \`\`>giveaway enter\`\` to have a chance at grabbing it!`);
+            return message.channel.send(`@everyone, ${message.author} is giving away ${collected.first().content}! Use \`\`>giveaway enter\`\` to have a chance at grabbing it!`);
           });
         } else if (activeGiveaway) {
           return message.reply("please wait for the ongoing giveaway to end.");
