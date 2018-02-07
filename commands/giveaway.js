@@ -14,7 +14,7 @@ module.exports = {
       const activeGiveaway = entries["currentGiveaway"];
       if (args[0] === "create") {
         if (!activeGiveaway) {
-          message.reply("what would you like to giveaway?");
+          message.channel.send("What would you like to giveaway?");
 
           const filter = m => m.content.startsWith(prefix);
           const collector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
@@ -28,6 +28,7 @@ module.exports = {
               item: collected.first().content,
             };
             fs.writeFile("./giveawayData.json", JSON.stringify(entries, null, "\t"));
+            message.channel.send("Alright, one last question: how long will the giveaway run for?");
             return message.channel.send(`@everyone, ${message.author} is giving away ${collected.first().content}! Use \`\`>giveaway enter\`\` to have a chance at grabbing it!`);
           });
         } else if (activeGiveaway) {
