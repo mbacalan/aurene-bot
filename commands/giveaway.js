@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
   storage: "./giveawayData.sqlite",
 });
 
-const entries = sequelize.import("../dbModels/Entries.js");
+const entries = sequelize.import("../dbModels/entries.js");
 const currentGiveaway = sequelize.import("../dbModels/currentGiveaway.js");
 const winners = sequelize.import("../dbModels/winners.js");
 
