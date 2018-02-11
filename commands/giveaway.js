@@ -1,3 +1,4 @@
+const { owner, leaders, officers } = require("../bot_config.json");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
@@ -11,7 +12,7 @@ const entries = sequelize.import("../dbModels/Entries.js");
 const currentGiveaway = sequelize.import("../dbModels/currentGiveaway.js");
 const winners = sequelize.import("../dbModels/winners.js");
 
-sequelize.sync({ force: true });
+sequelize.sync();
 
 module.exports = {
   name: "giveaway",
@@ -113,6 +114,11 @@ module.exports = {
         } else if (!activeGiveaway) {
           return message.reply("there is no active giveaway to enter!");
         }
+      } else if (args[0] === "clear") {
+        if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
+          sequelize.sync({ force: true });
+          return message.reply("databases forcefully synced!");
+        } return message.reply("this command is for owner only, pleb!");
       }
     } catch (error) {
       console.log(error);
