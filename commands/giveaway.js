@@ -5,6 +5,7 @@ const Op = Sequelize.Op;
 const sequelize = new Sequelize({
   host: "localhost",
   dialect: "sqlite",
+  logging: false,
   storage: "./giveawayData.sqlite",
 });
 
@@ -26,7 +27,7 @@ module.exports = {
       const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
       if (args[0] === "create") {
         if (!activeGiveaway) {
-          message.channel.send("What would you like to giveaway?");
+          message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
           const filter = m => m.author.id === message.author.id;
           const itemCollector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
 
@@ -35,7 +36,7 @@ module.exports = {
               return message.reply("you had to reply in 15 seconds, I don't have all day!");
             }
             const item = collectedItem.first().content;
-            message.channel.send("And how long will the giveaway run for?");
+            message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
             const durationCollector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
 
             durationCollector.on("end", collectedDuration => {
@@ -54,8 +55,9 @@ module.exports = {
                 });
               });
 
-              if (duration.includes("hour")) {
+              if (duration.includes("h")) {
                 const parsedDuration = parseInt(duration, 10) * 3600000;
+                console.log(`Created ${parsedDuration}(${duration}) timer for giveaway`);
                 setTimeout(async () => {
                   const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
                   if (winner === null) {
@@ -73,11 +75,13 @@ module.exports = {
                     });
                   });
                   message.channel.send(`Congratulations <@${winner.userId}>, you won ${item} from ${message.author}!`);
+                  console.log(`Giveaway ended. ${winner} won ${item}`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
-              } else if (duration.includes("min")) {
+              } else if (duration.includes("m")) {
                 const parsedDuration = parseInt(duration, 10) * 60000;
+                console.log(`Created ${parsedDuration}(${duration}) timer for giveaway`);
                 setTimeout(async () => {
                   const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
                   if (winner === null) {
@@ -95,12 +99,13 @@ module.exports = {
                     });
                   });
                   message.channel.send(`Congratulations <@${winner.userId}>, you won ${item} from ${message.author}!`);
+                  console.log(`Giveaway ended. ${winner} won ${item}`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
               }
 
-              return message.channel.send(`@everyone, ${message.author} is giving away **${item}**! Use \`\`>giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**`);
+              return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`>giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
             }); // durationCollector
           }); // itemCollector
         } else if (activeGiveaway) {
