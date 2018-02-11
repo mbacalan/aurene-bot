@@ -31,7 +31,7 @@ const currentGiveaway = sequelize.define("giveaway", {
     type: Sequelize.STRING,
     primaryKey: true,
   },
-  username: {
+  userName: {
     type: Sequelize.STRING,
     allowNull: false,
   },
@@ -73,16 +73,22 @@ module.exports = {
           const itemCollector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
 
           itemCollector.on("end", collectedItem => {
+            if (!collectedItem.first()) {
+              return message.reply("you had to reply in 15 seconds, I don't have all day!");
+            }
             const item = collectedItem.first().content;
             message.channel.send("And how long will the giveaway run for?");
             const durationCollector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
 
             durationCollector.on("end", collectedDuration => {
+              if (!collectedDuration.first()) {
+                return message.reply("you had to reply in 15 seconds, I don't have all day!");
+              }
               const duration = collectedDuration.first().content;
               currentGiveaway.sync().then(() => {
                 return currentGiveaway.create({
                   userId: message.author.id,
-                  username: message.author.username,
+                  userName: message.author.username,
                   discriminator: message.author.discriminator,
                   creationTime: `${message.createdAt}`,
                   item: item,
