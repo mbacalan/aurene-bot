@@ -7,54 +7,11 @@ const sequelize = new Sequelize("giveawayData", "admin", "password", {
   storage: "./giveawayData.sqlite",
 });
 
-const Entries = sequelize.define("entry", {
-  userId: {
-    type: Sequelize.STRING,
-    primaryKey: true,
-  },
-  userName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  discriminator: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  entryTime: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-});
+const entries = sequelize.import("../dbModels/Entries.js");
+const currentGiveaway = sequelize.import("../dbModels/currentGiveaway.js");
+const winners = sequelize.import("../dbModels/winners.js");
 
-const currentGiveaway = sequelize.define("giveaway", {
-  userId: {
-    type: Sequelize.STRING,
-    primaryKey: true,
-  },
-  userName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  discriminator: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  creationTime: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  item: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  duration: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-});
-
-Entries.sync({ force: true });
-currentGiveaway.sync({ force: true });
+sequelize.sync({ force: true });
 
 module.exports = {
   name: "giveaway",
@@ -64,7 +21,7 @@ module.exports = {
   usage: "enter OR create",
   async execute(message, args) {
     try {
-      const entryCheck = await Entries.findOne({ where: { userId: message.author.id } });
+      const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
       const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
       if (args[0] === "create") {
         if (!activeGiveaway) {
@@ -99,18 +56,36 @@ module.exports = {
               if (duration.includes("hour")) {
                 const parsedDuration = parseInt(duration, 10) * 3600000;
                 setTimeout(async () => {
-                  const winner = await Entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  winners.sync().then(() => {
+                    return winners.create({
+                      userId: message.author.id,
+                      userName: message.author.username,
+                      discriminator: message.author.discriminator,
+                      creationTime: `${message.createdAt}`,
+                      item: item,
+                    });
+                  });
                   message.channel.send(`<@${winner.userId}>, you won ${item} from ${message.author}`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
-                  return Entries.destroy({ where: {}, truncate: true });
+                  return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
               } else if (duration.includes("min")) {
                 const parsedDuration = parseInt(duration, 10) * 60000;
                 setTimeout(async () => {
-                  const winner = await Entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  winners.sync().then(() => {
+                    return winners.create({
+                      userId: message.author.id,
+                      userName: message.author.username,
+                      discriminator: message.author.discriminator,
+                      creationTime: `${message.createdAt}`,
+                      item: item,
+                    });
+                  });
                   message.channel.send(`<@${winner.userId}>, you won ${item} from ${message.author}`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
-                  return Entries.destroy({ where: {}, truncate: true });
+                  return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
               }
 
@@ -123,8 +98,8 @@ module.exports = {
       } else if (args[0] === "enter") {
         if (activeGiveaway) {
           if (!entryCheck) {
-            Entries.sync().then(() => {
-              return Entries.create({
+            entries.sync().then(() => {
+              return entries.create({
                 userId: message.author.id,
                 userName: message.author.username,
                 discriminator: message.author.discriminator,
