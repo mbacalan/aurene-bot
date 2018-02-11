@@ -2,7 +2,7 @@ const { owner, leaders, officers } = require("../bot_config.json");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
-const sequelize = new Sequelize("giveawayData", "admin", "password", {
+const sequelize = new Sequelize({
   host: "localhost",
   dialect: "sqlite",
   storage: "./giveawayData.sqlite",
@@ -58,6 +58,11 @@ module.exports = {
                 const parsedDuration = parseInt(duration, 10) * 3600000;
                 setTimeout(async () => {
                   const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  if (winner === null) {
+                    currentGiveaway.destroy({ where: {}, truncate: true });
+                    entries.destroy({ where: {}, truncate: true });
+                    return message.channel.send("Looks like no one entered the giveaway :(");
+                  }
                   winners.sync().then(() => {
                     return winners.create({
                       userId: message.author.id,
@@ -67,7 +72,7 @@ module.exports = {
                       item: item,
                     });
                   });
-                  message.channel.send(`<@${winner.userId}>, you won ${item} from ${message.author}`);
+                  message.channel.send(`Congratulations <@${winner.userId}>, you won ${item} from ${message.author}!`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
@@ -75,6 +80,11 @@ module.exports = {
                 const parsedDuration = parseInt(duration, 10) * 60000;
                 setTimeout(async () => {
                   const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  if (winner === null) {
+                    currentGiveaway.destroy({ where: {}, truncate: true });
+                    entries.destroy({ where: {}, truncate: true });
+                    return message.channel.send("Looks like no one entered the giveaway :(");
+                  }
                   winners.sync().then(() => {
                     return winners.create({
                       userId: message.author.id,
@@ -84,36 +94,34 @@ module.exports = {
                       item: item,
                     });
                   });
-                  message.channel.send(`<@${winner.userId}>, you won ${item} from ${message.author}`);
+                  message.channel.send(`Congratulations <@${winner.userId}>, you won ${item} from ${message.author}!`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
               }
 
-              return message.channel.send(`@everyone, ${message.author} is giving away ${item}! Use \`\`>giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in ${duration}`);
+              return message.channel.send(`@everyone, ${message.author} is giving away **${item}**! Use \`\`>giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**`);
             }); // durationCollector
           }); // itemCollector
         } else if (activeGiveaway) {
           return message.reply("please wait for the ongoing giveaway to end.");
         }
-      } else if (args[0] === "enter") {
-        if (activeGiveaway) {
-          if (!entryCheck) {
-            entries.sync().then(() => {
-              return entries.create({
-                userId: message.author.id,
-                userName: message.author.username,
-                discriminator: message.author.discriminator,
-                entryTime: `${message.createdAt}`,
-              });
+      } else if (args[0] === "enter" && activeGiveaway) {
+        if (!entryCheck) {
+          entries.sync().then(() => {
+            return entries.create({
+              userId: message.author.id,
+              userName: message.author.username,
+              discriminator: message.author.discriminator,
+              entryTime: `${message.createdAt}`,
             });
-            return message.reply(`You have entered the giveaway as ${message.author.username}#${message.author.discriminator}!`);
-          } else if (entryCheck) {
-            return message.reply("You've already entered this giveaway!");
-          }
-        } else if (!activeGiveaway) {
-          return message.reply("there is no active giveaway to enter!");
+          });
+          return message.reply(`You have entered the giveaway as ${message.author.username}#${message.author.discriminator}!`);
+        } else if (entryCheck) {
+          return message.reply("You've already entered this giveaway!");
         }
+      } else if (!activeGiveaway) {
+        return message.reply("there is no active giveaway to enter!");
       } else if (args[0] === "clear") {
         if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
           sequelize.sync({ force: true });
