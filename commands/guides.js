@@ -19,7 +19,7 @@ module.exports = {
   async execute(message, args) {
 
     async function bossInfo() {
-      let boss = await bosses.findOne({ where: { name: `${args[0]} ${args[1]}` } });
+      let boss = await bosses.findOne({ where: { name: args.join(" ") } });
       if (!boss) {
         boss = await bosses.findOne({ where: { alias: args[0] } });
       }
