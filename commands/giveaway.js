@@ -2,18 +2,18 @@ const { owner, leaders, officers } = require("../bot_config.json");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
-const sequelize = new Sequelize({
+const giveawayDb = new Sequelize({
   host: "localhost",
   dialect: "sqlite",
   logging: false,
   storage: "./giveawayData.sqlite",
 });
 
-const entries = sequelize.import("../dbModels/entries.js");
-const currentGiveaway = sequelize.import("../dbModels/currentGiveaway.js");
-const winners = sequelize.import("../dbModels/winners.js");
+const entries = giveawayDb.import("../dbModels/entries.js");
+const currentGiveaway = giveawayDb.import("../dbModels/currentGiveaway.js");
+const winners = giveawayDb.import("../dbModels/winners.js");
 
-sequelize.sync();
+giveawayDb.sync();
 
 module.exports = {
   name: "giveaway",
@@ -59,7 +59,7 @@ module.exports = {
                 const parsedDuration = parseInt(duration, 10) * 3600000;
                 console.log(`Created ${parsedDuration}(${duration}) timer for giveaway`);
                 setTimeout(async () => {
-                  const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  const winner = await entries.findOne({ attributes: ["userId"], order: giveawayDb.random() });
                   if (winner === null) {
                     currentGiveaway.destroy({ where: {}, truncate: true });
                     entries.destroy({ where: {}, truncate: true });
@@ -83,7 +83,7 @@ module.exports = {
                 const parsedDuration = parseInt(duration, 10) * 60000;
                 console.log(`Created ${parsedDuration}(${duration}) timer for giveaway`);
                 setTimeout(async () => {
-                  const winner = await entries.findOne({ attributes: ["userId"], order: sequelize.random() });
+                  const winner = await entries.findOne({ attributes: ["userId"], order: giveawayDb.random() });
                   if (winner === null) {
                     currentGiveaway.destroy({ where: {}, truncate: true });
                     entries.destroy({ where: {}, truncate: true });
@@ -129,7 +129,7 @@ module.exports = {
         return message.reply("there is no active giveaway to enter!");
       } else if (args[0] === "clear") {
         if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
-          sequelize.sync({ force: true });
+          giveawayDb.sync({ force: true });
           return message.reply("databases forcefully synced!");
         } return message.reply("this command is for owner only, pleb!");
       }
