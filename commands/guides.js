@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 const guidesDb = new Sequelize({
   host: "localhost",
   dialect: "sqlite",
-  // logging: false,
+  logging: false,
   storage: "./guideData.sqlite",
 });
 
