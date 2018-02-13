@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   return sequelize.define("winners", {
     userId: {
       type: DataTypes.STRING,
-      primaryKey: true,
+      allowNull: false,
     },
     userName: {
       type: DataTypes.STRING,

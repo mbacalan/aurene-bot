@@ -57,9 +57,9 @@ module.exports = {
 
               if (duration.includes("h")) {
                 const parsedDuration = parseInt(duration, 10) * 3600000;
-                console.log(`Created ${parsedDuration}(${duration}) timer for giveaway`);
+                console.log(`Created ${parsedDuration}(${duration}) timer for giveaway of ${item}`);
                 setTimeout(async () => {
-                  const winner = await entries.findOne({ attributes: ["userId"], order: giveawayDb.random() });
+                  const winner = await entries.findOne({ attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() });
                   if (winner === null) {
                     currentGiveaway.destroy({ where: {}, truncate: true });
                     entries.destroy({ where: {}, truncate: true });
@@ -67,23 +67,23 @@ module.exports = {
                   }
                   winners.sync().then(() => {
                     return winners.create({
-                      userId: message.author.id,
-                      userName: message.author.username,
-                      discriminator: message.author.discriminator,
+                      userId: winner.userId,
+                      userName: winner.userName,
+                      discriminator: winner.discriminator,
                       creationTime: `${message.createdAt}`,
                       item: item,
                     });
                   });
-                  message.channel.send(`Congratulations <@${winner.userId}>, you won ${item} from ${message.author}!`);
-                  console.log(`Giveaway ended. ${winner} won ${item}`);
+                  message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
+                  console.log(`The giveaway for ${item} ended.`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
               } else if (duration.includes("m")) {
                 const parsedDuration = parseInt(duration, 10) * 60000;
-                console.log(`Created ${parsedDuration}(${duration}) timer for giveaway`);
+                console.log(`Created ${parsedDuration}(${duration}) timer for giveaway of ${item}`);
                 setTimeout(async () => {
-                  const winner = await entries.findOne({ attributes: ["userId"], order: giveawayDb.random() });
+                  const winner = await entries.findOne({ attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() });
                   if (winner === null) {
                     currentGiveaway.destroy({ where: {}, truncate: true });
                     entries.destroy({ where: {}, truncate: true });
@@ -91,15 +91,15 @@ module.exports = {
                   }
                   winners.sync().then(() => {
                     return winners.create({
-                      userId: message.author.id,
-                      userName: message.author.username,
-                      discriminator: message.author.discriminator,
+                      userId: winner.userId,
+                      userName: winner.userName,
+                      discriminator: winner.discriminator,
                       creationTime: `${message.createdAt}`,
                       item: item,
                     });
                   });
-                  message.channel.send(`Congratulations <@${winner.userId}>, you won ${item} from ${message.author}!`);
-                  console.log(`Giveaway ended. ${winner} won ${item}`);
+                  message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
+                  console.log(`The giveaway for ${item} ended.`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
@@ -121,9 +121,9 @@ module.exports = {
               entryTime: `${message.createdAt}`,
             });
           });
-          return message.reply(`You have entered the giveaway as ${message.author.username}#${message.author.discriminator}!`);
+          return message.reply(`you entered the giveaway as ${message.author.username}#${message.author.discriminator}!`);
         } else if (entryCheck) {
-          return message.reply("You've already entered this giveaway!");
+          return message.reply("you already entered this giveaway!");
         }
       } else if (!activeGiveaway) {
         return message.reply("there is no active giveaway to enter!");
