@@ -24,7 +24,7 @@ module.exports = {
         boss = await bosses.findOne({ where: { alias: args[0] } });
       }
       const bossName = boss.name.charAt(0).toUpperCase() + boss.name.slice(1);
-      return message.reply(`\n\n${bossName} - ${boss.raidIndex}
+      return message.channel.send(`${bossName} - ${boss.raidIndex}
       \nWiki Guide: ${boss.wiki}
       \nVideo Guide: ${boss.video}
       \nGood luck!`);
