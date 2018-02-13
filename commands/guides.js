@@ -1,26 +1,61 @@
+const Sequelize = require("sequelize");
+
+const guidesDb = new Sequelize({
+  host: "localhost",
+  dialect: "sqlite",
+  // logging: false,
+  storage: "./guideData.sqlite",
+});
+
+const bosses = guidesDb.import("../dbModels/bosses.js");
+
+guidesDb.sync();
+
 module.exports = {
   name: "guide",
   description: "Get some guide links for the raid boss of your choice",
   args: true,
   usage: "bossname",
-  execute(message, args) {
+  async execute(message, args) {
+
+    async function bossInfo() {
+      let boss = await bosses.findOne({ where: { name: `${args[0]} ${args[1]}` } });
+      if (!boss) {
+        boss = await bosses.findOne({ where: { alias: args[0] } });
+      }
+      const bossName = boss.name.charAt(0).toUpperCase() + boss.name.slice(1);
+      return message.reply(`\n\n${bossName} - ${boss.raidIndex}
+      \nWiki Guide: ${boss.wiki}
+      \nVideo Guide: ${boss.video}
+      \nGood luck!`);
+    }
+
     try {
       if (args[0] === "cairn" || args[0] === "cairncer") {
-        return message.reply(`\n\nCairn the Indomitable - Raid 2 (Bastion of the Penitent), Boss 1
-        \nWiki Guide: https://wiki.guildwars2.com/wiki/Bastion_of_the_Penitent#Cairn_the_Indomitable
-        \nVideo Guide: https://www.youtube.com/watch?v=SjzG0qEi20o
-        \nGood luck!`);
-      } else if (args[0] === "mursaat overseer" || args[0] === "mursaat" || args[0] === "mo") {
-        return message.reply(`\n\nMursaat Overseer - Raid 2 (Bastion of the Penitent), Boss 2
-        \nWiki Guide: https://wiki.guildwars2.com/wiki/Bastion_of_the_Penitent#Mursaat_Overseer
-        \nVideo Guide: https://www.youtube.com/watch?v=pcYEEX6RgDM
-        \nGood luck!`);
+        return bossInfo();
+      } else if (args[0] === "mursaat" && args[1] === "overseer" || args[0] === "mo") {
+        return bossInfo();
       } else if (args[0] === "samarog" || args[0] === "sam") {
-        return message.reply(`\n\nSamarog - Raid 2 (Bastion of the Penitent), Boss 3
-        \nWiki Guide: https://wiki.guildwars2.com/wiki/Bastion_of_the_Penitent#Samarog
-        \nVideo Guide: https://www.youtube.com/watch?v=diwPG9Dsrt8
-        \nGood luck!`);
-      }
+        return bossInfo();
+      } else if (args[0] === "vale" && args[1] === "guardian" || args[0] === "vg") {
+        return bossInfo();
+      } else if (args[0] === "gorseval" || args[0] === "gorse") {
+        return bossInfo();
+      } else if (args[0] === "sabetha" || args[0] === "sab") {
+        return bossInfo();
+      } else if (args[0] === "slothasor" || args[0] === "sloth") {
+        return bossInfo();
+      } else if (args[0] === "bandit" && args[1] === "trio" || args[0] === "trio") {
+        return bossInfo();
+      } else if (args[0] === "matthias" || args[0] === "matt") {
+        return bossInfo();
+      } else if (args[0] === "escort" && args[1] === "glenna" || args[0] === "escort") {
+        return bossInfo();
+      } else if (args[0] === "keep" && args[1] === "construct" || args[0] === "kc") {
+        return bossInfo();
+      } else if (args[0] === "xera" || args[0] === "xera") {
+        return bossInfo();
+      } return message.reply("I couldn't find info about that boss");
     } catch (err) {
       console.log(err);
     }
