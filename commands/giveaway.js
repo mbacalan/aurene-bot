@@ -24,6 +24,7 @@ module.exports = {
   async execute(message, args) {
     try {
       const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
+      const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
       const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
       if (args[0] === "create") {
         if (!activeGiveaway) {
@@ -103,8 +104,9 @@ module.exports = {
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
+              } else if (!duration.includes("m") || !duration.includes("h")) {
+                return message.reply("I don't recognize that format. Try something like: ``5min`` or ``2h``");
               }
-
               return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`>giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
             }); // durationCollector
           }); // itemCollector
@@ -112,7 +114,7 @@ module.exports = {
           return message.reply("please wait for the ongoing giveaway to end.");
         }
       } else if (args[0] === "enter" && activeGiveaway) {
-        if (!entryCheck) {
+        if (!entryCheck && !giveawayCreator) {
           entries.sync().then(() => {
             return entries.create({
               userId: message.author.id,
@@ -124,6 +126,8 @@ module.exports = {
           return message.reply(`you entered the giveaway as ${message.author.username}#${message.author.discriminator}!`);
         } else if (entryCheck) {
           return message.reply("you already entered this giveaway!");
+        } else if (giveawayCreator) {
+          return message.reply("you can't enter your own giveaway!");
         }
       } else if (!activeGiveaway) {
         return message.reply("there is no active giveaway to enter!");
