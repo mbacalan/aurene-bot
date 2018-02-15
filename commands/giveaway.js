@@ -26,7 +26,7 @@ module.exports = {
     const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
     const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
     try {
-      if (args[0] === "create" && !activeGiveaway) {
+      if (args[0] === "create") {
         if (!activeGiveaway) {
           message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
           const filter = m => m.author.id === message.author.id;
@@ -47,7 +47,7 @@ module.exports = {
               }
 
               const duration = collectedDuration.first().content;
-              if (duration.includes("h")) {
+              if (duration.includes("h", 1)) {
                 const parsedDuration = parseInt(duration, 10) * 3600000;
 
                 currentGiveaway.sync().then(() => {
@@ -84,7 +84,7 @@ module.exports = {
                   currentGiveaway.destroy({ where: {}, truncate: true });
                   return entries.destroy({ where: {}, truncate: true });
                 }, parsedDuration);
-              } else if (duration.includes("m")) {
+              } else if (duration.includes("m", 1)) {
                 const parsedDuration = parseInt(duration, 10) * 60000;
 
                 currentGiveaway.sync().then(() => {
@@ -115,6 +115,7 @@ module.exports = {
                       item: item,
                     });
                   });
+
                   message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
                   console.log(`The giveaway for ${item} ended.`);
                   currentGiveaway.destroy({ where: {}, truncate: true });
