@@ -1,4 +1,4 @@
-const { owner, leaders, officers } = require("../bot_config.json");
+const { owner, leaders, officers, prefix } = require("../bot_config.json");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
@@ -126,7 +126,7 @@ module.exports = {
                 entries.destroy({ where: {}, truncate: true });
                 return message.reply("I don't recognize that format. Try something like: ``5min`` or ``2h``");
               }
-              return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`>giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
+              return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
             }); // durationCollector
           }); // itemCollector
         } else if (activeGiveaway) {
