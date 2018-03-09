@@ -1,15 +1,23 @@
+const { prefix } = require("../bot_config.json");
+
 module.exports = {
   name: "missions",
   aliases: ["gm", "guildmissions", "mission"],
-  description: "Get useful info about Guild Missions",
+  args: true,
+  description: "Alert members for starting Guild Missions and provide useful info to them",
   execute(message, args) {
     try {
-      if (!args[0]) {
-        message.channel.send(`Guild Missions can be lots of things: bounties, treks, races, puzzles or challenges! If you don't know what's what, I can help you with \`\`>missions bounty\`\` or \`\`>missions trek\`\` commands. Just type them in a channel and I'll give you some useful information!
-        \nOther than that, listen to leaders/officers and you'll do just fine. Good luck!`);
-      } else if (args[0] === "start" || args[0] === "starting") {
-        message.channel.send(`@everyone grab your omnomberry bars and apple ciders, it's time for Guild Missions! Come to our Guild Hall, join the squad and perhaps the voice channel.
-        \nLet's go get those <:commendation:402419240302411776>'s!`);
+      if (args[0] === "start") {
+        if (!args[1]) {
+          message.channel.send(`@everyone grab your omnomberry bars and apple ciders, it's time for Guild Missions! Come to our Guild Hall, join the squad and the voice channel, if you can.
+          \nHere are the links to help you with Trek and Bounty missions:
+          https://wiki.guildwars2.com/wiki/Guild_Trek#Possible_locations
+          https://wiki.guildwars2.com/wiki/Guild_Bounty#Possible_targets
+          If you need further help, you can use \`\`${prefix}mission trek\`\` and \`\`${prefix}missions bounty\`\` commands for more info.
+          \nLet's go get those <:commendation:326054375317307402>'s!`);
+        } else if (args[1]) {
+          message.channel.send(`@everyone ready your omnomberry bars and apple ciders, Guild Missions are starting in **${args[1]}**! We'll meet at our Guild Hall, create a squad and move on from there.`);
+        }
       } else if (args[0] === "bounty" || args[0] === "Bounty") {
         message.channel.send(`\nGuild Bounties are open world guild missions where members work together to kill targets across Tyria within 10-20 minutes. These NPCs are randomly chosen from a short list.
         \nPlease check https://wiki.guildwars2.com/wiki/Guild_Bounty#Possible_targets to see how/where you can find the chosen target and bring justice to them.
