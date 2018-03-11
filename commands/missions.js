@@ -17,7 +17,7 @@ module.exports = {
             If you need further help, you can use \`\`${prefix}mission trek\`\` and \`\`${prefix}missions bounty\`\` commands for more info.
             \nLet's go get those <:commendation:326054375317307402>'s!`);
           } else if (args[1]) {
-            message.channel.send(`@everyone ready your omnomberry bars and apple ciders, Guild Missions are starting in **${args[1]}**! We'll meet at our Guild Hall, create a squad and move on from there.`);
+            return message.channel.send(`@everyone ready your omnomberry bars and apple ciders, Guild Missions are starting in **${args[1]}**! We'll meet at our Guild Hall, create a squad and move on from there.`);
           }
         } return message.reply("only the owner, leaders and officers can use this command.");
       } else if (args[0] === "bounty" || args[0] === "Bounty") {
