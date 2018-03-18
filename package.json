@@ -1,12 +1,12 @@
 {
-  "name": "gw2apibot",
-  "version": "0.0.1",
-  "description": "A bot to play around with API",
+  "name": "aurenebot",
+  "version": "1.0",
+  "description": "A Guild Wars 2 themed bot for Discord",
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "myself",
+  "author": "Penemue#8514",
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.2.1",
