@@ -16,13 +16,14 @@ for (const file of commandFiles) {
   bot.commands.set(command.name, command);
 }
 
-bot.on("ready", async () => {
-  await console.log(`Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`);
-  await console.log(`Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`);
-  await bot.user.setActivity("Guild Wars 2");
-  await console.log(`Bot's presence is set to: ${bot.user.presence.game.name}`);
-  await console.log(`Bot is in: ${bot.guilds.size} servers`);
-  await console.log("Awaiting orders...");
+// Do these when bot is ready
+bot.on("ready", () => {
+  console.log(`Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`);
+  console.log(`Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`);
+  bot.user.setActivity("Guild Wars 2");
+  console.log(`Bot's presence is set to: ${bot.user.presence.game.name}`);
+  console.log(`Bot is in: ${bot.guilds.size} servers`);
+  console.log("Awaiting orders...");
 });
 
 bot.on("message", message => {
