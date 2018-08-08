@@ -27,9 +27,12 @@ bot.on("ready", () => {
 });
 
 bot.on("message", message => {
-  if (!message.content.startsWith(prefix) || message.author.bot) return;
+  // Prefix is either what's defined or the tag of the bot
+  const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${prefix})\\s*`);
+  if (!prefixRegex.test(message.content) || message.author.bot) return;
 
-  const args = message.content.slice(prefix.length).split(/ +/);
+  const [, matchedPrefix] = message.content.match(prefixRegex);
+  const args = message.content.slice(matchedPrefix.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
 
   // Check commands by name and alias
