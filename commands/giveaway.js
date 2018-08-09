@@ -169,7 +169,7 @@ module.exports = {
           return message.reply("you can't enter your own giveaway!");
         }
       } else if (!activeGiveaway) {
-        return message.reply("there is no active giveaway to enter!");
+        return message.reply("there is no active giveaway!");
       } else if (args[0] === "clear") {
         /* If something goes wrong and the bot is stuck without ending the giveaway,
         you can forcefully refresh the tables with this command. */
@@ -180,6 +180,16 @@ module.exports = {
         } else {
           return message.reply("you don't have permission to use this command!");
         }
+      } else if (args[0] === "list" && activeGiveaway) {
+        const entryList = [];
+        let entryCount;
+        await entries.findAll({ attributes: ["userName"] })
+          .then((entrants) => {
+            entrants.forEach((entrant) => entryList.push(entrant.userName));
+          });
+        await entries.findAndCountAll({ attributes: ["userName"] })
+          .then((response) => entryCount = response.count);
+        message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
       }
     } catch (error) {
       console.log(error);
