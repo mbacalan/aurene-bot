@@ -180,6 +180,16 @@ module.exports = {
         } else {
           return message.reply("you don't have permission to use this command!");
         }
+      } else if (args[0] === "list" && activeGiveaway) {
+        const entryList = [];
+        let entryCount;
+        await entries.findAll({ attributes: ["userName"] })
+          .then((entrants) => {
+            entrants.forEach((entrant) => entryList.push(entrant.userName));
+          });
+        await entries.findAndCountAll({ attributes: ["userName"] })
+          .then((response) => entryCount = response.count);
+        message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
       }
     } catch (error) {
       console.log(error);
