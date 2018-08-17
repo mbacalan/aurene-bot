@@ -189,7 +189,11 @@ module.exports = {
           });
         await entries.findAndCountAll({ attributes: ["userName"] })
           .then((response) => entryCount = response.count);
-        message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
+        if (!entryCount) {
+          message.channel.send("There are no entries yet.");
+        } else if (entryCount) {
+          message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
+        }
       }
     } catch (error) {
       console.log(error);
