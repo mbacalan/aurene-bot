@@ -28,6 +28,32 @@ module.exports = {
     const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
     const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
     const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
+
+    function createGiveaway(item, duration) {
+      currentGiveaway.sync().then(() => {
+        return currentGiveaway.create({
+          userId: message.author.id,
+          userName: message.author.username,
+          discriminator: message.author.discriminator,
+          creationTime: `${message.createdAt}`,
+          item: item,
+          duration: duration,
+        });
+      });
+    }
+
+    function createWinner(winner, item) {
+      winners.sync().then(() => {
+        return winners.create({
+          userId: winner.userId,
+          userName: winner.userName,
+          discriminator: winner.discriminator,
+          creationTime: `${message.createdAt}`,
+          item: item,
+        });
+      });
+    }
+
     try {
       if (args[0] === "create") {
         if (!activeGiveaway) {
@@ -58,16 +84,7 @@ module.exports = {
                 parse the string into an integer and multiply it with an hour in miliseconds */
                 const parsedDuration = parseInt(duration, 10) * 3600000;
 
-                currentGiveaway.sync().then(() => {
-                  return currentGiveaway.create({
-                    userId: message.author.id,
-                    userName: message.author.username,
-                    discriminator: message.author.discriminator,
-                    creationTime: `${message.createdAt}`,
-                    item: item,
-                    duration: duration,
-                  });
-                });
+                createGiveaway(item, duration);
 
                 console.log(`Created ${parsedDuration}(${duration}) timer for giveaway of ${item}`);
                 setTimeout(async () => {
@@ -81,15 +98,7 @@ module.exports = {
                     return console.log(`The giveaway for ${item} ended.`);
                   }
                   // Save the winner into the database, for fun
-                  winners.sync().then(() => {
-                    return winners.create({
-                      userId: winner.userId,
-                      userName: winner.userName,
-                      discriminator: winner.discriminator,
-                      creationTime: `${message.createdAt}`,
-                      item: item,
-                    });
-                  });
+                  createWinner(winner, item);
 
                   message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
                   console.log(`The giveaway for ${item} ended.`);
@@ -101,16 +110,7 @@ module.exports = {
                 parse the string into an integer and multiply it with a minute in miliseconds */
                 const parsedDuration = parseInt(duration, 10) * 60000;
 
-                currentGiveaway.sync().then(() => {
-                  return currentGiveaway.create({
-                    userId: message.author.id,
-                    userName: message.author.username,
-                    discriminator: message.author.discriminator,
-                    creationTime: `${message.createdAt}`,
-                    item: item,
-                    duration: duration,
-                  });
-                });
+                createGiveaway(item, duration);
 
                 console.log(`${message.author.id} is giving away ${item}`);
                 console.log(`Created ${duration}(${parsedDuration}ms) timer for giveaway of ${item}`);
@@ -122,15 +122,7 @@ module.exports = {
                     return message.channel.send("Looks like no one entered the giveaway :(");
                   }
 
-                  winners.sync().then(() => {
-                    return winners.create({
-                      userId: winner.userId,
-                      userName: winner.userName,
-                      discriminator: winner.discriminator,
-                      creationTime: `${message.createdAt}`,
-                      item: item,
-                    });
-                  });
+                  createWinner(winner, item);
 
                   console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
                   message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
