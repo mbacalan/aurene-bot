@@ -26,7 +26,6 @@ module.exports = {
   usage: "enter OR create",
   async execute(message, args) {
     const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
-    const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
     const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
 
     function createGiveaway(item, duration) {
@@ -55,13 +54,17 @@ module.exports = {
     }
 
     try {
-      if (args[0] === "create") {
-        if (!activeGiveaway) {
+      if (!activeGiveaway) {
+        return message.reply("there is no active giveaway!");
+      }
+
+      switch (args[0]) {
+        case "create": {
           message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
           // Create a filter to listen to author's input only
           const filter = m => m.author.id === message.author.id;
           /* Create the collector to learn the giveaway item,
-          which will end when the filter has a match or when time runs out */
+            which will end when the filter has a match or when time runs out */
           const itemCollector = message.channel.createMessageCollector(filter, { max: 1, time: 15000 });
           itemCollector.on("end", collectedItem => {
             // If nothing is collected, return
@@ -81,7 +84,7 @@ module.exports = {
               const duration = collectedDuration.first().content;
               if (duration.includes("h", 1)) {
                 /* If the collectedDuration includes "h" in it,
-                parse the string into an integer and multiply it with an hour in miliseconds */
+                  parse the string into an integer and multiply it with an hour in miliseconds */
                 const parsedDuration = parseInt(duration, 10) * 3600000;
 
                 createGiveaway(item, duration);
@@ -107,7 +110,7 @@ module.exports = {
                 }, parsedDuration);
               } else if (duration.includes("m", 1)) {
                 /* If the collectedDuration includes "m" in it,
-                parse the string into an integer and multiply it with a minute in miliseconds */
+                  parse the string into an integer and multiply it with a minute in miliseconds */
                 const parsedDuration = parseInt(duration, 10) * 60000;
 
                 createGiveaway(item, duration);
@@ -138,12 +141,15 @@ module.exports = {
               return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
             }); // durationCollector
           }); // itemCollector
-        } else if (activeGiveaway) {
-          return message.reply("please wait for the ongoing giveaway to end.");
-        } // create arg
+        }
+          break;
 
-      } else if (args[0] === "enter" && activeGiveaway) {
-        if (!entryCheck && !giveawayCreator) {
+        case "enter": {
+          const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
+
+          if (giveawayCreator) return message.reply("you can't enter your own giveaway!");
+          if (entryCheck) return message.reply("you *already* entered this giveaway!");
+
           entries.sync().then(() => {
             return entries.create({
               userId: message.author.id,
@@ -154,38 +160,36 @@ module.exports = {
           });
 
           console.log(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
-          return message.reply("you have entered the giveaway, good luck!");
-        } else if (entryCheck) {
-          return message.reply("you *already* entered this giveaway!");
-        } else if (giveawayCreator) {
-          return message.reply("you can't enter your own giveaway!");
+          message.reply("you have entered the giveaway, good luck!");
         }
-      } else if (!activeGiveaway) {
-        return message.reply("there is no active giveaway!");
-      } else if (args[0] === "clear") {
-        /* If something goes wrong and the bot is stuck without ending the giveaway,
-        you can forcefully refresh the tables with this command. */
-        if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
-          currentGiveaway.sync({ force: true });
-          entries.sync({ force: true });
-          return message.reply("database tables are cleared!");
-        } else {
-          return message.reply("you don't have permission to use this command!");
+          break;
+
+        case "list": {
+          const entryList = [];
+          let entryCount;
+          await entries.findAll({ attributes: ["userName"] })
+            .then((entrants) => {
+              entrants.forEach((entrant) => entryList.push(entrant.userName));
+            });
+          await entries.findAndCountAll({ attributes: ["userName"] })
+            .then((response) => entryCount = response.count);
+          if (!entryCount) {
+            message.channel.send("There are no entries yet.");
+          } else if (entryCount) {
+            message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
+          }
         }
-      } else if (args[0] === "list" && activeGiveaway) {
-        const entryList = [];
-        let entryCount;
-        await entries.findAll({ attributes: ["userName"] })
-          .then((entrants) => {
-            entrants.forEach((entrant) => entryList.push(entrant.userName));
-          });
-        await entries.findAndCountAll({ attributes: ["userName"] })
-          .then((response) => entryCount = response.count);
-        if (!entryCount) {
-          message.channel.send("There are no entries yet.");
-        } else if (entryCount) {
-          message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
-        }
+          break;
+        case "clear":
+          /* If something goes wrong and the bot is stuck without ending the giveaway,
+                  you can forcefully refresh the tables with this command. */
+          if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
+            currentGiveaway.sync({ force: true });
+            entries.sync({ force: true });
+            return message.reply("database tables are cleared!");
+          } else {
+            return message.reply("you don't have permission to use this command!");
+          }
       }
     } catch (error) {
       console.log(error);
