@@ -68,6 +68,7 @@ module.exports = {
             .then(collected => item = collected.first().content)
             .catch(() => {
               message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+              throw new Error("Error: User reply for item timed out");
             });
 
           await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
@@ -75,6 +76,7 @@ module.exports = {
             .then(collected => duration = collected.first().content)
             .catch(() => {
               message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+              throw new Error("Error: User reply for duration timed out");
             });
 
           if (duration.includes("h", 1)) {
@@ -93,10 +95,11 @@ module.exports = {
                 currentGiveaway.destroy({ where: {}, truncate: true });
                 entries.destroy({ where: {}, truncate: true });
                 message.channel.send("Looks like no one entered the giveaway :(");
-                return console.log(`The giveaway for ${item} ended.`);
+                throw new Error(`No one entered the giveaway of ${item}`);
               }
               // Save the winner into the database, for fun
               createWinner(winner, item);
+
 
               message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
               console.log(`The giveaway for ${item} ended.`);
@@ -113,29 +116,38 @@ module.exports = {
             console.log(`${message.author.id} is giving away ${item}`);
             console.log(`Created ${duration}(${parsedDuration}ms) timer for giveaway of ${item}`);
             setTimeout(async () => {
-              const winner = await entries.findOne({ attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() });
-              if (winner === null) {
+              try {
+                const winner = await entries.findOne(
+                  { attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() }
+                );
+
+                if (winner === null) {
+                  currentGiveaway.destroy({ where: {}, truncate: true });
+                  entries.destroy({ where: {}, truncate: true });
+                  message.channel.send("Looks like no one entered the giveaway :(");
+                  throw new Error(`No one entered the giveaway of ${item}`);
+                }
+
+                createWinner(winner, item);
+
+                console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
+                message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
                 currentGiveaway.destroy({ where: {}, truncate: true });
-                entries.destroy({ where: {}, truncate: true });
-                return message.channel.send("Looks like no one entered the giveaway :(");
+                return entries.destroy({ where: {}, truncate: true });
+              } catch (err) {
+                console.log(err.message);
               }
-
-              createWinner(winner, item);
-
-              console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
-              message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
-              currentGiveaway.destroy({ where: {}, truncate: true });
-              return entries.destroy({ where: {}, truncate: true });
             }, parsedDuration);
           } else if (!duration.includes("m") || !duration.includes("h")) {
             // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
             currentGiveaway.destroy({ where: {}, truncate: true });
             entries.destroy({ where: {}, truncate: true });
-            return message.reply("I don't recognize that format. Try something like: ``5min`` or ``2h``");
+            message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+            throw new Error("Error: Can not parse user's reply for duration");
           }
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
         } catch (err) {
-          console.log(err);
+          console.log(err.message);
         }
       }
         break;
