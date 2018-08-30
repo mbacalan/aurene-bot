@@ -54,6 +54,32 @@ module.exports = {
       });
     }
 
+    function createTimer(item, parsedDuration) {
+      setTimeout(async () => {
+        try {
+          const winner = await entries.findOne(
+            { attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() }
+          );
+
+          if (winner === null) {
+            currentGiveaway.destroy({ where: {}, truncate: true });
+            entries.destroy({ where: {}, truncate: true });
+            message.channel.send("Looks like no one entered the giveaway :(");
+            throw new Error(`No one entered the giveaway of ${item}`);
+          }
+
+          createWinner(winner, item);
+
+          console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
+          message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
+          currentGiveaway.destroy({ where: {}, truncate: true });
+          return entries.destroy({ where: {}, truncate: true });
+        } catch (err) {
+          console.log(err.message);
+        }
+      }, parsedDuration);
+    }
+
     switch (args[0]) {
       case "create": {
         let item;
@@ -87,56 +113,14 @@ module.exports = {
             const parsedDuration = parseInt(duration, 10) * 3600000;
 
             createGiveaway(item, duration);
-
-            setTimeout(async () => {
-              // Look for entries with the given attributes and randomly pick one of them
-              const winner = await entries.findOne({ attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() });
-              if (winner === null) {
-                // If winner is null, that means no one entered. Recreate the tables for a fresh start
-                currentGiveaway.destroy({ where: {}, truncate: true });
-                entries.destroy({ where: {}, truncate: true });
-                message.channel.send("Looks like no one entered the giveaway :(");
-                throw new Error(`No one entered the giveaway of ${item}`);
-              }
-              // Save the winner into the database, for fun
-              createWinner(winner, item);
-
-
-              message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
-              console.log(`The giveaway for ${item} ended.`);
-              currentGiveaway.destroy({ where: {}, truncate: true });
-              return entries.destroy({ where: {}, truncate: true });
-            }, parsedDuration);
+            createTimer(item, parsedDuration);
           } else if (duration.includes("m", 1)) {
             /* If the collectedDuration includes "m" in it,
               parse the string into an integer and multiply it with a minute in miliseconds */
             const parsedDuration = parseInt(duration, 10) * 60000;
 
             createGiveaway(item, duration);
-
-            setTimeout(async () => {
-              try {
-                const winner = await entries.findOne(
-                  { attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() }
-                );
-
-                if (winner === null) {
-                  currentGiveaway.destroy({ where: {}, truncate: true });
-                  entries.destroy({ where: {}, truncate: true });
-                  message.channel.send("Looks like no one entered the giveaway :(");
-                  throw new Error(`No one entered the giveaway of ${item}`);
-                }
-
-                createWinner(winner, item);
-
-                console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
-                message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
-                currentGiveaway.destroy({ where: {}, truncate: true });
-                return entries.destroy({ where: {}, truncate: true });
-              } catch (err) {
-                console.log(err.message);
-              }
-            }, parsedDuration);
+            createTimer(item, parsedDuration);
           } else if (!duration.includes("m") || !duration.includes("h")) {
             // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
             currentGiveaway.destroy({ where: {}, truncate: true });
