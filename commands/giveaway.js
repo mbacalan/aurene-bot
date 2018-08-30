@@ -39,6 +39,7 @@ module.exports = {
           duration: duration,
         });
       });
+      console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
     function createWinner(winner, item) {
@@ -59,6 +60,7 @@ module.exports = {
         let duration;
 
         try {
+          console.log(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
           // Create a filter to listen to author's input only
           const filter = m => m.author.id === message.author.id;
           // Send the initial message asking for user input
@@ -86,7 +88,6 @@ module.exports = {
 
             createGiveaway(item, duration);
 
-            console.log(`Created ${parsedDuration}(${duration}) timer for giveaway of ${item}`);
             setTimeout(async () => {
               // Look for entries with the given attributes and randomly pick one of them
               const winner = await entries.findOne({ attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() });
@@ -113,8 +114,6 @@ module.exports = {
 
             createGiveaway(item, duration);
 
-            console.log(`${message.author.id} is giving away ${item}`);
-            console.log(`Created ${duration}(${parsedDuration}ms) timer for giveaway of ${item}`);
             setTimeout(async () => {
               try {
                 const winner = await entries.findOne(
