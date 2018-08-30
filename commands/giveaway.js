@@ -107,28 +107,32 @@ module.exports = {
               throw new Error("Error: User reply for duration timed out");
             });
 
-          if (duration.includes("h", 1)) {
-            /* If the collectedDuration includes "h" in it,
-              parse the string into an integer and multiply it with an hour in miliseconds */
-            const parsedDuration = parseInt(duration, 10) * 3600000;
-
-            createGiveaway(item, duration);
-            createTimer(item, parsedDuration);
-          } else if (duration.includes("m", 1)) {
-            /* If the collectedDuration includes "m" in it,
-              parse the string into an integer and multiply it with a minute in miliseconds */
-            const parsedDuration = parseInt(duration, 10) * 60000;
-
-            createGiveaway(item, duration);
-            createTimer(item, parsedDuration);
-          } else if (!duration.includes("m") || !duration.includes("h")) {
-            // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
+          // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
+          if (!duration.includes("m") || !duration.includes("h")) {
             currentGiveaway.destroy({ where: {}, truncate: true });
             entries.destroy({ where: {}, truncate: true });
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
             throw new Error("Error: Can not parse user's reply for duration");
           }
-          return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
+
+          if (duration.includes("h", 1)) {
+            /* If the collectedDuration includes "h" in it,
+              parse the string into an integer and multiply it with an hour in miliseconds */
+            const parsedDuration = parseInt(duration, 10) * 3600000;
+            // Create the giveaway in database
+            createGiveaway(item, duration);
+            // Create the timer with setTimeout and resolve it with a winner
+            createTimer(item, parsedDuration);
+          }
+
+          if (duration.includes("m", 1)) {
+            const parsedDuration = parseInt(duration, 10) * 60000;
+            createGiveaway(item, duration);
+            createTimer(item, parsedDuration);
+          }
+
+          return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!\
+           Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
         } catch (err) {
           console.log(err.message);
         }
@@ -164,16 +168,18 @@ module.exports = {
           });
         await entries.findAndCountAll({ attributes: ["userName"] })
           .then((response) => entryCount = response.count);
+
         if (!entryCount) {
-          message.channel.send("There are no entries yet.");
-        } else if (entryCount) {
-          message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
+          return message.channel.send("There are no entries yet.");
         }
+
+        message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
       }
         break;
+
       case "clear":
         /* If something goes wrong and the bot is stuck without ending the giveaway,
-                you can forcefully refresh the tables with this command. */
+          you can forcefully refresh the tables with this command. */
         if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
           currentGiveaway.sync({ force: true });
           entries.sync({ force: true });
