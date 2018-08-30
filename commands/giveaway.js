@@ -65,7 +65,7 @@ module.exports = {
             currentGiveaway.destroy({ where: {}, truncate: true });
             entries.destroy({ where: {}, truncate: true });
             message.channel.send("Looks like no one entered the giveaway :(");
-            throw new Error(`No one entered the giveaway of ${item}`);
+            throw new Error(`No one entered the giveaway of ${item}.`);
           }
 
           createWinner(winner, item);
@@ -84,6 +84,8 @@ module.exports = {
       case "create": {
         let item;
         let duration;
+
+        if (activeGiveaway) return message.reply("please wait for current giveaway to end.");
 
         try {
           console.log(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
@@ -108,7 +110,7 @@ module.exports = {
             });
 
           // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
-          if (!duration.includes("m") || !duration.includes("h")) {
+          if (!duration.includes("m") && !duration.includes("h")) {
             currentGiveaway.destroy({ where: {}, truncate: true });
             entries.destroy({ where: {}, truncate: true });
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
@@ -123,16 +125,14 @@ module.exports = {
             createGiveaway(item, duration);
             // Create the timer with setTimeout and resolve it with a winner
             createTimer(item, parsedDuration);
-          }
-
-          if (duration.includes("m", 1)) {
+          } else if (duration.includes("m", 1)) {
             const parsedDuration = parseInt(duration, 10) * 60000;
             createGiveaway(item, duration);
             createTimer(item, parsedDuration);
           }
 
-          return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!\
-           Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
+          return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
+          } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
         } catch (err) {
           console.log(err.message);
         }
@@ -140,6 +140,8 @@ module.exports = {
         break;
 
       case "enter": {
+        if (!activeGiveaway) return message.reply("there is no active giveaway to enter.");
+
         const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
 
         if (giveawayCreator) return message.reply("you can't enter your own giveaway!");
@@ -160,6 +162,8 @@ module.exports = {
         break;
 
       case "list": {
+        if (!activeGiveaway) return message.reply("there is no active giveaway to list the entries of.");
+
         const entryList = [];
         let entryCount;
         await entries.findAll({ attributes: ["userName"] })
@@ -184,9 +188,8 @@ module.exports = {
           currentGiveaway.sync({ force: true });
           entries.sync({ force: true });
           return message.reply("database tables are cleared!");
-        } else {
-          return message.reply("you don't have permission to use this command!");
         }
+        return message.reply("you don't have permission to use this command!");
     }
   },
 };
