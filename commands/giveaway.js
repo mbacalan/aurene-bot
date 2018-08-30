@@ -23,7 +23,7 @@ module.exports = {
   aliases: ["giffaway", "lottery", "fortunetest"],
   description: "Create, enter and view giveaways",
   args: true,
-  usage: ">giveaway create/enter/list",
+  usage: "create/enter/list",
   async execute(message, args) {
     const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
     const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
