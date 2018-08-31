@@ -121,19 +121,25 @@ module.exports = {
           if (duration.includes("h", 1)) {
             /* If the collectedDuration includes "h" in it,
               parse the string into an integer and multiply it with an hour in miliseconds */
-            const parsedDuration = parseInt(duration, 10) * 3600000;
+            const intDuration = parseInt(duration, 10);
+            const parsedDuration = intDuration * 3600000;
             // Create the giveaway in database
             createGiveaway(item, duration);
             // Create the timer with setTimeout and resolve it with a winner
             createTimer(item, parsedDuration);
+            // ${"" } is used to eat the whitespace to avoid creating a new line.
+            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
+            } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!${""
+            } The giveaway will end in **${intDuration} hour(s)**.`);
           } else if (duration.includes("m", 1)) {
-            const parsedDuration = parseInt(duration, 10) * 60000;
+            const intDuration = parseInt(duration, 10);
+            const parsedDuration = intDuration * 60000;
             createGiveaway(item, duration);
             createTimer(item, parsedDuration);
+            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
+            } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!${""
+            } The giveaway will end in **${intDuration} minute(s)**.`);
           }
-
-          return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
-          } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it! The giveaway will end in **${duration}**.`);
         } catch (err) {
           console.log(err.message);
         }
