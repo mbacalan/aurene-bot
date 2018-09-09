@@ -30,7 +30,7 @@ module.exports = {
     const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
     const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
 
-    function createGiveaway(item, duration) {
+    function createGiveaway(item, duration, endTime) {
       currentGiveaway.sync().then(() => {
         return currentGiveaway.create({
           userId: message.author.id,
@@ -39,6 +39,7 @@ module.exports = {
           creationTime: `${message.createdAt}`,
           item: item,
           duration: duration,
+          endTime: endTime,
         });
       });
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
