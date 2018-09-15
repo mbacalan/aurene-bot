@@ -1,6 +1,7 @@
 const { owner, leaders, officers, prefix } = require("../bot_config.json");
 const Sequelize = require("sequelize");
 const moment = require("moment");
+// eslint-disable-next-line
 const countdown = require("moment-countdown");
 const Op = Sequelize.Op;
 
@@ -58,27 +59,27 @@ module.exports = {
     }
 
     async function endGiveaway(item) {
-        try {
-          const winner = await entries.findOne(
-            { attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() }
-          );
+      try {
+        const winner = await entries.findOne(
+          { attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() }
+        );
 
-          if (winner === null) {
-            currentGiveaway.destroy({ where: {}, truncate: true });
-            entries.destroy({ where: {}, truncate: true });
-            message.channel.send("Looks like no one entered the giveaway :(");
-            throw new Error(`No one entered the giveaway of ${item}.`);
-          }
-
-          createWinner(winner, item);
-
-          console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
-          message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
+        if (winner === null) {
           currentGiveaway.destroy({ where: {}, truncate: true });
-          return entries.destroy({ where: {}, truncate: true });
-        } catch (err) {
-          console.log(err.message);
+          entries.destroy({ where: {}, truncate: true });
+          message.channel.send("Looks like no one entered the giveaway :(");
+          throw new Error(`No one entered the giveaway of ${item}.`);
         }
+
+        createWinner(winner, item);
+
+        console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
+        message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
+        currentGiveaway.destroy({ where: {}, truncate: true });
+        return entries.destroy({ where: {}, truncate: true });
+      } catch (err) {
+        console.log(err.message);
+      }
     }
 
     function initCountdown(item, countdownDuration) {
@@ -140,7 +141,6 @@ module.exports = {
           } else if (duration.includes("m", 1)) {
             const intDuration = parseInt(duration, 10);
             const endTime = moment().add(intDuration, "minutes");
-            console.log(typeof endTime);
             createGiveaway(item, duration, endTime);
             initCountdown(item, endTime);
             return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
@@ -192,6 +192,15 @@ module.exports = {
         }
 
         message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
+      }
+        break;
+
+      case "timeleft": {
+        if (!activeGiveaway) return message.reply("there is no active giveaway!");
+
+        const giveawayEndTime = await currentGiveaway.findOne({ attributes: ["endTime"] });
+        const countdownString = moment().countdown(giveawayEndTime.endTime).toString();
+        message.channel.send(`The giveaway will end in: **${countdownString}**`);
       }
         break;
 
