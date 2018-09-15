@@ -59,4 +59,6 @@ bot.on("message", message => {
   }
 });
 
+bot.on("error", error => console.log(error));
+
 bot.login(token);
