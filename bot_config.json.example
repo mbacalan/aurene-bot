@@ -1,5 +1,7 @@
 {
   "token": "token",
   "owner": "owner id",
+  "leaders": "\@Leader will give the id, write only the numbers here",
+  "officers": "same here",
   "prefix": ">"
 }
