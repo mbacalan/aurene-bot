@@ -1,4 +1,5 @@
 const { owner, leaders, officers, prefix } = require("../bot_config.json");
+const { RichEmbed } = require("discord.js");
 const Sequelize = require("sequelize");
 const moment = require("moment");
 // eslint-disable-next-line
@@ -21,6 +22,12 @@ const winners = giveawayDb.import("../dbModels/winners.js");
 // Sync the database
 giveawayDb.sync();
 
+// Shared info about giveaway
+const gwy = {
+  item: "",
+  duration: "",
+};
+
 module.exports = {
   name: "giveaway",
   aliases: ["giffaway", "lottery", "fortunetest"],
@@ -31,14 +38,10 @@ module.exports = {
 
     const dbChecks = {
       entryCheck: await entries.findOne({ where: { userId: message.author.id } }),
+      creatorCheck: await currentGiveaway.findOne({ where: { userId: message.author.id } }),
       activeGiveaway: await currentGiveaway.findOne({ status: { [Op.not]: false } }),
-      giveawayCreator: await currentGiveaway.findOne({ where: { userId: message.author.id } }),
       giveawayEndTime: await currentGiveaway.findOne({ attributes: ["endTime"] }),
-    };
-
-    const gwy = {
-      item: "",
-      duration: "",
+      giveawayCreator: await currentGiveaway.findOne({ attributes: ["userName"] }),
     };
 
     function createGiveaway(item, duration, endTime) {
@@ -162,7 +165,7 @@ module.exports = {
 
       case "enter": {
         if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to enter.");
-        if (dbChecks.giveawayCreator) return message.reply("you can't enter your own giveaway!");
+        if (dbChecks.creatorCheck) return message.reply("you can't enter your own giveaway!");
         if (dbChecks.entryCheck) return message.reply("you *already* entered this giveaway!");
 
         entries.sync().then(() => {
@@ -200,6 +203,25 @@ module.exports = {
         if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway!");
         const countdownString = moment().countdown(dbChecks.giveawayEndTime.endTime).toString();
         message.channel.send(`The giveaway will end in: **${countdownString}**`);
+      }
+        break;
+
+      case "info": {
+        const countdownString = moment().countdown(dbChecks.giveawayEndTime.endTime).toString();
+        const infoEmbed = new RichEmbed()
+          .setTitle(`Giveaway by ${dbChecks.giveawayCreator.userName}`)
+          .addField("Item", `${gwy.item}`, true)
+          .addField("Duration", `${gwy.duration}`, true)
+          .addField("Ends In", `${countdownString}`, true)
+          .setFooter(`Enter this giveaway by sending: ${prefix}giveaway enter`);
+
+        message.channel.send(infoEmbed)
+          .catch(() => {
+            message.reply("it looks like I don't have permissions to send an embed. Here is a boring version instead:");
+            message.channel.send(`${dbChecks.giveawayCreator.userName} is giving away **${gwy.item}**!${""
+            } The giveaway will end in **${countdownString}**.${""
+            }  Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!`);
+          });
       }
         break;
 
