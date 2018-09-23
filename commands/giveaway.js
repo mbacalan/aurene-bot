@@ -28,8 +28,18 @@ module.exports = {
   args: true,
   usage: "create/enter/list",
   async execute(message, args) {
-    const entryCheck = await entries.findOne({ where: { userId: message.author.id } });
-    const activeGiveaway = await currentGiveaway.findOne({ status: { [Op.not]: false } });
+
+    const dbChecks = {
+      entryCheck: await entries.findOne({ where: { userId: message.author.id } }),
+      activeGiveaway: await currentGiveaway.findOne({ status: { [Op.not]: false } }),
+      giveawayCreator: await currentGiveaway.findOne({ where: { userId: message.author.id } }),
+      giveawayEndTime: await currentGiveaway.findOne({ attributes: ["endTime"] }),
+    };
+
+    const gwy = {
+      item: "",
+      duration: "",
+    };
 
     function createGiveaway(item, duration, endTime) {
       currentGiveaway.sync().then(() => {
@@ -89,10 +99,7 @@ module.exports = {
 
     switch (args[0]) {
       case "create": {
-        let item;
-        let duration;
-
-        if (activeGiveaway) return message.reply("please wait for current giveaway to end.");
+        if (dbChecks.activeGiveaway) return message.reply("please wait for current giveaway to end.");
 
         try {
           console.log(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
@@ -102,7 +109,7 @@ module.exports = {
           await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
           // Create the collector to learn the giveaway item
           await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] })
-            .then(collected => item = collected.first().content)
+            .then(collected => gwy.item = collected.first().content)
             .catch(() => {
               message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
               throw new Error("Error: User reply for item timed out");
@@ -110,40 +117,40 @@ module.exports = {
 
           await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
           await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] })
-            .then(collected => duration = collected.first().content)
+            .then(collected => gwy.duration = collected.first().content)
             .catch(() => {
               message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
               throw new Error("Error: User reply for duration timed out");
             });
 
           // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
-          if ((!duration.includes("m") && !duration.includes("h")) ||
-            (duration.includes("m") && duration.includes("h"))) {
+          if ((!gwy.duration.includes("m") && !gwy.duration.includes("h")) ||
+            (gwy.duration.includes("m") && gwy.duration.includes("h"))) {
             currentGiveaway.destroy({ where: {}, truncate: true });
             entries.destroy({ where: {}, truncate: true });
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
             throw new Error("Error: Can not parse user's reply for duration");
           }
 
-          if (duration.includes("h", 1)) {
+          if (gwy.duration.includes("h", 1)) {
             /* If the collectedDuration includes "h" in it,
               parse the string into an integer and multiply it with an hour in miliseconds */
-            const intDuration = parseInt(duration, 10);
+            const intDuration = parseInt(gwy.duration, 10);
             const endTime = moment().add(intDuration, "hours");
             // Create the giveaway in database
-            createGiveaway(item, duration, endTime);
+            createGiveaway(gwy.item, gwy.duration, endTime);
             // Create the timer with setTimeout and resolve it with a winner
-            initCountdown(item, endTime);
+            initCountdown(gwy.item, endTime);
             // ${"" } is used to eat the whitespace to avoid creating a new line.
-            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
+            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${gwy.item}**!${""
             } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!${""
             } The giveaway will end in **${intDuration} hour(s)**.`);
-          } else if (duration.includes("m", 1)) {
-            const intDuration = parseInt(duration, 10);
+          } else if (gwy.duration.includes("m", 1)) {
+            const intDuration = parseInt(gwy.duration, 10);
             const endTime = moment().add(intDuration, "minutes");
-            createGiveaway(item, duration, endTime);
-            initCountdown(item, endTime);
-            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
+            createGiveaway(gwy.item, gwy.duration, endTime);
+            initCountdown(gwy.item, endTime);
+            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${gwy.item}**!${""
             } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!${""
             } The giveaway will end in **${intDuration} minute(s)**.`);
           }
@@ -154,12 +161,9 @@ module.exports = {
         break;
 
       case "enter": {
-        if (!activeGiveaway) return message.reply("there is no active giveaway to enter.");
-
-        const giveawayCreator = await currentGiveaway.findOne({ where: { userId: message.author.id } });
-
-        if (giveawayCreator) return message.reply("you can't enter your own giveaway!");
-        if (entryCheck) return message.reply("you *already* entered this giveaway!");
+        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to enter.");
+        if (dbChecks.giveawayCreator) return message.reply("you can't enter your own giveaway!");
+        if (dbChecks.entryCheck) return message.reply("you *already* entered this giveaway!");
 
         entries.sync().then(() => {
           return entries.create({
@@ -176,7 +180,7 @@ module.exports = {
         break;
 
       case "list": {
-        if (!activeGiveaway) return message.reply("there is no active giveaway to list the entries of.");
+        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to list the entries of.");
 
         const entryList = [];
         let entryCount;
@@ -187,19 +191,14 @@ module.exports = {
         await entries.findAndCountAll({ attributes: ["userName"] })
           .then((response) => entryCount = response.count);
 
-        if (!entryCount) {
-          return message.channel.send("There are no entries yet.");
-        }
-
+        if (!entryCount) return message.channel.send("There are no entries yet.");
         message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
       }
         break;
 
       case "timeleft": {
-        if (!activeGiveaway) return message.reply("there is no active giveaway!");
-
-        const giveawayEndTime = await currentGiveaway.findOne({ attributes: ["endTime"] });
-        const countdownString = moment().countdown(giveawayEndTime.endTime).toString();
+        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway!");
+        const countdownString = moment().countdown(dbChecks.giveawayEndTime.endTime).toString();
         message.channel.send(`The giveaway will end in: **${countdownString}**`);
       }
         break;
