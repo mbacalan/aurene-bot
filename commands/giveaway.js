@@ -207,6 +207,8 @@ module.exports = {
         break;
 
       case "info": {
+        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to show the info of.");
+
         const countdownString = moment().countdown(dbChecks.giveawayEndTime.endTime).toString();
         const infoEmbed = new RichEmbed()
           .setTitle(`Giveaway by ${dbChecks.giveawayCreator.userName}`)
