@@ -111,20 +111,24 @@ module.exports = {
           // Send the initial message asking for user input
           await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
           // Create the collector to learn the giveaway item
-          await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] })
-            .then(collected => gwy.item = collected.first().content)
-            .catch(() => {
-              message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-              throw new Error("Error: User reply for item timed out");
-            });
+          const collectedItem = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] });
+
+          if (!collectedItem.first().content) {
+            message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+            throw new Error("Error: User reply for item timed out");
+          }
+
+          gwy.item = await collectedItem.first().content;
 
           await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
-          await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] })
-            .then(collected => gwy.duration = collected.first().content)
-            .catch(() => {
-              message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-              throw new Error("Error: User reply for duration timed out");
-            });
+          const collectedDuration = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] });
+
+          if (!collectedDuration.first().content) {
+            message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+            throw new Error("Error: User reply for item timed out");
+          }
+
+          gwy.duration = await collectedDuration.first().content;
 
           // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
           if ((!gwy.duration.includes("m") && !gwy.duration.includes("h")) ||
