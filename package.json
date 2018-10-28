@@ -3,6 +3,10 @@
   "version": "1.3.0",
   "description": "A Guild Wars 2 themed bot for Discord",
   "main": "bot.js",
+  "engines": {
+    "node": "8.12",
+    "npm": "*"
+  },
   "scripts": {
     "start": "node bot.js"
   },
