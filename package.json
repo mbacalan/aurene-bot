@@ -17,6 +17,7 @@
     "discord.js": "^11.4.2",
     "moment": "^2.22.2",
     "moment-countdown": "0.0.3",
+    "pg": "^7.6.0",
     "sequelize": "^4.32.2",
     "sqlite3": "^4.0.2"
   },
