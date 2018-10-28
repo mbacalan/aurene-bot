@@ -1,5 +1,3 @@
-const { owner, prefix } = require("../bot_config.json");
-
 module.exports = {
   name: "eval",
   description: "Evaluate JavaScript",
@@ -16,8 +14,8 @@ module.exports = {
 
       const args = message.content.split(" ").slice(1);
 
-      if (message.content.startsWith(prefix + "eval")) {
-        if(message.author.id !== owner) return;
+      if (message.content.startsWith(process.env.PREFIX + "eval")) {
+        if(message.author.id !== process.env.OWNER) return;
         try {
           const code = args.join(" ");
           let evaled = eval(code);

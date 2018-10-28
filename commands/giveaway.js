@@ -1,4 +1,3 @@
-const { owner, leaders, officers, prefix } = require("../bot_config.json");
 const { RichEmbed } = require("discord.js");
 const Sequelize = require("sequelize");
 const moment = require("moment");
@@ -149,7 +148,7 @@ module.exports = {
             initCountdown(gwy.item, endTime);
             // ${"" } is used to eat the whitespace to avoid creating a new line.
             return message.channel.send(`Hey @everyone, ${message.author} is giving away **${gwy.item}**!${""
-            } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!${""
+            } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
             } The giveaway will end in **${intDuration} hour(s)**.`);
           } else if (gwy.duration.includes("m", 1)) {
             const intDuration = parseInt(gwy.duration, 10);
@@ -157,7 +156,7 @@ module.exports = {
             createGiveaway(gwy.item, gwy.duration, endTime);
             initCountdown(gwy.item, endTime);
             return message.channel.send(`Hey @everyone, ${message.author} is giving away **${gwy.item}**!${""
-            } Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!${""
+            } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
             } The giveaway will end in **${intDuration} minute(s)**.`);
           }
         } catch (err) {
@@ -218,14 +217,14 @@ module.exports = {
           .addField("Item", `${gwy.item}`, true)
           .addField("Duration", `${gwy.duration}`, true)
           .addField("Ends In", `${countdownString}`, true)
-          .setFooter(`Enter this giveaway by sending: ${prefix}giveaway enter`);
+          .setFooter(`Enter this giveaway by sending: ${process.env.PREFIX}giveaway enter`);
 
         message.channel.send(infoEmbed)
           .catch(() => {
             message.reply("it looks like I don't have permissions to send an embed. Here is a boring version instead:");
             message.channel.send(`${dbChecks.giveawayCreator.userName} is giving away **${gwy.item}**!${""
             } The giveaway will end in **${countdownString}**.${""
-            }  Use \`\`${prefix}giveaway enter\`\` to have a chance at grabbing it!`);
+            }  Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
           });
       }
         break;
@@ -233,7 +232,7 @@ module.exports = {
       case "clear":
         /* If something goes wrong and the bot is stuck without ending the giveaway,
           you can forcefully refresh the tables with this command. */
-        if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
+        if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
           currentGiveaway.sync({ force: true });
           entries.sync({ force: true });
           return message.reply("database tables are cleared!");

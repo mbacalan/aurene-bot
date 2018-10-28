@@ -1,12 +1,11 @@
 const fs = require("fs");
 const discord = require("discord.js");
-const { token, owner, prefix } = require("./bot_config.json");
 const commandFiles = fs.readdirSync("./commands");
 
 // Get an instance of Discord Client
 const bot = new discord.Client({
-  commandPrefix: prefix,
-  owner,
+  commandPrefix: process.env.PREFIX,
+  owner: process.env.OWNER,
 });
 
 // Register commands
@@ -28,7 +27,7 @@ bot.on("ready", () => {
 
 bot.on("message", message => {
   // Prefix is either what's defined or the tag of the bot
-  const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${prefix})\\s*`);
+  const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${process.env.PREFIX})\\s*`);
   if (!prefixRegex.test(message.content) || message.author.bot) return;
 
   const [, matchedPrefix] = message.content.match(prefixRegex);
@@ -45,7 +44,7 @@ bot.on("message", message => {
     let reply = `You didn't provide any arguments, ${message.author}!`;
 
     if (command.usage) {
-      reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+      reply += `\nThe proper usage would be: \`${process.env.PREFIX}${command.name} ${command.usage}\``;
     }
 
     return message.channel.send(reply);
@@ -61,4 +60,4 @@ bot.on("message", message => {
 
 bot.on("error", error => console.log(error));
 
-bot.login(token);
+bot.login(process.env.TOKEN);

@@ -1,5 +1,3 @@
-const { prefix, owner, leaders, officers } = require("../bot_config.json");
-
 module.exports = {
   name: "missions",
   aliases: ["gm", "guildmissions", "mission"],
@@ -8,13 +6,13 @@ module.exports = {
   execute(message, args) {
     try {
       if (args[0] === "start") {
-        if (message.author.id === owner || message.member.roles.has(leaders) || message.member.roles.has(officers)) {
+        if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
           if (!args[1]) {
             return message.channel.send(`@everyone grab your omnomberry bars and apple ciders, it's time for Guild Missions! Come to our Guild Hall, join the squad and the voice channel, if you can.
             \nHere are the links to help you with Trek and Bounty missions:
             https://wiki.guildwars2.com/wiki/Guild_Trek#Possible_locations
             https://wiki.guildwars2.com/wiki/Guild_Bounty#Possible_targets
-            If you need further help, you can use \`\`${prefix}mission trek\`\` and \`\`${prefix}missions bounty\`\` commands for more info.
+            If you need further help, you can use \`\`${process.env.PREFIX}mission trek\`\` and \`\`${process.env.PREFIX}missions bounty\`\` commands for more info.
             \nLet's go get those <:commendation:326054375317307402>'s!`);
           } else if (args[1]) {
             return message.channel.send(`@everyone ready your omnomberry bars and apple ciders, Guild Missions are starting in **${args[1]}**! We'll meet at our Guild Hall, create a squad and move on from there.`);
