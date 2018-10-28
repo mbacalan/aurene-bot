@@ -7,11 +7,10 @@ const countdown = require("moment-countdown");
 const Op = Sequelize.Op;
 
 // Create Sequelize instance
-const giveawayDb = new Sequelize({
-  host: "localhost",
-  dialect: "sqlite",
+const giveawayDb = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
+  protocol: "postgres",
   logging: false,
-  storage: "./giveawayData.sqlite",
 });
 
 // Import database models
