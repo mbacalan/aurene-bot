@@ -1,15 +1,13 @@
-const Sequelize = require("sequelize");
+const mongoose = require("mongoose");
 
-const guidesDb = new Sequelize({
-  host: "localhost",
-  dialect: "sqlite",
-  logging: false,
-  storage: "./guideData.sqlite",
-});
+mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
+  useNewUrlParser: true,
+}));
 
-const bosses = guidesDb.import("../dbModels/bosses.js");
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
 
-guidesDb.sync();
+const Bosses = require("../dbModels/bosses");
 
 module.exports = {
   name: "guide",
@@ -19,9 +17,9 @@ module.exports = {
   async execute(message, args) {
 
     async function bossInfo() {
-      let boss = await bosses.findOne({ where: { name: args.join(" ") } });
+      let boss = await Bosses.findOne({ name: args.join(" ") });
       if (!boss) {
-        boss = await bosses.findOne({ where: { alias: args[0] } });
+        boss = await Bosses.findOne({ alias: args[0] });
       }
       const bossName = boss.name.charAt(0).toUpperCase() + boss.name.slice(1);
       return message.channel.send(`${bossName} - ${boss.raidIndex}
