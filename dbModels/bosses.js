@@ -1,24 +1,27 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("bosses", {
-    name: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-    },
-    alias: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    wiki: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    video: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    raidIndex: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-};
+const mongoose = require("mongoose");
+
+const bossSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  alias: {
+    type: String,
+    required: true,
+  },
+  wiki: {
+    type: String,
+    required: true,
+  },
+  video: {
+    type: String,
+    required: true,
+  },
+  raidIndex: {
+    type: String,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Bosses", bossSchema);
+
