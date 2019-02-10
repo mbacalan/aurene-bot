@@ -169,16 +169,13 @@ module.exports = {
         if (!dbChecks.active) return message.reply("there is no active giveaway to list the entries of.");
 
         const entryList = [];
-        let entryCount;
-        await Entries.find({ userName: "" })
+        await Entries.find({})
           .then((entrants) => {
             entrants.forEach((entrant) => entryList.push(entrant.userName));
           });
-        await Entries.count({ userName: "" })
-          .then((response) => entryCount = response.count);
 
-        if (!entryCount) return message.channel.send("There are no entries yet.");
-        message.channel.send(`There are currently ${entryCount} entries. They are: ${entryList.join(", ")}`);
+        if (!entryList.length) return message.channel.send("There are no entries yet.");
+        message.channel.send(`There are currently ${entryList.length} entries. They are: ${entryList.join(", ")}`);
       }
         break;
 
