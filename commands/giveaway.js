@@ -10,19 +10,12 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
 }));
 
 const db = mongoose.connection;
-
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => console.log("Succesfully connected to database..."));
 
 const Entries = require("../dbModels/entries");
 const Winner = require("../dbModels/winners");
 const Giveaway = require("../dbModels/currentGiveaway");
-
-// Shared info about giveaway
-const gwy = {
-  item: "",
-  duration: "",
-};
 
 module.exports = {
   name: "giveaway",
@@ -106,7 +99,7 @@ module.exports = {
             throw new Error("Error: User reply for item timed out");
           }
 
-          gwy.item = await collectedItem.first().content;
+          const item = await collectedItem.first().content;
 
           await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
           const collectedDuration = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] });
@@ -116,36 +109,36 @@ module.exports = {
             throw new Error("Error: User reply for item timed out");
           }
 
-          gwy.duration = await collectedDuration.first().content;
+          const duration = await collectedDuration.first().content;
 
           // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
-          if ((!gwy.duration.includes("m") && !gwy.duration.includes("h")) ||
-            (gwy.duration.includes("m") && gwy.duration.includes("h"))) {
+          if ((!duration.includes("m") && !duration.includes("h")) ||
+            (duration.includes("m") && duration.includes("h"))) {
             Giveaway.collection.deleteMany({});
             Entries.collection.deleteMany({});
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
             throw new Error("Error: Can not parse user's reply for duration");
           }
 
-          if (gwy.duration.includes("h", 1)) {
+          if (duration.includes("h", 1)) {
             /* If the collectedDuration includes "h" in it,
               parse the string into an integer and multiply it with an hour in miliseconds */
-            const intDuration = parseInt(gwy.duration, 10);
+            const intDuration = parseInt(duration, 10);
             const endTime = moment().add(intDuration, "hours");
             // Create the giveaway in database
-            createGiveaway(gwy.item, gwy.duration, endTime);
+            createGiveaway(item, duration, endTime);
             // Create the timer with setTimeout and resolve it with a winner
-            initCountdown(gwy.item, endTime);
+            initCountdown(item, endTime);
             // ${"" } is used to eat the whitespace to avoid creating a new line.
-            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${gwy.item}**!${""
+            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
             } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
             } The giveaway will end in **${intDuration} hour(s)**.`);
-          } else if (gwy.duration.includes("m", 1)) {
-            const intDuration = parseInt(gwy.duration, 10);
+          } else if (duration.includes("m", 1)) {
+            const intDuration = parseInt(duration, 10);
             const endTime = moment().add(intDuration, "minutes");
-            createGiveaway(gwy.item, gwy.duration, endTime);
-            initCountdown(gwy.item, endTime);
-            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${gwy.item}**!${""
+            createGiveaway(item, duration, endTime);
+            initCountdown(item, endTime);
+            return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
             } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
             } The giveaway will end in **${intDuration} minute(s)**.`);
           }
