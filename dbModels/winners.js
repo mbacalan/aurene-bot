@@ -1,24 +1,23 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("winners", {
-    userId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    discriminator: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    creationTime: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    item: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-};
+const mongoose = require("mongoose");
+
+const winnerSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  userName: {
+    type: String,
+    required: true,
+  },
+  discriminator: {
+    type: Number,
+    required: true,
+  },
+  item: {
+    type: String,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Winner", winnerSchema);
+

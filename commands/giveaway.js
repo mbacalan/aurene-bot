@@ -1,24 +1,22 @@
 const { RichEmbed } = require("discord.js");
-const Sequelize = require("sequelize");
 const moment = require("moment");
 // eslint-disable-next-line
 const countdown = require("moment-countdown");
-const Op = Sequelize.Op;
+const mongoose = require("mongoose");
 
-// Create Sequelize instance
-const giveawayDb = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-  protocol: "postgres",
-  logging: false,
-});
+// Connect to Database, either the env variable or localhost
+mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
+  useNewUrlParser: true,
+}));
 
-// Import database models
-const entries = giveawayDb.import("../dbModels/entries.js");
-const currentGiveaway = giveawayDb.import("../dbModels/currentGiveaway.js");
-const winners = giveawayDb.import("../dbModels/winners.js");
+const db = mongoose.connection;
 
-// Sync the database
-giveawayDb.sync();
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => console.log("Succesfully connected to database..."));
+
+const Entries = require("../dbModels/entries");
+const Winner = require("../dbModels/winners");
+const Giveaway = require("../dbModels/currentGiveaway");
 
 // Shared info about giveaway
 const gwy = {
@@ -35,59 +33,51 @@ module.exports = {
   async execute(message, args) {
 
     const dbChecks = {
-      entryCheck: await entries.findOne({ where: { userId: message.author.id } }),
-      creatorCheck: await currentGiveaway.findOne({ where: { userId: message.author.id } }),
-      activeGiveaway: await currentGiveaway.findOne({ status: { [Op.not]: false } }),
-      giveawayEndTime: await currentGiveaway.findOne({ attributes: ["endTime"] }),
-      giveawayCreator: await currentGiveaway.findOne({ attributes: ["userName"] }),
+      entry: await Entries.findOne({ userId: message.author.id }),
+      creator: await Giveaway.findOne({ userId: message.author.id }),
+      active: await Giveaway.countDocuments({}),
+      info: await Giveaway.find({}),
     };
 
     function createGiveaway(item, duration, endTime) {
-      currentGiveaway.sync().then(() => {
-        return currentGiveaway.create({
-          userId: message.author.id,
-          userName: message.author.username,
-          discriminator: message.author.discriminator,
-          creationTime: `${message.createdAt}`,
-          item: item,
-          duration: duration,
-          endTime: endTime,
-        });
-      });
+      Giveaway.create(new Giveaway ({
+        userId: message.author.id,
+        userName: message.author.username,
+        discriminator: message.author.discriminator,
+        creationTime: `${message.createdAt}`,
+        item: item,
+        duration: duration,
+        endTime: endTime,
+      }));
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
     function createWinner(winner, item) {
-      winners.sync().then(() => {
-        return winners.create({
-          userId: winner.userId,
-          userName: winner.userName,
-          discriminator: winner.discriminator,
-          creationTime: `${message.createdAt}`,
-          item: item,
-        });
-      });
+      Winner.create(new Winner ({
+        userId: winner[0].userId,
+        userName: winner[0].userName,
+        discriminator: winner[0].discriminator,
+        item: item,
+      }));
     }
 
     async function endGiveaway(item) {
       try {
-        const winner = await entries.findOne(
-          { attributes: ["userId", "userName", "discriminator"], order: giveawayDb.random() }
-        );
+        const winner = await Entries.aggregate([{ $sample: { size: 1 } }]);
 
-        if (winner === null) {
-          currentGiveaway.destroy({ where: {}, truncate: true });
-          entries.destroy({ where: {}, truncate: true });
+        if (!winner[0]) {
+          Giveaway.collection.deleteMany({});
+          Entries.collection.deleteMany({});
           message.channel.send("Looks like no one entered the giveaway :(");
           throw new Error(`No one entered the giveaway of ${item}.`);
         }
 
         createWinner(winner, item);
 
-        console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
-        message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
-        currentGiveaway.destroy({ where: {}, truncate: true });
-        return entries.destroy({ where: {}, truncate: true });
+        console.log(`The giveaway for ${item} ended, ${winner[0].userName}#${winner[0].discriminator} won.`);
+        message.channel.send(`Congratulations <@${winner[0].userId}>, you won **${item}** from ${message.author}!`);
+        Giveaway.collection.deleteMany({});
+        return Entries.collection.deleteMany({});
       } catch (err) {
         console.log(err.message);
       }
@@ -100,7 +90,7 @@ module.exports = {
 
     switch (args[0]) {
       case "create": {
-        if (dbChecks.activeGiveaway) return message.reply("please wait for current giveaway to end.");
+        if (dbChecks.active) return message.reply("please wait for current giveaway to end.");
 
         try {
           console.log(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
@@ -131,8 +121,8 @@ module.exports = {
           // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
           if ((!gwy.duration.includes("m") && !gwy.duration.includes("h")) ||
             (gwy.duration.includes("m") && gwy.duration.includes("h"))) {
-            currentGiveaway.destroy({ where: {}, truncate: true });
-            entries.destroy({ where: {}, truncate: true });
+            Giveaway.collection.deleteMany({});
+            Entries.collection.deleteMany({});
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
             throw new Error("Error: Can not parse user's reply for duration");
           }
@@ -166,18 +156,16 @@ module.exports = {
         break;
 
       case "enter": {
-        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to enter.");
-        if (dbChecks.creatorCheck) return message.reply("you can't enter your own giveaway!");
-        if (dbChecks.entryCheck) return message.reply("you *already* entered this giveaway!");
+        if (!dbChecks.active) return message.reply("there is no active giveaway to enter.");
+        if (dbChecks.creator) return message.reply("you can't enter your own giveaway!");
+        if (dbChecks.entry) return message.reply("you *already* entered this giveaway!");
 
-        entries.sync().then(() => {
-          return entries.create({
-            userId: message.author.id,
-            userName: message.author.username,
-            discriminator: message.author.discriminator,
-            entryTime: `${message.createdAt}`,
-          });
-        });
+        Entries.create(new Entries ({
+          userId: message.author.id,
+          userName: message.author.username,
+          discriminator: message.author.discriminator,
+          entryTime: `${message.createdAt}`,
+        }));
 
         console.log(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
         message.reply("you have entered the giveaway, good luck!");
@@ -185,15 +173,15 @@ module.exports = {
         break;
 
       case "list": {
-        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to list the entries of.");
+        if (!dbChecks.active) return message.reply("there is no active giveaway to list the entries of.");
 
         const entryList = [];
         let entryCount;
-        await entries.findAll({ attributes: ["userName"] })
+        await Entries.find({ userName: "" })
           .then((entrants) => {
             entrants.forEach((entrant) => entryList.push(entrant.userName));
           });
-        await entries.findAndCountAll({ attributes: ["userName"] })
+        await Entries.count({ userName: "" })
           .then((response) => entryCount = response.count);
 
         if (!entryCount) return message.channel.send("There are no entries yet.");
@@ -202,27 +190,27 @@ module.exports = {
         break;
 
       case "timeleft": {
-        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway!");
-        const countdownString = moment().countdown(dbChecks.giveawayEndTime.endTime).toString();
+        if (!dbChecks.active) return message.reply("there is no active giveaway!");
+        const countdownString = moment().countdown(dbChecks.info[0].endTime).toString();
         message.channel.send(`The giveaway will end in: **${countdownString}**`);
       }
         break;
 
       case "info": {
-        if (!dbChecks.activeGiveaway) return message.reply("there is no active giveaway to show the info of.");
+        if (!dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
 
-        const countdownString = moment().countdown(dbChecks.giveawayEndTime.endTime).toString();
+        const countdownString = moment().countdown(dbChecks.info[0].endTime).toString();
         const infoEmbed = new RichEmbed()
-          .setTitle(`Giveaway by ${dbChecks.giveawayCreator.userName}`)
-          .addField("Item", `${gwy.item}`, true)
-          .addField("Duration", `${gwy.duration}`, true)
+          .setTitle(`Giveaway by ${dbChecks.info[0].userName}`)
+          .addField("Item", `${dbChecks.info[0].item}`, true)
+          .addField("Duration", `${dbChecks.info[0].duration}`, true)
           .addField("Ends In", `${countdownString}`, true)
           .setFooter(`Enter this giveaway by sending: ${process.env.PREFIX}giveaway enter`);
 
         message.channel.send(infoEmbed)
           .catch(() => {
             message.reply("it looks like I don't have permissions to send an embed. Here is a boring version instead:");
-            message.channel.send(`${dbChecks.giveawayCreator.userName} is giving away **${gwy.item}**!${""
+            message.channel.send(`${dbChecks.info[0].userName} is giving away **${dbChecks.info[0].item}**!${""
             } The giveaway will end in **${countdownString}**.${""
             }  Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
           });
@@ -233,8 +221,8 @@ module.exports = {
         /* If something goes wrong and the bot is stuck without ending the giveaway,
           you can forcefully refresh the tables with this command. */
         if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
-          currentGiveaway.sync({ force: true });
-          entries.sync({ force: true });
+          Giveaway.collection.deleteMany({});
+          Entries.collection.deleteMany({});
           return message.reply("database tables are cleared!");
         }
         return message.reply("you don't have permission to use this command!");
