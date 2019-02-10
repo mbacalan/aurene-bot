@@ -1,21 +1,18 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("entries", {
-    userId: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-    },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    discriminator: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    entryTime: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-};
+const mongoose = require("mongoose");
 
+const entrySchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  userName: {
+    type: String,
+    required: true,
+  },
+  discriminator: {
+    type: Number,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Entries", entrySchema);

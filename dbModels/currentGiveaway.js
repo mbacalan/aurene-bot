@@ -1,32 +1,35 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("currentGiveaway", {
-    userId: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-    },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    discriminator: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    creationTime: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    item: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    duration: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    endTime: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-  });
-};
+const mongoose = require("mongoose");
+
+const giveawaySchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  userName: {
+    type: String,
+    required: true,
+  },
+  discriminator: {
+    type: Number,
+    required: true,
+  },
+  creationTime: {
+    type: String,
+    required: true,
+  },
+  item: {
+    type: String,
+    required: true,
+  },
+  duration: {
+    type: String,
+    required: true,
+  },
+  endTime: {
+    type: Date,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Giveaway", giveawaySchema);
+
