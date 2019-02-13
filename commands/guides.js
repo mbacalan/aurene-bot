@@ -1,4 +1,4 @@
-const Bosses = require("../dbModels/bosses");
+const { Bosses } = require("../dbModels/models");
 
 module.exports = {
   name: "guide",

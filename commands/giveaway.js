@@ -1,11 +1,8 @@
 const { RichEmbed } = require("discord.js");
 const moment = require("moment");
-// eslint-disable-next-line
-const countdown = require("moment-countdown");
+require("moment-countdown");
 
-const Entries = require("../dbModels/entries");
-const Winner = require("../dbModels/winners");
-const Giveaway = require("../dbModels/currentGiveaway");
+const { Entries, Winner, Giveaway } = require("../dbModels/models");
 
 module.exports = {
   name: "giveaway",
