@@ -69,5 +69,6 @@ bot.on("message", message => {
 });
 
 bot.on("error", error => console.log(error));
+process.on("unhandledRejection", error => console.error("Uncaught Promise Rejection", error));
 
 bot.login(process.env.TOKEN);
