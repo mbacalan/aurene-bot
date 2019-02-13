@@ -1,6 +1,7 @@
 const fs = require("fs");
 const discord = require("discord.js");
 const commandFiles = fs.readdirSync("./commands");
+const mongoose = require("mongoose");
 
 // Get an instance of Discord Client
 const bot = new discord.Client({
@@ -14,6 +15,15 @@ for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
   bot.commands.set(command.name, command);
 }
+
+// Connect to MongoDB, either via env variable or localhost
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", ({
+  useNewUrlParser: true,
+}));
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => console.log("Succesfully connected to database"));
 
 // Do these when bot is ready
 bot.on("ready", () => {

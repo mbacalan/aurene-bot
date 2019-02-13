@@ -2,16 +2,6 @@ const { RichEmbed } = require("discord.js");
 const moment = require("moment");
 // eslint-disable-next-line
 const countdown = require("moment-countdown");
-const mongoose = require("mongoose");
-
-// Connect to Database, either the env variable or localhost
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", ({
-  useNewUrlParser: true,
-}));
-
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", () => console.log("Succesfully connected to database..."));
 
 const Entries = require("../dbModels/entries");
 const Winner = require("../dbModels/winners");
