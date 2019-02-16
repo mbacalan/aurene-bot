@@ -32,6 +32,16 @@ module.exports = {
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
+    async function pickWinner(item) {
+      try {
+        return Entries.aggregate([{ $sample: { size: 1 } }]);
+      } catch (err) {
+        message.channel.send("Looks like no one entered the giveaway :(");
+        console.error(`No one entered the giveaway of ${item}.`);
+        return clearGiveawayAndEntries();
+      }
+    }
+
     function createWinner(winner, item) {
       Winner.create(new Winner ({
         userId: winner[0].userId,
@@ -43,17 +53,8 @@ module.exports = {
 
     async function endGiveaway(item) {
       try {
-        const winner = await Entries.aggregate([{ $sample: { size: 1 } }]);
-
-        if (!winner[0]) {
-          Giveaway.collection.deleteMany({});
-          Entries.collection.deleteMany({});
-          message.channel.send("Looks like no one entered the giveaway :(");
-          throw new Error(`No one entered the giveaway of ${item}.`);
-        }
-
+        const winner = pickWinner(item);
         createWinner(winner, item);
-
         console.log(`The giveaway for ${item} ended, ${winner[0].userName}#${winner[0].discriminator} won.`);
         message.channel.send(`Congratulations <@${winner[0].userId}>, you won **${item}** from ${message.author}!`);
         Giveaway.collection.deleteMany({});
