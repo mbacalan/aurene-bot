@@ -19,6 +19,11 @@ module.exports = {
       info: await Giveaway.find({}),
     };
 
+    function clearGiveawayAndEntries() {
+      Giveaway.collection.deleteMany({});
+      Entries.collection.deleteMany({});
+    }
+
     function createGiveaway(item, duration, endTime) {
       Giveaway.create(new Giveaway ({
         userId: message.author.id,
@@ -57,8 +62,7 @@ module.exports = {
         createWinner(winner, item);
         console.log(`The giveaway for ${item} ended, ${winner[0].userName}#${winner[0].discriminator} won.`);
         message.channel.send(`Congratulations <@${winner[0].userId}>, you won **${item}** from ${message.author}!`);
-        Giveaway.collection.deleteMany({});
-        return Entries.collection.deleteMany({});
+        clearGiveawayAndEntries();
       } catch (err) {
         console.log(err.message);
       }
@@ -102,8 +106,7 @@ module.exports = {
           // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
           if ((!duration.includes("m") && !duration.includes("h")) ||
             (duration.includes("m") && duration.includes("h"))) {
-            Giveaway.collection.deleteMany({});
-            Entries.collection.deleteMany({});
+            clearGiveawayAndEntries();
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
             throw new Error("Error: Can not parse user's reply for duration");
           }
@@ -199,8 +202,7 @@ module.exports = {
         /* If something goes wrong and the bot is stuck without ending the giveaway,
           you can forcefully refresh the tables with this command. */
         if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
-          Giveaway.collection.deleteMany({});
-          Entries.collection.deleteMany({});
+          clearGiveawayAndEntries();
           return message.reply("database tables are cleared!");
         }
         return message.reply("you don't have permission to use this command!");
