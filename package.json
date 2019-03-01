@@ -24,6 +24,6 @@
     "mongoose": "^5.4.9"
   },
   "devDependencies": {
-    "eslint": "^4.11.0"
+    "eslint": "^4.19.1"
   }
 }

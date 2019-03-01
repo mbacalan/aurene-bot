@@ -1,5 +1,3 @@
 /node_modules
 bot_config.json
-.eslintrc.json
 .env
-giveawayData.sqlite
