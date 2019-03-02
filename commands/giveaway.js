@@ -24,8 +24,8 @@ module.exports = {
       Entries.collection.deleteMany({});
     }
 
-    function createGiveaway(item, duration, endTime) {
-      Giveaway.create(new Giveaway ({
+    async function createGiveaway(item, duration, endTime) {
+      await Giveaway.create({
         userId: message.author.id,
         userName: message.author.username,
         discriminator: message.author.discriminator,
@@ -33,11 +33,11 @@ module.exports = {
         item: item,
         duration: duration,
         endTime: endTime,
-      }));
+      });
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
-    async function pickWinner(item) {
+    function pickWinner(item) {
       try {
         return Entries.aggregate([{ $sample: { size: 1 } }]);
       } catch (err) {
@@ -48,15 +48,15 @@ module.exports = {
     }
 
     function createWinner(winner, item) {
-      Winner.create(new Winner ({
+      Winner.create({
         userId: winner[0].userId,
         userName: winner[0].userName,
         discriminator: winner[0].discriminator,
         item: item,
-      }));
+      });
     }
 
-    async function endGiveaway(item) {
+    function endGiveaway(item) {
       try {
         const winner = pickWinner(item);
         createWinner(winner, item);
@@ -147,12 +147,12 @@ module.exports = {
       if (dbChecks.creator) return message.reply("you can't enter your own giveaway!");
       if (dbChecks.entry) return message.reply("you *already* entered this giveaway!");
 
-      Entries.create(new Entries ({
+      Entries.create({
         userId: message.author.id,
         userName: message.author.username,
         discriminator: message.author.discriminator,
         entryTime: `${message.createdAt}`,
-      }));
+      });
 
       console.log(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
       message.reply("you have entered the giveaway, good luck!");
