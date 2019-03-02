@@ -24,8 +24,8 @@ module.exports = {
       Entries.collection.deleteMany({});
     }
 
-    function createGiveaway(item, duration, endTime) {
-      Giveaway.create(new Giveaway ({
+    async function createGiveaway(item, duration, endTime) {
+      await Giveaway.create({
         userId: message.author.id,
         userName: message.author.username,
         discriminator: message.author.discriminator,
@@ -33,11 +33,11 @@ module.exports = {
         item: item,
         duration: duration,
         endTime: endTime,
-      }));
+      });
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
-    async function pickWinner(item) {
+    function pickWinner(item) {
       try {
         return Entries.aggregate([{ $sample: { size: 1 } }]);
       } catch (err) {
@@ -48,15 +48,15 @@ module.exports = {
     }
 
     function createWinner(winner, item) {
-      Winner.create(new Winner ({
+      Winner.create({
         userId: winner[0].userId,
         userName: winner[0].userName,
         discriminator: winner[0].discriminator,
         item: item,
-      }));
+      });
     }
 
-    async function endGiveaway(item) {
+    function endGiveaway(item) {
       try {
         const winner = pickWinner(item);
         createWinner(winner, item);
@@ -66,11 +66,6 @@ module.exports = {
       } catch (err) {
         console.log(err.message);
       }
-    }
-
-    function initCountdown(item, countdownDuration) {
-      const t = countdownDuration - moment();
-      return setTimeout(() => endGiveaway(item), t);
     }
 
     switch (args[0]) {
@@ -115,20 +110,28 @@ module.exports = {
           /* If the collectedDuration includes "h" in it,
               parse the string into an integer and multiply it with an hour in miliseconds */
           const intDuration = parseInt(duration, 10);
-          const endTime = moment().add(intDuration, "hours");
+          let endTime = moment().add(intDuration, "hours");
           // Create the giveaway in database
-          createGiveaway(item, duration, endTime);
+          await createGiveaway(item, duration, endTime);
           // Create the timer with setTimeout and resolve it with a winner
-          initCountdown(item, endTime);
+          Giveaway.findOne({}).then(function(result) {
+            endTime = result.endTime;
+            const timeout = endTime - moment();
+            setTimeout(() => endGiveaway(item), timeout);
+          });
           // ${"" } is used to eat the whitespace to avoid creating a new line.
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
           } The giveaway will end in **${intDuration} hour(s)**.`);
         } else if (duration.includes("m", 1)) {
           const intDuration = parseInt(duration, 10);
-          const endTime = moment().add(intDuration, "minutes");
-          createGiveaway(item, duration, endTime);
-          initCountdown(item, endTime);
+          let endTime = moment().add(intDuration, "minutes");
+          await createGiveaway(item, duration, endTime);
+          Giveaway.findOne({}).then(function(result) {
+            endTime = result.endTime;
+            const timeout = endTime - moment();
+            setTimeout(() => endGiveaway(item), timeout);
+          });
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
           } The giveaway will end in **${intDuration} minute(s)**.`);
@@ -144,12 +147,12 @@ module.exports = {
       if (dbChecks.creator) return message.reply("you can't enter your own giveaway!");
       if (dbChecks.entry) return message.reply("you *already* entered this giveaway!");
 
-      Entries.create(new Entries ({
+      Entries.create({
         userId: message.author.id,
         userName: message.author.username,
         discriminator: message.author.discriminator,
         entryTime: `${message.createdAt}`,
-      }));
+      });
 
       console.log(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
       message.reply("you have entered the giveaway, good luck!");
