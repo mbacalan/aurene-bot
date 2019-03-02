@@ -68,11 +68,6 @@ module.exports = {
       }
     }
 
-    function initCountdown(item, countdownDuration) {
-      const t = countdownDuration - moment();
-      return setTimeout(() => endGiveaway(item), t);
-    }
-
     switch (args[0]) {
     case "create": {
       if (dbChecks.active) return message.reply("please wait for current giveaway to end.");
@@ -115,20 +110,28 @@ module.exports = {
           /* If the collectedDuration includes "h" in it,
               parse the string into an integer and multiply it with an hour in miliseconds */
           const intDuration = parseInt(duration, 10);
-          const endTime = moment().add(intDuration, "hours");
+          let endTime = moment().add(intDuration, "hours");
           // Create the giveaway in database
-          createGiveaway(item, duration, endTime);
+          await createGiveaway(item, duration, endTime);
           // Create the timer with setTimeout and resolve it with a winner
-          initCountdown(item, endTime);
+          Giveaway.findOne({}).then(function(result) {
+            endTime = result.endTime;
+            const timeout = endTime - moment();
+            setTimeout(() => endGiveaway(item), timeout);
+          });
           // ${"" } is used to eat the whitespace to avoid creating a new line.
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
           } The giveaway will end in **${intDuration} hour(s)**.`);
         } else if (duration.includes("m", 1)) {
           const intDuration = parseInt(duration, 10);
-          const endTime = moment().add(intDuration, "minutes");
-          createGiveaway(item, duration, endTime);
-          initCountdown(item, endTime);
+          let endTime = moment().add(intDuration, "minutes");
+          await createGiveaway(item, duration, endTime);
+          Giveaway.findOne({}).then(function(result) {
+            endTime = result.endTime;
+            const timeout = endTime - moment();
+            setTimeout(() => endGiveaway(item), timeout);
+          });
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
           } The giveaway will end in **${intDuration} minute(s)**.`);
