@@ -37,35 +37,35 @@ module.exports = {
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
-    function pickWinner(item) {
-      try {
-        return Entries.aggregate([{ $sample: { size: 1 } }]);
-      } catch (err) {
-        message.channel.send("Looks like no one entered the giveaway :(");
-        console.error(`No one entered the giveaway of ${item}.`);
-        return clearGiveawayAndEntries();
-      }
+    function pickWinner() {
+      let winner;
+      Entries.aggregate([{ $sample: { size: 1 } }])
+        .then(function(result) {
+          winner = result[0];
+        });
+      return winner;
     }
 
     function createWinner(winner, item) {
       Winner.create({
-        userId: winner[0].userId,
-        userName: winner[0].userName,
-        discriminator: winner[0].discriminator,
+        userId: winner.userId,
+        userName: winner.userName,
+        discriminator: winner.discriminator,
         item: item,
       });
     }
 
     function endGiveaway(item) {
-      try {
-        const winner = pickWinner(item);
-        createWinner(winner, item);
-        console.log(`The giveaway for ${item} ended, ${winner[0].userName}#${winner[0].discriminator} won.`);
-        message.channel.send(`Congratulations <@${winner[0].userId}>, you won **${item}** from ${message.author}!`);
-        clearGiveawayAndEntries();
-      } catch (err) {
-        console.log(err.message);
+      const winner = pickWinner();
+      if (!winner) {
+        message.channel.send("Looks like no one entered the giveaway :(");
+        console.error(`No one entered the giveaway of ${item}.`);
+        return clearGiveawayAndEntries();
       }
+      createWinner(winner, item);
+      console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
+      message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
+      clearGiveawayAndEntries();
     }
 
     switch (args[0]) {
