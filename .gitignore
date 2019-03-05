@@ -1,3 +1,4 @@
 /node_modules
+/.vscode
 bot_config.json
 .env
