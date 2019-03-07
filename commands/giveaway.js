@@ -37,13 +37,9 @@ module.exports = {
       console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
     }
 
-    function pickWinner() {
-      let winner;
-      Entries.aggregate([{ $sample: { size: 1 } }])
-        .then(function(result) {
-          winner = result[0];
-        });
-      return winner;
+    async function pickWinner() {
+      const winner = await Entries.aggregate([{ $sample: { size: 1 } }]);
+      return winner[0];
     }
 
     function createWinner(winner, item) {
@@ -55,8 +51,8 @@ module.exports = {
       });
     }
 
-    function endGiveaway(item) {
-      const winner = pickWinner();
+    async function endGiveaway(item) {
+      const winner = await pickWinner();
       if (!winner) {
         message.channel.send("Looks like no one entered the giveaway :(");
         console.error(`No one entered the giveaway of ${item}.`);
