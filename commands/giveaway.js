@@ -94,6 +94,12 @@ module.exports = {
 
         const duration = await collectedDuration.first().content;
 
+        // If, when parsed, duration is NaN: we can't do anything with it
+        if (isNaN(parseInt(duration, 10))) {
+          message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+          throw new Error("Can not parse user's reply for duration (isNaN)");
+        }
+
         // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
         if ((!duration.includes("m") && !duration.includes("h")) ||
             (duration.includes("m") && duration.includes("h"))) {
