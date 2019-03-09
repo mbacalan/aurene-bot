@@ -159,7 +159,7 @@ module.exports = {
     }
       break;
 
-    case "list": {
+    case "entries": {
       if (!dbChecks.active) return message.reply("there is no active giveaway to list the entries of.");
 
       const entryList = [];
