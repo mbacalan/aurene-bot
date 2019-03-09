@@ -173,13 +173,6 @@ module.exports = {
     }
       break;
 
-    case "timeleft": {
-      if (!dbChecks.active) return message.reply("there is no active giveaway!");
-      const countdownString = moment().countdown(dbChecks.info[0].endTime).toString();
-      message.channel.send(`The giveaway will end in: **${countdownString}**`);
-    }
-      break;
-
     case "info": {
       if (!dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
 
