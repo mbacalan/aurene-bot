@@ -4,10 +4,7 @@ const commandFiles = fs.readdirSync("./commands");
 const mongoose = require("mongoose");
 
 // Get an instance of Discord Client
-const bot = new discord.Client({
-  commandPrefix: process.env.PREFIX,
-  owner: process.env.OWNER,
-});
+const bot = new discord.Client();
 
 // Register commands
 bot.commands = new discord.Collection();
