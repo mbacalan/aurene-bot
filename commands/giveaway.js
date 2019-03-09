@@ -9,7 +9,7 @@ module.exports = {
   aliases: ["giffaway", "lottery", "fortunetest"],
   description: "Create, enter and view giveaways",
   args: true,
-  usage: "create/enter/list",
+  usage: "create/enter/entries/info",
   async execute(message, args) {
 
     const dbChecks = {
