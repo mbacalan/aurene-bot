@@ -79,7 +79,7 @@ module.exports = {
 
         if (!collectedItem.first().content) {
           message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-          throw new Error("Error: User reply for item timed out");
+          throw new Error("User reply for item timed out");
         }
 
         const item = await collectedItem.first().content;
@@ -89,7 +89,7 @@ module.exports = {
 
         if (!collectedDuration.first().content) {
           message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-          throw new Error("Error: User reply for item timed out");
+          throw new Error("User reply for duration timed out");
         }
 
         const duration = await collectedDuration.first().content;
@@ -103,7 +103,7 @@ module.exports = {
         // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
         if ((!duration.includes("m", "h")) || (duration.includes("m", "h"))) {
           message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-          throw new Error("Error: Can not parse user's reply for duration");
+          throw new Error("Can not parse user's reply for duration (includesH&M)");
         }
 
         if (duration.includes("h", 1)) {
