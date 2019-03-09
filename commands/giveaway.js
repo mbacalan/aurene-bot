@@ -101,9 +101,7 @@ module.exports = {
         }
 
         // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
-        if ((!duration.includes("m") && !duration.includes("h")) ||
-            (duration.includes("m") && duration.includes("h"))) {
-          clearGiveawayAndEntries();
+        if ((!duration.includes("m", "h")) || (duration.includes("m", "h"))) {
           message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
           throw new Error("Error: Can not parse user's reply for duration");
         }
