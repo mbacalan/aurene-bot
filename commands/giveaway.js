@@ -175,19 +175,19 @@ module.exports = {
 
     case "info": {
       if (!dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
-
-      const countdownString = moment().countdown(dbChecks.info[0].endTime).toString();
+      const giveawayInfo = dbChecks.info[0];
+      const countdownString = moment().countdown(giveawayInfo.endTime).toString();
       const infoEmbed = new RichEmbed()
-        .setTitle(`Giveaway by ${dbChecks.info[0].userName}`)
-        .addField("Item", `${dbChecks.info[0].item}`, true)
-        .addField("Duration", `${dbChecks.info[0].duration}`, true)
+        .setTitle(`Giveaway by ${giveawayInfo.userName}`)
+        .addField("Item", `${giveawayInfo.item}`, true)
+        .addField("Duration", `${giveawayInfo.duration}`, true)
         .addField("Ends In", `${countdownString}`, true)
         .setFooter(`Enter this giveaway by sending: ${process.env.PREFIX}giveaway enter`);
 
       message.channel.send(infoEmbed)
         .catch(() => {
           message.reply("it looks like I don't have permissions to send an embed. Here is a boring version instead:");
-          message.channel.send(`${dbChecks.info[0].userName} is giving away **${dbChecks.info[0].item}**!${""
+          message.channel.send(`${giveawayInfo.userName} is giving away **${giveawayInfo.item}**!${""
           } The giveaway will end in **${countdownString}**.${""
           }  Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
         });
