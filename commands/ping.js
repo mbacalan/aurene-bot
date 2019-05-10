@@ -13,7 +13,6 @@ module.exports = {
 
       message.channel.send(pingEmbed)
         .catch(() => {
-          message.reply("it looks like I don't have permissions to send an embed. Here is a boring version instead:");
           message.channel.send(`Websocket latency is ${Math.round(message.client.ping)}ms.`);
         });
     } catch (err) {

@@ -188,7 +188,6 @@ module.exports = {
 
       message.channel.send(infoEmbed)
         .catch(() => {
-          message.reply("it looks like I don't have permissions to send an embed. Here is a boring version instead:");
           message.channel.send(`${giveawayInfo.userName} is giving away **${giveawayInfo.item}**!${""
           } The giveaway will end in **${countdownString}**.${""
           }  Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
