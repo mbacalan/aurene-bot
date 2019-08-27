@@ -195,6 +195,14 @@ module.exports = {
     }
       break;
 
+    case "end": {
+      if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
+        const item = dbChecks.info[0].item;
+        endGiveaway(item);
+      }
+      break;
+    }
+
     case "clear":
       /* If something goes wrong and the bot is stuck without ending the giveaway,
           you can forcefully refresh the tables with this command. */
