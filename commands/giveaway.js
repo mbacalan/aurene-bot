@@ -196,11 +196,11 @@ module.exports = {
       break;
 
     case "end": {
-      if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
+      if (message.author.id === process.env.OWNER || message.author.id === dbChecks.info[0].userId) {
         const item = dbChecks.info[0].item;
         endGiveaway(item);
       }
-      break;
+      return message.reply("only the giveaway creator can end it!");
     }
 
     case "clear":
