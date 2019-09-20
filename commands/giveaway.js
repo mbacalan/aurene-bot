@@ -198,7 +198,7 @@ module.exports = {
     case "end": {
       if (message.author.id === process.env.OWNER || message.author.id === dbChecks.info[0].userId) {
         const item = dbChecks.info[0].item;
-        endGiveaway(item);
+        return endGiveaway(item);
       }
       return message.reply("only the giveaway creator can end it!");
     }
