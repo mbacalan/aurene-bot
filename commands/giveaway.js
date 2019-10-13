@@ -1,8 +1,9 @@
 const { RichEmbed } = require("discord.js");
 const moment = require("moment");
+const helpers = require("../utils/helpers");
 require("moment-countdown");
 
-const { Entries, Winner, Giveaway } = require("../dbModels/models");
+const { Entries, Giveaway } = require("../dbModels/models");
 
 module.exports = {
   name: "giveaway",
@@ -11,58 +12,13 @@ module.exports = {
   args: true,
   usage: "create/enter/entries/info",
   async execute(message, args) {
-
+    const giveawayChannel = message.client.channels.get(process.env.GIVEAWAY_CHANNEL);
     const dbChecks = {
       entry: await Entries.findOne({ userId: message.author.id }),
       creator: await Giveaway.findOne({ userId: message.author.id }),
       active: await Giveaway.countDocuments({}),
       info: await Giveaway.find({}),
     };
-
-    function clearGiveawayAndEntries() {
-      Giveaway.collection.deleteMany({});
-      Entries.collection.deleteMany({});
-    }
-
-    async function createGiveaway(item, duration, endTime) {
-      await Giveaway.create({
-        userId: message.author.id,
-        userName: message.author.username,
-        discriminator: message.author.discriminator,
-        creationTime: `${message.createdAt}`,
-        item: item,
-        duration: duration,
-        endTime: endTime,
-      });
-      console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
-    }
-
-    async function pickWinner() {
-      const winner = await Entries.aggregate([{ $sample: { size: 1 } }]);
-      return winner[0];
-    }
-
-    function createWinner(winner, item) {
-      Winner.create({
-        userId: winner.userId,
-        userName: winner.userName,
-        discriminator: winner.discriminator,
-        item: item,
-      });
-    }
-
-    async function endGiveaway(item) {
-      const winner = await pickWinner();
-      if (!winner) {
-        message.channel.send("Looks like no one entered the giveaway :(");
-        console.error(`No one entered the giveaway of ${item}.`);
-        return clearGiveawayAndEntries();
-      }
-      createWinner(winner, item);
-      console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
-      message.channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${message.author}!`);
-      clearGiveawayAndEntries();
-    }
 
     switch (args[0]) {
     case "create": {
@@ -95,7 +51,7 @@ module.exports = {
         const duration = await collectedDuration.first().content;
 
         // If, when parsed, duration is NaN: we can't do anything with it
-        if (isNaN(parseInt(duration, 10))) {
+        if (Number.isNaN(parseInt(duration, 10))) {
           message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
           throw new Error("Can not parse user's reply for duration (isNaN)");
         }
@@ -103,24 +59,25 @@ module.exports = {
         // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
         if ((!duration.includes("m") && !duration.includes("h")) ||
             (duration.includes("m") && duration.includes("h"))) {
-          clearGiveawayAndEntries();
+          helpers.clearGiveawayAndEntries(Giveaway, Entries);
           message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
           throw new Error("Can not parse user's reply for duration (includesH&M)");
         }
 
         if (duration.includes("h", 1)) {
           /* If the collectedDuration includes "h" in it,
-              parse the string into an integer and multiply it with an hour in miliseconds */
+            parse the string into an integer and multiply it with an hour in miliseconds */
           const intDuration = parseInt(duration, 10);
           let endTime = moment().add(intDuration, "hours");
-          // Create the giveaway in database
-          await createGiveaway(item, duration, endTime);
-          // Create the timer with setTimeout and resolve it with a winner
+
+          await helpers.createGiveaway(Giveaway, message, item, duration, endTime);
+
           Giveaway.findOne({}).then(function(result) {
             endTime = result.endTime;
             const timeout = endTime - moment();
-            setTimeout(() => endGiveaway(item), timeout);
+            setTimeout(() => helpers.endGiveaway(dbChecks.creator, giveawayChannel, item), timeout);
           });
+
           // ${"" } is used to eat the whitespace to avoid creating a new line.
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
@@ -128,11 +85,11 @@ module.exports = {
         } else if (duration.includes("m", 1)) {
           const intDuration = parseInt(duration, 10);
           let endTime = moment().add(intDuration, "minutes");
-          await createGiveaway(item, duration, endTime);
+          await helpers.createGiveaway(Giveaway, message, item, duration, endTime);
           Giveaway.findOne({}).then(function(result) {
             endTime = result.endTime;
             const timeout = endTime - moment();
-            setTimeout(() => endGiveaway(item), timeout);
+            setTimeout(() => helpers.endGiveaway(dbChecks.creator, giveawayChannel, item), timeout);
           });
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
@@ -198,7 +155,7 @@ module.exports = {
     case "end": {
       if (message.author.id === process.env.OWNER || message.author.id === dbChecks.info[0].userId) {
         const item = dbChecks.info[0].item;
-        return endGiveaway(item);
+        return helpers.endGiveaway(dbChecks.creator, giveawayChannel, item);
       }
       return message.reply("only the giveaway creator can end it!");
     }
@@ -206,8 +163,10 @@ module.exports = {
     case "clear":
       /* If something goes wrong and the bot is stuck without ending the giveaway,
           you can forcefully refresh the tables with this command. */
-      if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
-        clearGiveawayAndEntries();
+      if (message.author.id === process.env.OWNER ||
+        message.member.roles.has(process.env.LEADERS) ||
+        message.member.roles.has(process.env.OFFICERS)) {
+        helpers.clearGiveawayAndEntries();
         return message.reply("database tables are cleared!");
       }
       return message.reply("you don't have permission to use this command!");
