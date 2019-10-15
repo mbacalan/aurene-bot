@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const moment = require("moment");
 const commandFiles = fs.readdirSync("./commands");
 const helpers = require("./utils/helpers");
-const { Giveaway, Winner } = require("./dbModels/models");
+const { Giveaway } = require("./dbModels/models");
 
 const bot = new discord.Client();
 
@@ -26,6 +26,9 @@ db.once("open", () => console.log("Succesfully connected to database"));
 bot.on("ready", async () => {
   const giveawayChannel = bot.channels.get(process.env.GIVEAWAY_CHANNEL);
   const giveaway = await Giveaway.find({});
+
+  bot.user.setActivity("Guild Wars 2");
+
   const logs = [
     `Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`,
     `Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`,
@@ -34,14 +37,13 @@ bot.on("ready", async () => {
     "Awaiting orders...",
   ];
 
-  bot.user.setActivity("Guild Wars 2");
   helpers.logger(logs);
 
   if (giveaway[0]) {
     const item = giveaway[0].item;
     const timeout = giveaway[0].endTime - moment();
 
-    setTimeout(() => helpers.endGiveaway(Winner, giveaway[0], giveawayChannel, item), timeout);
+    setTimeout(() => helpers.endGiveaway(giveaway[0], giveawayChannel, item), timeout);
   }
 });
 

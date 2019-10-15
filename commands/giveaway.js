@@ -59,7 +59,7 @@ module.exports = {
         // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
         if ((!duration.includes("m") && !duration.includes("h")) ||
             (duration.includes("m") && duration.includes("h"))) {
-          helpers.clearGiveawayAndEntries(Giveaway, Entries);
+          helpers.clearGiveawayAndEntries();
           message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
           throw new Error("Can not parse user's reply for duration (includesH&M)");
         }
@@ -70,7 +70,7 @@ module.exports = {
           const intDuration = parseInt(duration, 10);
           let endTime = moment().add(intDuration, "hours");
 
-          await helpers.createGiveaway(Giveaway, message, item, duration, endTime);
+          await helpers.createGiveaway(message, item, duration, endTime);
 
           Giveaway.findOne({}).then(function(result) {
             endTime = result.endTime;
@@ -82,15 +82,20 @@ module.exports = {
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
           } The giveaway will end in **${intDuration} hour(s)**.`);
-        } else if (duration.includes("m", 1)) {
+        }
+
+        if (duration.includes("m", 1)) {
           const intDuration = parseInt(duration, 10);
           let endTime = moment().add(intDuration, "minutes");
-          await helpers.createGiveaway(Giveaway, message, item, duration, endTime);
+
+          await helpers.createGiveaway(message, item, duration, endTime);
+
           Giveaway.findOne({}).then(function(result) {
             endTime = result.endTime;
             const timeout = endTime - moment();
             setTimeout(() => helpers.endGiveaway(dbChecks.creator, giveawayChannel, item), timeout);
           });
+
           return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
           } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
           } The giveaway will end in **${intDuration} minute(s)**.`);
@@ -147,29 +152,35 @@ module.exports = {
         .catch(() => {
           message.channel.send(`${giveawayInfo.userName} is giving away **${giveawayInfo.item}**!${""
           } The giveaway will end in **${countdownString}**.${""
-          }  Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
+          } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
         });
     }
       break;
 
     case "end": {
-      if (message.author.id === process.env.OWNER || message.author.id === dbChecks.info[0].userId) {
+      if (dbChecks.info[0] && (message.author.id === process.env.OWNER || message.author.id === dbChecks.info[0].userId)) {
         const item = dbChecks.info[0].item;
+
         return helpers.endGiveaway(dbChecks.creator, giveawayChannel, item);
       }
-      return message.reply("only the giveaway creator can end it!");
-    }
 
-    case "clear":
-      /* If something goes wrong and the bot is stuck without ending the giveaway,
-          you can forcefully refresh the tables with this command. */
-      if (message.author.id === process.env.OWNER ||
-        message.member.roles.has(process.env.LEADERS) ||
-        message.member.roles.has(process.env.OFFICERS)) {
+      if (!dbChecks.info[0]) {
+        return message.reply("there is no giveaway to end!");
+      }
+
+      message.reply("only the giveaway creator can end it!");
+    }
+      break;
+
+    case "clear": {
+      if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
         helpers.clearGiveawayAndEntries();
         return message.reply("database tables are cleared!");
       }
-      return message.reply("you don't have permission to use this command!");
+
+      message.reply("you don't have permission to use this command!");
+    }
+      break;
     }
   },
 };

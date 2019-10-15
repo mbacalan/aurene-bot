@@ -1,3 +1,5 @@
+const { Entries, Giveaway, Winner } = require("../dbModels/models");
+
 module.exports = {
   logger(logs) {
     if (Array.isArray(logs)) {
@@ -11,13 +13,13 @@ module.exports = {
     }
   },
 
-  clearGiveawayAndEntries(giveawayDb, entriesDb) {
-    giveawayDb.collection.deleteMany({});
-    entriesDb.collection.deleteMany({});
+  clearGiveawayAndEntries() {
+    Giveaway.collection.deleteMany({});
+    Entries.collection.deleteMany({});
   },
 
-  createWinner(winnerDb, winner, item) {
-    winnerDb.create({
+  createWinner(winner, item) {
+    Winner.create({
       userId: winner.userId,
       userName: winner.userName,
       discriminator: winner.discriminator,
@@ -25,28 +27,28 @@ module.exports = {
     });
   },
 
-  async pickWinner(entriesDb) {
-    const winner = await entriesDb.aggregate([{ $sample: { size: 1 } }]);
+  async pickWinner() {
+    const winner = await Entries.aggregate([{ $sample: { size: 1 } }]);
     return winner[0];
   },
 
-  async endGiveaway(winnerDb, creator, channel, item) {
-    const winner = await this.pickWinner();
+  async endGiveaway(creator, channel, item) {
+    const winner = await this.pickWinner(Entries);
 
     if (!winner) {
       channel.send("Looks like no one entered the giveaway :(");
       console.error(`No one entered the giveaway of ${item}.`);
-      return this.clearGiveawayAndEntries();
+      return this.clearGiveawayAndEntries(Giveaway, Entries);
     }
 
-    this.createWinner(winnerDb, winner, item);
+    this.createWinner(winner, item);
     channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${creator.userName}#${creator.discriminator}!`);
     console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
     this.clearGiveawayAndEntries();
   },
 
-  async createGiveaway(giveawayDb, message, item, duration, endTime) {
-    await giveawayDb.create({
+  async createGiveaway(message, item, duration, endTime) {
+    await Giveaway.create({
       userId: message.author.id,
       userName: message.author.username,
       discriminator: message.author.discriminator,
