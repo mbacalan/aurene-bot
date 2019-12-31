@@ -89,11 +89,35 @@ const winnerSchema = new mongoose.Schema({
   },
 });
 
+const keySchema = new mongoose.Schema({
+  discordId: {
+    type: String,
+    required: true,
+  },
+  keyName: {
+    type: String,
+    required: true,
+  },
+  accountName: {
+    type: String,
+    required: true,
+  },
+  permissions: {
+    type: Array,
+    required: true,
+  },
+  key: {
+    type: String,
+    required: true,
+  },
+});
+
 // Declare models based on schemas
 const Bosses = mongoose.model("Bosses", bossSchema);
 const Giveaway = mongoose.model("Giveaway", giveawaySchema);
 const Entries = mongoose.model("Entries", entrySchema);
 const Winner = mongoose.model("Winner", winnerSchema);
+const Key = mongoose.model("Key", keySchema);
 
 // Export them for use as required
-module.exports = { Bosses, Giveaway, Entries, Winner };
+module.exports = { Bosses, Giveaway, Entries, Winner, Key };
