@@ -17,6 +17,10 @@ async function endGiveaway(creator, channel, item) {
 }
 
 async function checkKey(message, key) {
+  const userId = message.author.id;
+  const userHasKey = await Key.findOne({ discordId: userId });
+  const keyExists = await Key.findOne({ key: key });
+
   if (!key) {
     message.reply("you didn't provide a key!");
     return false;
@@ -28,7 +32,13 @@ async function checkKey(message, key) {
     return false;
   }
 
-  if (await Key.findOne({ key: key })) {
+  if (userHasKey) {
+    message.delete();
+    message.reply("you already have a registered key. You can use the delete arguement to delete it.");
+    return false;
+  }
+
+  if (keyExists) {
     message.delete();
     message.reply("this key already exists in the database.");
     return false;

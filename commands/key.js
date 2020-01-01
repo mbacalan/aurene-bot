@@ -1,6 +1,6 @@
 const { callApi, getTokenInfo } = require("../utils/api");
 const { checkKey } = require("../utils/general");
-const { createKey } = require("../utils/db");
+const { createKey, deleteKey } = require("../utils/db");
 
 module.exports = {
   name: "key",
@@ -11,7 +11,11 @@ module.exports = {
       case "add": {
         const inputtedKey = args[1];
         const keyIsValid = await checkKey(message, inputtedKey);
-        const tokenInfo = await getTokenInfo(message, inputtedKey);
+        let tokenInfo = null;
+
+        if (keyIsValid) {
+          tokenInfo = await getTokenInfo(message, inputtedKey);
+        }
 
         if (keyIsValid && tokenInfo) {
           const account = await callApi("account", inputtedKey);
@@ -21,10 +25,14 @@ module.exports = {
             await message.delete();
             await message.reply("your key has been saved and your message has been deleted for privacy.");
           } catch (error) {
-            console.log(error);
             message.channel.send("There was an issue while trying to save your key. Please contact my author.");
+            console.log(error);
           }
         }
+      }
+        break;
+      case "delete": {
+        deleteKey(message);
       }
     }
   },
