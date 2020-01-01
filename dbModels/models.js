@@ -96,7 +96,7 @@ const keySchema = new mongoose.Schema({
   },
   keyName: {
     type: String,
-    required: true,
+    required: false,
   },
   accountName: {
     type: String,

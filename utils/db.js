@@ -26,7 +26,7 @@ async function createWinner(winner, item) {
 async function createKey(message, tokenInfo, account, key) {
   await Key.create({
     discordId: message.author.id,
-    keyName: tokenInfo.name,
+    keyName: tokenInfo.name ? tokenInfo.name : "",
     accountName: account.name,
     permissions: tokenInfo.permissions,
     key,

@@ -1,36 +1,13 @@
-const fetch = require("node-fetch");
+const apiClient = require("gw2api-client");
+const redis = require("redis");
+const cacheRedis = require("../node_modules/gw2api-client/src/cache/redis.js");
 
-async function callApi(endpoint, key) {
-  let headers;
+const options = {
+  redis: redis.createClient(),
+};
 
-  if (key) {
-    headers = { Authorization: `Bearer ${key}` };
-  }
+const gw2api = apiClient();
 
-  try {
-    const response = await fetch(`https://api.guildwars2.com/v2/${endpoint}`, {
-      method: "GET",
-      headers,
-    });
+gw2api.cacheStorage(cacheRedis(options));
 
-    if (response.status >= 200 && response.status < 400) {
-      return response.json();
-    } else { return; }
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function getTokenInfo(message, key) {
-  const tokenInfo = await callApi("tokeninfo", key);
-
-  if (!tokenInfo) {
-    message.delete();
-    message.reply("there is either an issue with the API or your key. Please try again later.");
-    return;
-  }
-
-  return tokenInfo;
-}
-
-module.exports = { callApi, getTokenInfo };
+module.exports = { gw2api };

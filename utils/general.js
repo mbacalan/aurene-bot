@@ -16,7 +16,7 @@ async function endGiveaway(creator, channel, item) {
   await clearGiveawayAndEntries();
 }
 
-async function checkKey(message, key) {
+async function validateKey(message, key) {
   const userId = message.author.id;
   const userHasKey = await Key.findOne({ discordId: userId });
   const keyExists = await Key.findOne({ key: key });
@@ -49,5 +49,5 @@ async function checkKey(message, key) {
 
 module.exports = {
   endGiveaway,
-  checkKey,
+  validateKey,
 };

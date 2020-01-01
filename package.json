@@ -8,7 +8,8 @@
     "npm": "*"
   },
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "dev": "nodemon --exec 'heroku local'"
   },
   "repository": {
     "type": "git",
@@ -19,10 +20,11 @@
   "dependencies": {
     "countdown": "^2.6.0",
     "discord.js": "^11.4.2",
+    "gw2api-client": "^7.4.1",
     "moment": "^2.22.2",
     "moment-countdown": "0.0.3",
     "mongoose": "^5.7.11",
-    "node-fetch": "^2.6.0"
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1"
