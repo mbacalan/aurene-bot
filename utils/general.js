@@ -2,7 +2,10 @@ const { Entries, Giveaway, Key } = require("../dbModels/models");
 const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
 
 async function endGiveaway(creator, channel, item) {
+  const giveaway = await Giveaway.find({});
   const winner = await pickWinner(Entries);
+
+  if (!giveaway) return false;
 
   if (!winner) {
     channel.send("Looks like no one entered the giveaway :(");

@@ -25,7 +25,7 @@ module.exports = {
         if (dbChecks.active) return message.reply("please wait for current giveaway to end.");
 
         try {
-          console(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
+          console.log(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
           // Create a filter to listen to author's input only
           const filter = m => m.author.id === message.author.id;
           // Send the initial message asking for user input
@@ -50,17 +50,16 @@ module.exports = {
 
           const duration = await collectedDuration.first().content;
 
-          // If, when parsed, duration is NaN: we can't do anything with it
           if (Number.isNaN(parseInt(duration, 10))) {
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
             throw new Error("Can not parse user's reply for duration (isNaN)");
           }
 
-          // If the input for duration doesn't include "m" or "h", we can't match that with anything. Do a fresh start
-          if ((!duration.includes("m") && !duration.includes("h")) ||
-            (duration.includes("m") && duration.includes("h"))) {
-            await clearGiveawayAndEntries();
+          if (
+            (!duration.includes("m") && !duration.includes("h")) || (duration.includes("m") && duration.includes("h"))
+          ) {
             message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+            await clearGiveawayAndEntries();
             throw new Error("Can not parse user's reply for duration (includesH&M)");
           }
 
@@ -139,6 +138,7 @@ module.exports = {
 
       case "info": {
         if (!dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
+
         const giveawayInfo = dbChecks.info[0];
         const countdownString = moment().countdown(giveawayInfo.endTime).toString();
         const infoEmbed = new RichEmbed()
@@ -158,17 +158,17 @@ module.exports = {
         break;
 
       case "end": {
-        if (dbChecks.info[0] && (message.author.id === process.env.OWNER || message.author.id === dbChecks.info[0].userId)) {
-          const item = dbChecks.info[0].item;
-
-          return endGiveaway(dbChecks.creator, giveawayChannel, item);
+        if (message.author.id !== process.env.OWNER || message.author.id !== dbChecks.info[0].userId) {
+          return message.reply("only the giveaway creator can end it!");
         }
 
-        if (!dbChecks.info[0]) {
-          return message.reply("there is no giveaway to end!");
-        }
+        const item = dbChecks.info[0].item;
 
-        message.reply("only the giveaway creator can end it!");
+        try {
+          endGiveaway(dbChecks.creator, giveawayChannel, item);
+        } catch (error) {
+          message.reply("there is no giveaway to end!");
+        }
       }
         break;
 

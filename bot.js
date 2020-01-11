@@ -80,7 +80,9 @@ bot.on("message", message => {
   }
 
   try {
+    message.channel.startTyping();
     command.execute(message, args);
+    message.channel.stopTyping(true);
   } catch (error) {
     console.log(error);
     message.reply("there was an error trying to execute that command!");

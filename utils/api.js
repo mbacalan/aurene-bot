@@ -3,7 +3,7 @@ const redis = require("redis");
 const cacheRedis = require("../node_modules/gw2api-client/src/cache/redis.js");
 
 const options = {
-  redis: redis.createClient(),
+  redis: redis.createClient(process.env.REDIS_URL),
 };
 
 const gw2api = apiClient();
