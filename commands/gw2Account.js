@@ -1,6 +1,7 @@
 const { Key } = require("../dbModels/models");
 const { RichEmbed } = require("discord.js");
 const { gw2api } = require("../utils/api");
+const { formatAge } = require("../utils/general");
 
 module.exports = {
   name: "account",
@@ -21,15 +22,16 @@ module.exports = {
     // TODO: Set primary guild
     const guild = await gw2api.guild().get(account.guild_leader[0]);
     const world = await gw2api.worlds().get(account.world);
+    const age = formatAge(account.age);
     const expansions = account.access
       .filter(i => !["PlayForFree", "GuildWars2"].includes(i))
       .map(i => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
       .join("\n");
 
-    const infoEmbed = new RichEmbed()
+    const accountEmbed = new RichEmbed()
       .setTitle(`${account.name}`)
       .addField("Created at", `${new Date(account.created).toDateString()}`, true)
-      .addField("Leads", `${guild.name} [${guild.tag}]`, true)
+      .addField("Age", `${age}`, true)
       .addField("\u200b", "\u200b", true)
       .addField("Has Expansions", `${expansions}`, true)
       .addField("World", `${world.name}`, true)
@@ -39,8 +41,9 @@ module.exports = {
       .addField("\u200b", "\u200b", true)
       .addField("Fractal Level", `${account.fractal_level}`, true)
       .addField("Commander", `${account.commander ? "Yes" : "No"}`, true)
-      .addField("\u200b", "\u200b", true);
+      .addField("\u200b", "\u200b", true)
+      .addField("Leads", `${guild.name} [${guild.tag}]`, true);
 
-    message.channel.send(infoEmbed);
+    message.channel.send(accountEmbed);
   },
 };
