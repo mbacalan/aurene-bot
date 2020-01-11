@@ -50,7 +50,19 @@ async function validateKey(message, key) {
   return true;
 }
 
+function formatAge(age) {
+  const hours = Math.floor(age / 3600);
+  const minutes = Math.round((age % 3600) / 60);
+
+  if (hours) {
+    return `${hours} hours ${minutes} minutes`;
+  }
+
+  return `${minutes} minutes`;
+}
+
 module.exports = {
   endGiveaway,
   validateKey,
+  formatAge,
 };
