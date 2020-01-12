@@ -1,6 +1,7 @@
 const { Key } = require("../dbModels/models");
 const { RichEmbed } = require("discord.js");
-const { gw2api } = require("../utils/api");
+const { gw2api, getLeadingGuilds } = require("../utils/api");
+const { formatAge, filterExpansions } = require("../utils/general");
 
 module.exports = {
   name: "account",
@@ -18,29 +19,28 @@ module.exports = {
 
     const account = await gw2api.account().get();
     const pvp = await gw2api.account().pvp().stats().get();
-    // TODO: Set primary guild
-    const guild = await gw2api.guild().get(account.guild_leader[0]);
     const world = await gw2api.worlds().get(account.world);
-    const expansions = account.access
-      .filter(i => !["PlayForFree", "GuildWars2"].includes(i))
-      .map(i => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
-      .join("\n");
+    const age = formatAge(account.age);
+    const guilds = await getLeadingGuilds(account);
+    const expansions = filterExpansions(account);
+    const creationDate = new Date(account.created).toDateString();
 
-    const infoEmbed = new RichEmbed()
-      .setTitle(`${account.name}`)
-      .addField("Created at", `${new Date(account.created).toDateString()}`, true)
-      .addField("Leads", `${guild.name} [${guild.tag}]`, true)
+    const accountEmbed = new RichEmbed()
+      .setTitle(account.name)
+      .addField("Created at", creationDate, true)
+      .addField("Age", age, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Has Expansions", `${expansions}`, true)
-      .addField("World", `${world.name}`, true)
+      .addField("Has Expansions", expansions, true)
+      .addField("World", world.name, true)
       .addField("\u200b", "\u200b", true)
-      .addField("WvW Rank", `${account.wvw_rank}`, true)
-      .addField("PvP Rank", `${pvp.pvp_rank}`, true)
+      .addField("WvW Rank", account.wvw_rank, true)
+      .addField("PvP Rank", pvp.pvp_rank, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Fractal Level", `${account.fractal_level}`, true)
-      .addField("Commander", `${account.commander ? "Yes" : "No"}`, true)
-      .addField("\u200b", "\u200b", true);
+      .addField("Fractal Level", account.fractal_level, true)
+      .addField("Commander", account.commander ? "Yes" : "No", true)
+      .addField("\u200b", "\u200b", true)
+      .addField("Leads", guilds, true);
 
-    message.channel.send(infoEmbed);
+    message.channel.send(accountEmbed);
   },
 };
