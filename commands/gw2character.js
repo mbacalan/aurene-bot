@@ -18,13 +18,11 @@ module.exports = {
 
     gw2api.authenticate(key.key);
 
-    let characterName = args[0];
-
-    if (args[1]) {
-      characterName = [args[0], args[1]].join(" ");
-    }
-
-    const character = await gw2api.characters(characterName).core().get();
+    const characterName = args[1] ? [args[0], args[1]].join(" ") : args[0];
+    const character = await gw2api.characters(characterName).core().get().catch((error) => {
+      message.reply("couldn't find that character.");
+      throw new Error(`${error.content.text} ${characterName}`);
+    });
     const guild = await gw2api.guild().get(character.guild);
     const title = await gw2api.titles().get(character.title).catch(() => "No Title");
     const professionIcon = professions[character.profession.toLowerCase()].icon;
@@ -33,19 +31,19 @@ module.exports = {
     const age = formatAge(character.age);
 
     const characterEmbed = new RichEmbed()
-      .setTitle(`${character.name}`)
-      .setDescription(`A ${character.race} ${character.gender} ${character.profession}`)
+      .setTitle(character.name)
+      .setDescription(`${character.gender} ${character.race} ${character.profession}`)
       .setThumbnail(professionIcon)
-      .addField("Level", `${character.level}`, true)
-      .addField("Title", `${title.name ? title.name : title}`, true)
+      .addField("Level", character.level, true)
+      .addField("Title", title.name ? title.name : title, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Created at", `${createdAt}`, true)
-      .addField("Guild", `${guild.name} [${guild.tag}]`, true)
+      .addField("Created At", createdAt, true)
+      .addField("Played For", age, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Deaths", `${character.deaths}`, true)
-      .addField("Deaths Per Hour", `${deathsPerHour}`, true)
+      .addField("Deaths", character.deaths, true)
+      .addField("Deaths Per Hour", deathsPerHour, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Age", `${age}`);
+      .addField("Representing", `${guild.name} [${guild.tag}]`);
 
     message.channel.send(characterEmbed);
   },
