@@ -26,20 +26,20 @@ module.exports = {
     const creationDate = new Date(account.created).toDateString();
 
     const accountEmbed = new RichEmbed()
-      .setTitle(`${account.name}`)
-      .addField("Created at", `${new Date(account.created).toDateString()}`, true)
-      .addField("Age", `${age}`, true)
+      .setTitle(account.name)
+      .addField("Created at", creationDate, true)
+      .addField("Age", age, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Has Expansions", `${expansions}`, true)
-      .addField("World", `${world.name}`, true)
+      .addField("Has Expansions", expansions, true)
+      .addField("World", world.name, true)
       .addField("\u200b", "\u200b", true)
-      .addField("WvW Rank", `${account.wvw_rank}`, true)
-      .addField("PvP Rank", `${pvp.pvp_rank}`, true)
+      .addField("WvW Rank", account.wvw_rank, true)
+      .addField("PvP Rank", pvp.pvp_rank, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Fractal Level", `${account.fractal_level}`, true)
-      .addField("Commander", `${account.commander ? "Yes" : "No"}`, true)
+      .addField("Fractal Level", account.fractal_level, true)
+      .addField("Commander", account.commander ? "Yes" : "No", true)
       .addField("\u200b", "\u200b", true)
-      .addField("Leads", `${guild.name} [${guild.tag}]`, true);
+      .addField("Leads", guilds, true);
 
     message.channel.send(accountEmbed);
   },
