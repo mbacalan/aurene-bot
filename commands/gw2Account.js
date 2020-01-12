@@ -1,7 +1,7 @@
 const { Key } = require("../dbModels/models");
 const { RichEmbed } = require("discord.js");
-const { gw2api } = require("../utils/api");
-const { formatAge } = require("../utils/general");
+const { gw2api, getLeadingGuilds } = require("../utils/api");
+const { formatAge, filterExpansions } = require("../utils/general");
 
 module.exports = {
   name: "account",
@@ -19,14 +19,11 @@ module.exports = {
 
     const account = await gw2api.account().get();
     const pvp = await gw2api.account().pvp().stats().get();
-    // TODO: Set primary guild
-    const guild = await gw2api.guild().get(account.guild_leader[0]);
     const world = await gw2api.worlds().get(account.world);
     const age = formatAge(account.age);
-    const expansions = account.access
-      .filter(i => !["PlayForFree", "GuildWars2"].includes(i))
-      .map(i => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
-      .join("\n");
+    const guilds = await getLeadingGuilds(account);
+    const expansions = filterExpansions(account);
+    const creationDate = new Date(account.created).toDateString();
 
     const accountEmbed = new RichEmbed()
       .setTitle(`${account.name}`)
