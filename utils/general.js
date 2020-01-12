@@ -61,8 +61,18 @@ function formatAge(age) {
   return `${minutes} minutes`;
 }
 
+function filterExpansions(account) {
+  const expansions = account.access
+    .filter(i => !["PlayForFree", "GuildWars2"].includes(i))
+    .map(i => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
+    .join("\n");
+
+  return expansions;
+}
+
 module.exports = {
   endGiveaway,
   validateKey,
   formatAge,
+  filterExpansions,
 };
