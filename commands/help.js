@@ -1,9 +1,13 @@
-module.exports = {
-  name: "help",
-  description: "List all of my commands or info about a specific command.",
-  aliases: ["commands"],
-  usage: "[command name]",
-  cooldown: 5,
+class Help {
+  constructor() {
+    this.name = "help";
+    this.args = false;
+    this.description = "List all of my commands or info about a specific command.";
+    this.aliases = ["commands"];
+    this.usage = "[command name]";
+    this.cooldown = 5;
+  }
+
   execute(message, args) {
     const { commands } = message.client;
     const data = [];
@@ -30,5 +34,7 @@ module.exports = {
         }
       })
       .catch(() => message.reply("it seems like I can't DM you!"));
-  },
-};
+  }
+}
+
+module.exports = new Help;

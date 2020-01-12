@@ -4,10 +4,13 @@ const { gw2api } = require("../utils/api");
 const { formatAge } = require("../utils/general");
 const { professions } = require("../utils/gameData");
 
-module.exports = {
-  name: "character",
-  args: true,
-  description: "See your GW2 account information",
+class Character {
+  constructor() {
+    this.name = "character";
+    this.args = true;
+    this.description = "See your GW2 character information";
+  }
+
   async execute(message, args) {
     const key = await Key.findOne({ discordId: message.author.id });
 
@@ -46,5 +49,7 @@ module.exports = {
       .addField("Representing", `${guild.name} [${guild.tag}]`);
 
     message.channel.send(characterEmbed);
-  },
-};
+  }
+}
+
+module.exports = new Character;

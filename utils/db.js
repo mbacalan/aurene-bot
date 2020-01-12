@@ -14,6 +14,15 @@ async function createGiveaway(message, item, duration, endTime) {
   console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
 }
 
+async function createEntry(message) {
+  await Entries.create({
+    userId: message.author.id,
+    userName: message.author.username,
+    discriminator: message.author.discriminator,
+    entryTime: `${message.createdAt}`,
+  });
+}
+
 async function createWinner(winner, item) {
   await Winner.create({
     userId: winner.userId,
@@ -61,6 +70,7 @@ async function clearGiveawayAndEntries() {
 
 module.exports = {
   createGiveaway,
+  createEntry,
   createWinner,
   createKey,
   deleteKey,

@@ -1,9 +1,13 @@
-module.exports = {
-  name: "eval",
-  description: "Evaluate JavaScript",
-  execute(message) {
-    try {
+class Eval {
+  constructor() {
+    this.name = "eval";
+    this.description = "Evaluate JS code";
+  }
 
+  execute(message) {
+    if (message.author.id !== process.env.OWNER) return;
+
+    try {
       const clean = text => {
         if (typeof (text) === "string") {
           return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
@@ -14,24 +18,22 @@ module.exports = {
 
       const args = message.content.split(" ").slice(1);
 
-      if (message.content.startsWith(process.env.PREFIX + "eval")) {
-        if(message.author.id !== process.env.OWNER) return;
-        try {
-          const code = args.join(" ");
-          let evaled = eval(code);
+      try {
+        const code = args.join(" ");
+        let evaled = eval(code);
 
-          if (typeof evaled !== "string") {
-            evaled = require("util").inspect(evaled);
-          }
-
-          message.channel.send(clean(evaled), { code:"xl" });
-        } catch (err) {
-          message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
+        if (typeof evaled !== "string") {
+          evaled = require("util").inspect(evaled);
         }
-      }
 
+        message.channel.send(clean(evaled), { code:"xl" });
+      } catch (err) {
+        message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
+      }
     } catch (err) {
       console.log(err);
     }
-  },
-};
+  }
+}
+
+module.exports = new Eval;

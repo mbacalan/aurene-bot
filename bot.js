@@ -52,7 +52,7 @@ bot.on("ready", async () => {
   }
 });
 
-bot.on("message", message => {
+bot.on("message", async message => {
   // Prefix is either what's defined or the tag of the bot
   const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${process.env.PREFIX})\\s*`);
 
@@ -81,6 +81,7 @@ bot.on("message", message => {
 
   try {
     message.channel.startTyping();
+    await command.init(message);
     command.execute(message, args);
     message.channel.stopTyping(true);
   } catch (error) {

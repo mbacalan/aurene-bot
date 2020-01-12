@@ -3,10 +3,13 @@ const { RichEmbed } = require("discord.js");
 const { gw2api, getLeadingGuilds } = require("../utils/api");
 const { formatAge, filterExpansions } = require("../utils/general");
 
-module.exports = {
-  name: "account",
-  args: false,
-  description: "See your GW2 account information",
+class Account {
+  constructor() {
+    this.name = "account";
+    this.arss = false;
+    this.description = "See your GW2 account information";
+  }
+
   async execute(message) {
     const key = await Key.findOne({ discordId: message.author.id });
 
@@ -42,5 +45,7 @@ module.exports = {
       .addField("Leads", guilds, true);
 
     message.channel.send(accountEmbed);
-  },
-};
+  }
+}
+
+module.exports = new Account;
