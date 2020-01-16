@@ -6,7 +6,7 @@ const { formatAge, filterExpansions } = require("../utils/general");
 class Account {
   constructor() {
     this.name = "account";
-    this.arss = false;
+    this.args = false;
     this.description = "See your GW2 account information";
   }
 
