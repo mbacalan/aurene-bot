@@ -26,24 +26,26 @@ class Character {
       message.reply("couldn't find that character.");
       throw new Error(`${error.content.text} ${characterName}`);
     });
+
+    const { profession, deaths, age, created, name, gender, race } = character;
     const guild = await gw2api.guild().get(character.guild);
     const title = await gw2api.titles().get(character.title).catch(() => "No Title");
-    const professionIcon = professions[character.profession.toLowerCase()].icon;
-    const deathsPerHour = (character.deaths / (character.age / 3600)).toFixed(1);
-    const createdAt = new Date(character.created).toDateString();
-    const age = formatAge(character.age);
+    const professionIcon = professions[profession.toLowerCase()].icon;
+    const deathsPerHour = (deaths / (age / 3600)).toFixed(1);
+    const createdAt = new Date(created).toDateString();
+    const formattedAge = formatAge(age);
 
     const characterEmbed = new RichEmbed()
-      .setTitle(character.name)
-      .setDescription(`${character.gender} ${character.race} ${character.profession}`)
+      .setTitle(name)
+      .setDescription(`${gender} ${race} ${profession}`)
       .setThumbnail(professionIcon)
       .addField("Level", character.level, true)
       .addField("Title", title.name ? title.name : title, true)
       .addField("\u200b", "\u200b", true)
       .addField("Created At", createdAt, true)
-      .addField("Played For", age, true)
+      .addField("Played For", formattedAge, true)
       .addField("\u200b", "\u200b", true)
-      .addField("Deaths", character.deaths, true)
+      .addField("Deaths", deaths, true)
       .addField("Deaths Per Hour", deathsPerHour, true)
       .addField("\u200b", "\u200b", true)
       .addField("Representing", `${guild.name} [${guild.tag}]`);
