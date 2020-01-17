@@ -12,6 +12,7 @@ class Giveaways {
     this.description = "Create, enter and view giveaways";
     this.args = true;
     this.usage = "create/enter/entries/info";
+    this.timeout;
     this.giveawayChannel;
     this.dbChecks = {};
   }
@@ -167,7 +168,11 @@ class Giveaways {
       });
   }
 
-  end(message) {
+  async end(message) {
+    await this.setDbChecks(message);
+
+    // TODO: Fix if condition
+    if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
     if (message.author.id !== process.env.OWNER || message.author.id !== this.dbChecks.info[0].userId) {
       return message.reply("only the giveaway creator can end it!");
     }
@@ -176,6 +181,8 @@ class Giveaways {
 
     try {
       endGiveaway(this.dbChecks.creator, this.giveawayChannel, item);
+      clearTimeout(this.timeout);
+      this.timeout = null;
     } catch (error) {
       message.reply("there is no giveaway to end!");
     }
