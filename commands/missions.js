@@ -1,8 +1,11 @@
-module.exports = {
-  name: "missions",
-  aliases: ["gm", "guildmissions", "mission"],
-  args: true,
-  description: "Alert members for starting Guild Missions and provide useful info to them",
+class Missions {
+  constructor() {
+    this.name = "missions";
+    this.aliases = ["gm", "guildmissions", "mission"];
+    this.args = true;
+    this.description = "Alert members for starting Guild Missions and provide useful info to them";
+  }
+
   execute(message, args) {
     try {
       if (args[0] === "start") {
@@ -30,5 +33,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
-};
+  }
+}
+
+module.exports = new Missions;

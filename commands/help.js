@@ -5,9 +5,9 @@ class Help {
     this.description = "List all of my commands or info about a specific command.";
     this.aliases = ["commands"];
     this.usage = "[command name]";
-    this.cooldown = 5;
   }
 
+  // TODO: Clean up the mess
   execute(message, args) {
     const { commands } = message.client;
     const data = [];
@@ -20,6 +20,7 @@ class Help {
       if (!commands.has(args[0])) {
         return message.reply("that's not a valid command!");
       }
+
       const command = commands.get(args[0]);
 
       data.push(`**Name:** ${command.name}`);
@@ -27,6 +28,7 @@ class Help {
       if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(", ")}`);
       if (command.usage) data.push(`**Usage:** ${process.env.PREFIX}${command.name} ${command.usage}`);
     }
+
     message.author.send(data, { split: true })
       .then(() => {
         if (message.channel.type !== "dm") {

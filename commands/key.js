@@ -2,10 +2,13 @@ const { validateKey } = require("../utils/general");
 const { createKey, deleteKey } = require("../utils/db");
 const { gw2api } = require("../utils/api");
 
-module.exports = {
-  name: "key",
-  args: true,
-  description: "Add your GW2 API key",
+class Key {
+  constructor() {
+    this.name = "key";
+    this.args = true;
+    this.description = "Add your GW2 API key";
+  }
+
   async execute(message, args) {
     switch (args[0]) {
       case "add": {
@@ -18,11 +21,11 @@ module.exports = {
         const tokenInfo = await gw2api.tokeninfo().get(key).catch(() => {
           message.delete();
           message.reply("there is either an issue with the API or your key. Please try again later.");
-          return;
         });
 
         try {
           const account = await gw2api.account().get(key);
+
           await createKey(message, tokenInfo, account, key);
           await message.delete();
           await message.reply("your key has been saved and your message has been deleted for privacy.");
@@ -32,9 +35,12 @@ module.exports = {
         }
       }
         break;
+
       case "delete": {
-        deleteKey(message);
+        await deleteKey(message);
       }
     }
-  },
-};
+  }
+}
+
+module.exports = new Key;

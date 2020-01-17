@@ -1,10 +1,13 @@
 const { Bosses } = require("../dbModels/models");
 
-module.exports = {
-  name: "guide",
-  description: "Get some guide links for the raid boss of your choice",
-  args: true,
-  usage: "bossname",
+class Guides {
+  constructor() {
+    this.name = "guide";
+    this.description = "Get some guide links for the raid boss of your choice";
+    this.args = true;
+    this.usage = "bossname";
+  }
+
   async execute(message, args) {
 
     let boss = await Bosses.findOne({ name: args.join(" ") });
@@ -23,7 +26,9 @@ module.exports = {
         message.reply("I couldn't find info about that boss");
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
-  },
-};
+  }
+}
+
+module.exports = new Guides;
