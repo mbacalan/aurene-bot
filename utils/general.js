@@ -1,11 +1,9 @@
 const { Entries, Giveaway, Key } = require("../dbModels/models");
 const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
+const moment = require("moment");
 
 async function endGiveaway(creator, channel, item) {
-  const giveaway = await Giveaway.find({});
   const winner = await pickWinner(Entries);
-
-  if (!giveaway) return false;
 
   if (!winner) {
     channel.send("Looks like no one entered the giveaway :(");
@@ -17,6 +15,17 @@ async function endGiveaway(creator, channel, item) {
   channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${creator.userName}#${creator.discriminator}!`);
   console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
   await clearGiveawayAndEntries();
+}
+
+async function initGiveawayTimeout(creator, channel, item) {
+  const giveaway = await Giveaway.findOne({});
+  const endTime = giveaway.endTime;
+  const duration = endTime - moment();
+  const timeout = setTimeout(() => {
+    endGiveaway(creator, channel, item);
+  }, duration);
+
+  return timeout;
 }
 
 async function validateKey(message, key) {
@@ -75,4 +84,5 @@ module.exports = {
   validateKey,
   formatAge,
   filterExpansions,
+  initGiveawayTimeout,
 };
