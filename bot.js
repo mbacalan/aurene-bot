@@ -81,7 +81,11 @@ bot.on("message", async message => {
 
   try {
     message.channel.startTyping();
-    await command.init(message);
+
+    if (command.init) {
+      await command.init(message);
+    }
+
     command.execute(message, args);
     message.channel.stopTyping(true);
   } catch (error) {
