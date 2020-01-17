@@ -12,8 +12,8 @@ class Giveaways {
     this.description = "Create, enter and view giveaways";
     this.args = true;
     this.usage = "create/enter/entries/info";
-    this.timeout;
-    this.giveawayChannel;
+    this.timeout = null;
+    this.giveawayChannel = null;
     this.dbChecks = {};
   }
 
@@ -76,24 +76,24 @@ class Giveaways {
 
       if (!collectedItem.first().content) {
         message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-        throw new Error("User reply for item timed out");
+        return console.error("User reply for item timed out");
       }
 
-      const item = await collectedItem.first().content;
+      const item = collectedItem.first().content;
 
       await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
       const collectedDuration = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] });
 
       if (!collectedDuration.first().content) {
         message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-        throw new Error("User reply for duration timed out");
+        return console.error("User reply for duration timed out");
       }
 
-      const duration = await collectedDuration.first().content;
+      const duration = collectedDuration.first().content;
 
       if (Number.isNaN(parseInt(duration, 10))) {
         message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-        throw new Error("Can not parse user's reply for duration (isNaN)");
+        return console.error("Can not parse user's reply for duration (isNaN)");
       }
 
       if (
@@ -101,12 +101,12 @@ class Giveaways {
       ) {
         message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
         await clearGiveawayAndEntries();
-        throw new Error("Can not parse user's reply for duration (includesH&M)");
+        return console.error("Can not parse user's reply for duration (includesH&M)");
       }
 
       if (duration.includes("h", 1)) {
-      /* If the collectedDuration includes "h" in it,
-        parse the string into an integer and multiply it with an hour in miliseconds */
+        /* If the collectedDuration includes "h" in it,
+          parse the string into an integer and multiply it with an hour in miliseconds */
         const intDuration = parseInt(duration, 10);
         const endTime = moment().add(intDuration, "hours");
 
@@ -115,9 +115,9 @@ class Giveaways {
         this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
 
         // ${"" } is used to eat the whitespace to avoid creating a new line.
-        return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
-        } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
-        } The giveaway will end in **${intDuration} hour(s)**.`);
+        return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
+          `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
+          `The giveaway will end in **${intDuration} hour(s)**.`);
       }
 
       if (duration.includes("m", 1)) {
@@ -128,9 +128,9 @@ class Giveaways {
         await this.setDbChecks(message);
         this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
 
-        return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
-        } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
-        } The giveaway will end in **${intDuration} minute(s)**.`);
+        return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
+          `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
+          `The giveaway will end in **${intDuration} minute(s)**.`);
       }
     } catch (err) {
       console.log(err);
@@ -153,8 +153,8 @@ class Giveaways {
 
     const giveawayInfo = this.dbChecks.info[0];
     const countdownString = moment().countdown(giveawayInfo.endTime).toString();
-    const entires = await Entries.find({});
-    const entryList = entires.map((entrant) => entrant.userName);
+    const entries = await Entries.find({});
+    const entryList = entries.map((entrant) => entrant.userName);
     const infoEmbed = new RichEmbed()
       .setTitle(`Giveaway by ${giveawayInfo.userName}`)
       .addField("Item", `${giveawayInfo.item}`, true)
@@ -165,9 +165,9 @@ class Giveaways {
 
     message.channel.send(infoEmbed)
       .catch(() => {
-        message.channel.send(`${giveawayInfo.userName} is giving away **${giveawayInfo.item}**!${""
-        } The giveaway will end in **${countdownString}**.${""
-        } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
+        message.channel.send(`${giveawayInfo.userName} is giving away **${giveawayInfo.item}**! ` +
+          `The giveaway will end in **${countdownString}**. ` +
+          `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
       });
   }
 
@@ -183,7 +183,7 @@ class Giveaways {
     const item = this.dbChecks.info[0].item;
 
     try {
-      endGiveaway(this.dbChecks.creator, this.giveawayChannel, item);
+      await endGiveaway(this.dbChecks.creator, this.giveawayChannel, item);
       clearTimeout(this.timeout);
       this.timeout = null;
     } catch (error) {

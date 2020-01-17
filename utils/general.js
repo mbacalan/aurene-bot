@@ -12,7 +12,7 @@ async function endGiveaway(creator, channel, item) {
   }
 
   await createWinner(winner, item);
-  channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from ${creator.userName}#${creator.discriminator}!`);
+  channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from <@${creator.userId}>!`);
   console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
   await clearGiveawayAndEntries();
 }
@@ -21,11 +21,10 @@ async function initGiveawayTimeout(creator, channel, item) {
   const giveaway = await Giveaway.findOne({});
   const endTime = giveaway.endTime;
   const duration = endTime - moment();
-  const timeout = setTimeout(() => {
+
+  return setTimeout(() => {
     endGiveaway(creator, channel, item);
   }, duration);
-
-  return timeout;
 }
 
 async function validateKey(message, key) {
@@ -46,7 +45,7 @@ async function validateKey(message, key) {
 
   if (userHasKey) {
     message.delete();
-    message.reply("you already have a registered key. You can use the delete arguement to delete it.");
+    message.reply("you already have a registered key. You can use the delete argument to delete it.");
     return false;
   }
 
@@ -71,12 +70,10 @@ function formatAge(age) {
 }
 
 function filterExpansions(account) {
-  const expansions = account.access
+  return account.access
     .filter(i => !["PlayForFree", "GuildWars2"].includes(i))
     .map(i => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
     .join("\n");
-
-  return expansions;
 }
 
 module.exports = {
