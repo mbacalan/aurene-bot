@@ -37,18 +37,13 @@ class Giveaways {
       }
         break;
 
-      case "entries": {
-        await this.entries(message);
-      }
-        break;
-
       case "info": {
-        this.info(message);
+        await this.info(message);
       }
         break;
 
       case "end": {
-        this.end(message);
+        await this.end(message);
       }
         break;
 
@@ -56,6 +51,8 @@ class Giveaways {
         await this.clear(message);
       }
         break;
+
+      default: message.reply("invalid argument.");
     }
   }
 
