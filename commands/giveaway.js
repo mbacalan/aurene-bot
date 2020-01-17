@@ -19,10 +19,16 @@ class Giveaways {
 
   async init(message) {
     this.giveawayChannel = message.client.channels.get(process.env.GIVEAWAY_CHANNEL);
-    this.dbChecks.entry = await Entries.findOne({ userId: message.author.id });
-    this.dbChecks.creator = await Giveaway.findOne({ userId: message.author.id });
-    this.dbChecks.active = await Giveaway.countDocuments({});
-    this.dbChecks.info = await Giveaway.find({});
+    await this.setDbChecks(message);
+  }
+
+  async setDbChecks(message) {
+    this.dbChecks = {
+      entry: await Entries.findOne({ userId: message.author.id }),
+      creator: await Giveaway.findOne({ userId: message.author.id }),
+      active: await Giveaway.countDocuments({}),
+      info: await Giveaway.find({}),
+    };
   }
 
   async execute(message, args) {
