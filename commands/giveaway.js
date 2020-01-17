@@ -1,5 +1,5 @@
 const { RichEmbed } = require("discord.js");
-const { endGiveaway } = require("../utils/general");
+const { endGiveaway, initGiveawayTimeout } = require("../utils/general");
 const { clearGiveawayAndEntries, createGiveaway, createEntry } = require("../utils/db");
 const { Entries, Giveaway } = require("../dbModels/models");
 const moment = require("moment");
@@ -104,17 +104,11 @@ class Giveaways {
       /* If the collectedDuration includes "h" in it,
         parse the string into an integer and multiply it with an hour in miliseconds */
         const intDuration = parseInt(duration, 10);
-        let endTime = moment().add(intDuration, "hours");
+        const endTime = moment().add(intDuration, "hours");
 
         await createGiveaway(message, item, duration, endTime);
-
-        Giveaway.findOne({}).then((result) => {
-          endTime = result.endTime;
-          const timeout = endTime - moment();
-          setTimeout(() => {
-            endGiveaway(this.dbChecks.creator, this.giveawayChannel, item);
-          }, timeout);
-        });
+        await this.setDbChecks(message);
+        this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
 
         // ${"" } is used to eat the whitespace to avoid creating a new line.
         return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
@@ -124,17 +118,11 @@ class Giveaways {
 
       if (duration.includes("m", 1)) {
         const intDuration = parseInt(duration, 10);
-        let endTime = moment().add(intDuration, "minutes");
+        const endTime = moment().add(intDuration, "minutes");
 
         await createGiveaway(message, item, duration, endTime);
-
-        Giveaway.findOne({}).then((result) => {
-          endTime = result.endTime;
-          const timeout = endTime - moment();
-          setTimeout(() => {
-            endGiveaway(this.dbChecks.creator, this.giveawayChannel, item);
-          }, timeout);
-        });
+        await this.setDbChecks(message);
+        this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
 
         return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**!${""
         } Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!${""
