@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node bot.js",
-    "dev": "nodemon --exec 'heroku local'"
+    "dev": "heroku local",
+    "devmon": "nodemon --exec 'heroku local'"
   },
   "repository": {
     "type": "git",
