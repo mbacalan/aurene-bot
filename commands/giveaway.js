@@ -144,29 +144,19 @@ class Giveaways {
     message.reply("you have entered the giveaway, good luck!");
   }
 
-  async entries(message) {
-    if (!this.dbChecks.active) return message.reply("there is no active giveaway to list the entries of.");
-
-    const entryList = [];
-    await Entries.find({})
-      .then((entrants) => {
-        entrants.forEach((entrant) => entryList.push(entrant.userName));
-      });
-
-    if (!entryList.length) return message.channel.send("There are no entries yet.");
-    message.channel.send(`There are currently ${entryList.length} entries. They are: ${entryList.join(", ")}`);
-  }
-
-  info(message) {
+  async info(message) {
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
 
     const giveawayInfo = this.dbChecks.info[0];
     const countdownString = moment().countdown(giveawayInfo.endTime).toString();
+    const entires = await Entries.find({});
+    const entryList = entires.map((entrant) => entrant.userName);
     const infoEmbed = new RichEmbed()
       .setTitle(`Giveaway by ${giveawayInfo.userName}`)
       .addField("Item", `${giveawayInfo.item}`, true)
       .addField("Duration", `${giveawayInfo.duration}`, true)
       .addField("Ends In", `${countdownString}`, true)
+      .addField("Entries", `${entryList.length ? entryList : "None, yet"}`)
       .setFooter(`Enter this giveaway by sending: ${process.env.PREFIX}giveaway enter`);
 
     message.channel.send(infoEmbed)
