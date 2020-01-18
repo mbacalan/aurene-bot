@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", (
 const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", () => console.log("Succesfully connected to database"));
+db.once("open", () => console.log("Successfully connected to database"));
 
 bot.on("ready", async () => {
   const giveawayChannel = bot.channels.get(process.env.GIVEAWAY_CHANNEL);
