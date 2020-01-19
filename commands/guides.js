@@ -1,4 +1,5 @@
 const { Bosses } = require("../dbModels/models");
+const logger = require("../utils/logger");
 
 class Guides {
   constructor() {
@@ -25,8 +26,8 @@ class Guides {
       } else {
         message.reply("I couldn't find info about that boss");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      logger.error("Error in guides command", error);
     }
   }
 }

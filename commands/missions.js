@@ -1,3 +1,5 @@
+const logger = require("../utils/logger");
+
 class Missions {
   constructor() {
     this.name = "missions";
@@ -31,7 +33,7 @@ class Missions {
         \nIf you're not doing a trek alone, wait for everyone else to come before you interact with it. Good luck!`);
       }
     } catch (error) {
-      console.log(error);
+      logger.error("Error in missions command", error);
     }
   }
 }

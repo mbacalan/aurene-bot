@@ -1,3 +1,5 @@
+const logger = require("../utils/logger");
+
 class Eval {
   constructor() {
     this.name = "eval";
@@ -26,12 +28,12 @@ class Eval {
           evaled = require("util").inspect(evaled);
         }
 
-        message.channel.send(clean(evaled), { code:"xl" });
+        message.channel.send(clean(evaled), { code: "xl" });
       } catch (err) {
         message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      logger.error("Error in eval command", error);
     }
   }
 }

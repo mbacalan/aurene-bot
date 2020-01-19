@@ -1,10 +1,12 @@
 const { RichEmbed } = require("discord.js");
 const { pollEmojis, pollEmojiUnicodes } = require("../utils/emojiData");
+const logger = require("../utils/logger");
 
 class Poll {
   constructor() {
     this.name = "poll";
     this.description = "Make a poll with given arguments";
+    this.args = true;
     this.usage = "{question} [option1] [option2] (max 25)";
   }
 
@@ -34,7 +36,7 @@ class Poll {
 
       message.delete();
     } catch (error) {
-      console.log(error);
+      logger.error("Error in poll command", error);
     }
   }
 }

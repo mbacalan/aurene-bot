@@ -14,8 +14,7 @@ class Account {
     const key = await Key.findOne({ discordId: message.author.id });
 
     if (!key) {
-      message.reply("I couldn't find a GW2 API key associated with your Discord account!");
-      throw new Error(`Couldn't find a key associated with ${message.author.username}`);
+      return message.reply("I couldn't find a GW2 API key associated with your Discord account!");
     }
 
     gw2api.authenticate(key.key);

@@ -5,6 +5,7 @@ const moment = require("moment");
 const commandFiles = fs.readdirSync("./commands");
 const { endGiveaway } = require("./utils/general");
 const { Giveaway } = require("./dbModels/models");
+const logger = require("./utils/logger");
 
 const bot = new discord.Client();
 
@@ -23,8 +24,8 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", (
 
 const db = mongoose.connection;
 
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", () => console.log("Successfully connected to database"));
+db.on("error", () => logger.error("Error connecting to database"));
+db.once("open", () => logger.info("Successfully connected to database"));
 
 bot.on("ready", async () => {
   const giveawayChannel = bot.channels.get(process.env.GIVEAWAY_CHANNEL);
@@ -41,7 +42,7 @@ bot.on("ready", async () => {
   ];
 
   logs.forEach(function log(msg) {
-    console.log(msg);
+    logger.verbose(msg);
   });
 
   if (giveaway[0]) {
@@ -89,12 +90,12 @@ bot.on("message", async message => {
     command.execute(message, args);
     message.channel.stopTyping(true);
   } catch (error) {
-    console.log(error);
+    logger.error("Error while executing command", error);
     message.reply("there was an error trying to execute that command!");
   }
 });
 
-bot.on("error", error => console.log(error));
-process.on("unhandledRejection", error => console.error("Uncaught Promise Rejection", error));
+bot.on("error", error => logger.error("General error:", error));
+process.on("unhandledRejection", error => logger.error("Uncaught Promise Rejection:", error));
 
 bot.login(process.env.TOKEN);

@@ -25,7 +25,9 @@
     "moment": "^2.22.2",
     "moment-countdown": "0.0.3",
     "mongoose": "^5.7.11",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "winston": "^3.2.1",
+    "winston-mongodb": "^5.0.1"
   },
   "devDependencies": {
     "eslint": "^4.19.1"

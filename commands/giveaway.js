@@ -2,6 +2,7 @@ const { RichEmbed } = require("discord.js");
 const { endGiveaway, initGiveawayTimeout } = require("../utils/general");
 const { clearGiveawayAndEntries, createGiveaway, createEntry } = require("../utils/db");
 const { Entries, Giveaway } = require("../dbModels/models");
+const logger = require("../utils/logger");
 const moment = require("moment");
 require("moment-countdown");
 
@@ -66,34 +67,38 @@ class Giveaways {
     if (this.dbChecks.active) return message.reply("please wait for current giveaway to end.");
 
     try {
-      console.log(`${message.author.username} (${message.author.id}) is creating a giveaway...`);
+      logger.info(`${message.author.username} (${message.author.id}) is creating a giveaway`);
       // Create a filter to listen to author's input only
       const filter = m => m.author.id === message.author.id;
       // Send the initial message asking for user input
       await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
       // Create the collector to learn the giveaway item
-      const collectedItem = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] });
+      const collectedItem = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 1500, errors: ["time"] })
+        .catch(() => {
+          message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+        });
 
-      if (!collectedItem.first().content) {
-        message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-        return console.error("User reply for item timed out");
-      }
+      if (!collectedItem) return logger.error("User reply for item timed out", { author: message.author.id });
 
       const item = collectedItem.first().content;
 
       await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
-      const collectedDuration = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 15000, errors: ["time"] });
+      const collectedDuration = await message.channel.awaitMessages(filter, {
+        maxMatches: 1,
+        time: 15000,
+        errors: ["time"],
+      })
+        .catch(() => {
+          message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+        });
 
-      if (!collectedDuration.first().content) {
-        message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-        return console.error("User reply for duration timed out");
-      }
+      if (!collectedDuration) return logger.error("User reply for item timed out", { author: message.author.id });
 
       const duration = collectedDuration.first().content;
 
       if (Number.isNaN(parseInt(duration, 10))) {
         message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-        return console.error("Can not parse user's reply for duration (isNaN)");
+        return logger.error("Can not parse user's reply for duration (isNaN)");
       }
 
       if (
@@ -101,7 +106,7 @@ class Giveaways {
       ) {
         message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
         await clearGiveawayAndEntries();
-        return console.error("Can not parse user's reply for duration (includesH&M)");
+        return logger.error("Can not parse user's reply for duration (includesH&M)");
       }
 
       if (duration.includes("h", 1)) {
@@ -132,8 +137,8 @@ class Giveaways {
           `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
           `The giveaway will end in **${intDuration} minute(s)**.`);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      logger.error("Error in giveaway command, create argument", error);
     }
   }
 
@@ -144,7 +149,7 @@ class Giveaways {
 
     await createEntry(message);
 
-    console.log(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
+    logger.info(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
     message.reply("you have entered the giveaway, good luck!");
   }
 
@@ -187,6 +192,8 @@ class Giveaways {
       clearTimeout(this.timeout);
       this.timeout = null;
     } catch (error) {
+      logger.error("Error in giveaway command, end argument", error);
+      // TODO: Standardize error handling
       message.reply("there is no giveaway to end!");
     }
   }

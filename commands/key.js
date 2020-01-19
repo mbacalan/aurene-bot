@@ -1,6 +1,7 @@
 const { validateKey } = require("../utils/general");
 const { createKey, deleteKey } = require("../utils/db");
 const { gw2api } = require("../utils/api");
+const logger = require("../utils/logger");
 
 class Key {
   constructor() {
@@ -31,7 +32,7 @@ class Key {
           await message.reply("your key has been saved and your message has been deleted for privacy.");
         } catch (error) {
           message.channel.send("There was an issue while trying to save your key. Please contact my author.");
-          console.log(error);
+          logger.error("Error in key command, argument add", error);
         }
       }
         break;

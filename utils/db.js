@@ -1,4 +1,5 @@
 const { Entries, Giveaway, Winner, Key } = require("../dbModels/models");
+const logger = require("./logger");
 
 async function createGiveaway(message, item, duration, endTime) {
   await Giveaway.create({
@@ -11,7 +12,7 @@ async function createGiveaway(message, item, duration, endTime) {
     endTime: endTime,
   });
 
-  console.log(`Created giveaway for ${item}, which will go on for ${duration}.`);
+  logger.info(`Created giveaway for ${item}, which will go on for ${duration}.`);
 }
 
 async function createEntry(message) {
@@ -54,7 +55,7 @@ async function deleteKey(message) {
     message.reply("your key has been deleted!");
   } catch (error) {
     message.reply("there was an error with removing your key. Please contact my author");
-    console.log(error);
+    logger.error("Error while deleting key", error);
   }
 }
 

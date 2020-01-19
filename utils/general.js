@@ -1,19 +1,20 @@
 const { Entries, Giveaway, Key } = require("../dbModels/models");
 const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
 const moment = require("moment");
+const logger = require("./logger");
 
 async function endGiveaway(creator, channel, item) {
   const winner = await pickWinner(Entries);
 
   if (!winner) {
     channel.send("Looks like no one entered the giveaway :(");
-    console.log(`No one entered the giveaway of ${item}.`);
+    logger.info(`No one entered the giveaway of ${item}.`);
     return await clearGiveawayAndEntries(Giveaway, Entries);
   }
 
   await createWinner(winner, item);
   channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from <@${creator.userId}>!`);
-  console.log(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
+  logger.info(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
   await clearGiveawayAndEntries();
 }
 

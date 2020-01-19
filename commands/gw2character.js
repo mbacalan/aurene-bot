@@ -3,6 +3,7 @@ const { RichEmbed } = require("discord.js");
 const { gw2api } = require("../utils/api");
 const { formatAge } = require("../utils/general");
 const { professions } = require("../utils/gameData");
+const logger = require("../utils/logger");
 
 class Character {
   constructor() {
@@ -15,17 +16,17 @@ class Character {
     const key = await Key.findOne({ discordId: message.author.id });
 
     if (!key) {
-      message.reply("I couldn't find a GW2 API key associated with your Discord account!");
-      throw new Error(`Couldn't find a key associated with ${message.author.username}`);
+      return message.reply("I couldn't find a GW2 API key associated with your Discord account!");
     }
 
     gw2api.authenticate(key.key);
 
     const characterName = args[1] ? [args[0], args[1]].join(" ") : args[0];
     const character = await gw2api.characters(characterName).core().get().catch((error) => {
-      message.reply("couldn't find that character.");
-      throw new Error(`${error.content.text} ${characterName}`);
+      logger.error(`${error.content.text}: ${characterName}`);
     });
+
+    if (!character) return message.reply("couldn't find that character.");
 
     const { profession, deaths, age, created, name, gender, race } = character;
     const guild = await gw2api.guild().get(character.guild);
@@ -50,6 +51,7 @@ class Character {
       .addField("\u200b", "\u200b", true)
       .addField("Representing", `${guild.name} [${guild.tag}]`);
 
+    // TODO: Error if can't send embed
     message.channel.send(characterEmbed);
   }
 }

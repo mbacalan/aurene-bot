@@ -1,4 +1,5 @@
 const { RichEmbed } = require("discord.js");
+const logger = require("../utils/logger");
 
 class Ping {
   constructor() {
@@ -17,8 +18,8 @@ class Ping {
       message.channel.send(pingEmbed).catch(() => {
         message.channel.send(`Websocket latency is ${Math.round(message.client.ping)}ms.`);
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      logger.error("Error in ping command", error);
     }
   }
 }
