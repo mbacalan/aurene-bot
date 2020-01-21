@@ -1,5 +1,13 @@
 const { Entries, Giveaway, Winner, Key } = require("../dbModels/models");
 const logger = require("./logger");
+const mongoose = require("mongoose");
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", ({
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}));
+
+const db = mongoose.connection;
 
 async function createGiveaway(message, item, duration, endTime) {
   await Giveaway.create({
@@ -70,6 +78,7 @@ async function clearGiveawayAndEntries() {
 }
 
 module.exports = {
+  db,
   createGiveaway,
   createEntry,
   createWinner,

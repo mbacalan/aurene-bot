@@ -112,12 +112,20 @@ const keySchema = new mongoose.Schema({
   },
 });
 
+const buildSchema = new mongoose.Schema({
+  build: {
+    type: String,
+    required: true,
+  },
+});
+
 // Declare models based on schemas
 const Bosses = mongoose.model("Bosses", bossSchema);
 const Giveaway = mongoose.model("Giveaway", giveawaySchema);
 const Entries = mongoose.model("Entries", entrySchema);
 const Winner = mongoose.model("Winner", winnerSchema);
 const Key = mongoose.model("Key", keySchema);
+const Build = mongoose.model("Build", buildSchema);
 
 // Export them for use as required
-module.exports = { Bosses, Giveaway, Entries, Winner, Key };
+module.exports = { Bosses, Giveaway, Entries, Winner, Key, Build };
