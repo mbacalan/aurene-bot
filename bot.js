@@ -24,15 +24,13 @@ db.once("open", () => logger.info("Successfully connected to database"));
 
 bot.on("ready", async () => {
   setInterval(async function checkNewBuild() {
-    let currentBuild = await Build.findOne({});
+    const currentBuild = await Build.findOne({});
     const liveBuild = await gw2api.build().get();
 
     if (!currentBuild) {
       await Build.create({
         build: liveBuild,
       });
-
-      currentBuild = await Build.findOne({});
     }
 
     if (currentBuild.build != liveBuild) {
