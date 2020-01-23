@@ -1,7 +1,7 @@
 const { Key } = require("../dbModels/models");
 const { RichEmbed } = require("discord.js");
 const { gw2api } = require("../utils/api");
-const { formatAge } = require("../utils/general");
+const { formatAge, sortAlphabetically } = require("../utils/general");
 const { professions } = require("../utils/gameData");
 const logger = require("../utils/logger");
 
@@ -13,6 +13,7 @@ class Character {
   }
 
   async execute(message, args) {
+    const [arg, ...charName] = args;
     const key = await Key.findOne({ discordId: message.author.id });
 
     if (!key) {
@@ -21,38 +22,59 @@ class Character {
 
     gw2api.authenticate(key.key);
 
-    const characterName = args[1] ? [args[0], args[1]].join(" ") : args[0];
-    const character = await gw2api.characters(characterName).core().get().catch((error) => {
-      logger.error(`${error.content.text}: ${characterName}`);
-    });
+    switch (arg) {
+      case "list": {
+        const characters = await gw2api.characters().all();
+        // TODO: Add profession icons as emotes
+        const characterList = characters
+          .map((char) => char.name)
+          .slice().sort((a, b) => sortAlphabetically(a, b))
+          .join("\n");
 
-    if (!character) return message.reply("couldn't find that character.");
+        const characterListEmbed = new RichEmbed()
+          .setTitle(`${key.accountName}'s Characters`)
+          .addField("\u200b", characterList);
 
-    const { profession, deaths, age, created, name, gender, race } = character;
-    const guild = await gw2api.guild().get(character.guild);
-    const title = await gw2api.titles().get(character.title).catch(() => "No Title");
-    const professionIcon = professions[profession.toLowerCase()].icon;
-    const deathsPerHour = (deaths / (age / 3600)).toFixed(1);
-    const createdAt = new Date(created).toDateString();
-    const formattedAge = formatAge(age);
+        // TODO: Error if can't send embed
+        message.channel.send(characterListEmbed);
+      }
+        break;
 
-    const characterEmbed = new RichEmbed()
-      .setTitle(name)
-      .setDescription(`${gender} ${race} ${profession}`)
-      .setThumbnail(professionIcon)
-      .addField("Level", character.level, true)
-      .addField("Title", title.name ? title.name : title, true)
-      .addField("\u200b", "\u200b", true)
-      .addField("Created At", createdAt, true)
-      .addField("Played For", formattedAge, true)
-      .addField("\u200b", "\u200b", true)
-      .addField("Deaths", deaths, true)
-      .addField("Deaths Per Hour", deathsPerHour, true)
-      .addField("\u200b", "\u200b", true)
-      .addField("Representing", `${guild.name} [${guild.tag}]`);
+      case "info": {
+        const characterName = charName.join(" ");
+        const character = await gw2api.characters(characterName).core().get().catch((error) => {
+          logger.error(`${error.content.text}: ${characterName}`);
+        });
 
-    // TODO: Error if can't send embed
-    message.channel.send(characterEmbed);
+        if (!character) return message.reply("couldn't find that character.");
+
+        const { profession, deaths, age, created, name, gender, race } = character;
+        const guild = await gw2api.guild().get(character.guild);
+        const title = await gw2api.titles().get(character.title).catch(() => "No Title");
+        const professionIcon = professions[profession.toLowerCase()].icon;
+        const deathsPerHour = (deaths / (age / 3600)).toFixed(1);
+        const createdAt = new Date(created).toDateString();
+        const formattedAge = formatAge(age);
+
+        const characterEmbed = new RichEmbed()
+          .setTitle(name)
+          .setDescription(`${gender} ${race} ${profession}`)
+          .setThumbnail(professionIcon)
+          .addField("Level", character.level, true)
+          .addField("Title", title.name ? title.name : title, true)
+          .addField("\u200b", "\u200b", true)
+          .addField("Created At", createdAt, true)
+          .addField("Played For", formattedAge, true)
+          .addField("\u200b", "\u200b", true)
+          .addField("Deaths", deaths, true)
+          .addField("Deaths Per Hour", deathsPerHour, true)
+          .addField("\u200b", "\u200b", true)
+          .addField("Representing", `${guild.name} [${guild.tag}]`);
+
+        // TODO: Error if can't send embed
+        message.channel.send(characterEmbed);
+      }
+    }
   }
 }
 

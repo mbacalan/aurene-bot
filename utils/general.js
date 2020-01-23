@@ -111,6 +111,21 @@ function filterExpansions(account) {
     .join("\n");
 }
 
+function sortAlphabetically(a, b) {
+  const A = a.toLowerCase();
+  const B = b.toLowerCase();
+
+  if (A < B) {
+    return -1;
+  }
+
+  if (A > B) {
+    return 1;
+  }
+
+  return 0;
+}
+
 module.exports = {
   endGiveaway,
   validateKey,
@@ -119,4 +134,5 @@ module.exports = {
   initGiveawayTimeout,
   checkNewBuild,
   checkGiveawayOnStartup,
+  sortAlphabetically,
 };
