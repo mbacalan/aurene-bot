@@ -1,7 +1,41 @@
-const { Entries, Giveaway, Key } = require("../dbModels/models");
+const { Entries, Giveaway, Key, Build } = require("../dbModels/models");
 const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
 const moment = require("moment");
 const logger = require("./logger");
+const { gw2api } = require("./api");
+const { buildDbFromApi } = require("./caching");
+
+async function checkNewBuild(bot) {
+  const currentBuild = await Build.findOne({});
+  const liveBuild = await gw2api.build().get();
+
+  if (!currentBuild) {
+    await Build.create({
+      build: liveBuild,
+    });
+  }
+
+  if (currentBuild.build != liveBuild) {
+    logger.info("(Re)building API cache");
+    await bot.user.setStatus("dnd");
+    await bot.user.setActivity("Building API Cache", { type: "LISTENING" });
+    await buildDbFromApi();
+    await bot.user.setStatus("online");
+    await bot.user.setActivity("Guild Wars 2");
+  }
+}
+
+async function checkGiveawayOnStartup(bot) {
+  const giveawayChannel = bot.channels.get(process.env.GIVEAWAY_CHANNEL);
+  const giveaway = await Giveaway.find({});
+
+  if (giveaway[0]) {
+    const item = giveaway[0].item;
+    const timeout = giveaway[0].endTime - new Date();
+
+    setTimeout(() => endGiveaway(giveaway[0], giveawayChannel, item), timeout);
+  }
+}
 
 async function endGiveaway(creator, channel, item) {
   const winner = await pickWinner(Entries);
@@ -83,4 +117,6 @@ module.exports = {
   formatAge,
   filterExpansions,
   initGiveawayTimeout,
+  checkNewBuild,
+  checkGiveawayOnStartup,
 };

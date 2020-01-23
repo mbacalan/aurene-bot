@@ -9,6 +9,9 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", (
 
 const db = mongoose.connection;
 
+db.on("error", () => logger.error("Error connecting to database"));
+db.once("open", () => logger.info("Successfully connected to database"));
+
 async function createGiveaway(message, item, duration, endTime) {
   await Giveaway.create({
     userId: message.author.id,
