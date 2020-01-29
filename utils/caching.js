@@ -30,6 +30,7 @@ async function cacheToDbFromApi(endpoint) {
 
   if (!response) return;
 
+  await db.collection(`gw2.${endpoint}`).deleteMany({});
   await db.collection(`gw2.${endpoint}`).insertMany(response);
 }
 
@@ -42,6 +43,7 @@ async function cachePvpAmulets() {
 
   if (!pvpAmulets) return;
 
+  await db.collection("gw2.pvpAmulets").deleteMany({});
   await db.collection("gw2.pvpAmulets").insertMany(pvpAmulets);
 }
 
