@@ -9,13 +9,11 @@ async function checkNewBuild(bot) {
   const currentBuild = await Build.findOne({});
   const liveBuild = await gw2api.build().get();
 
-  if (!currentBuild) {
-    await Build.create({
-      build: liveBuild,
-    });
-  }
-
   if (currentBuild.build != liveBuild) {
+    await gw2api.flushCacheIfGameUpdated();
+    await Build.deleteMany({});
+    await Build.create({ build: liveBuild });
+
     logger.info("(Re)building API cache");
     await bot.user.setStatus("dnd");
     await bot.user.setActivity("Building API Cache", { type: "LISTENING" });
