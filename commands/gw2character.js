@@ -35,8 +35,9 @@ class Character {
           .setTitle(`${key.accountName}'s Characters`)
           .addField("\u200b", characterList);
 
-        // TODO: Error if can't send embed
-        message.channel.send(characterListEmbed);
+        await message.channel.send(characterListEmbed).catch(() => {
+          message.channel.send("I'm lacking permissions to send an embed!");
+        });
       }
         break;
 
@@ -71,8 +72,9 @@ class Character {
           .addField("\u200b", "\u200b", true)
           .addField("Representing", `${guild.name} [${guild.tag}]`);
 
-        // TODO: Error if can't send embed
-        message.channel.send(characterEmbed);
+        message.channel.send(characterEmbed).catch(() => {
+          message.channel.send("I'm lacking permissions to send an embed!");
+        });
       }
     }
   }

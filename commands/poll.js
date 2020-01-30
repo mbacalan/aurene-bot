@@ -32,6 +32,8 @@ class Poll {
         for (let i = 0; i < options.length; i++) {
           await m.react(pollEmojiUnicodes[i]);
         }
+      }).catch(() => {
+        message.channel.send("I'm lacking permissions to send an embed!");
       });
 
       message.delete();

@@ -45,7 +45,9 @@ class Account {
       .addField("\u200b", "\u200b", true)
       .addField("Leads", guilds, true);
 
-    message.channel.send(accountEmbed);
+    await message.channel.send(accountEmbed).catch(() => {
+      message.channel.send("I'm lacking permissions to send an embed!");
+    });
   }
 }
 
