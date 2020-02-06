@@ -1,13 +1,13 @@
-const { Entries, Giveaway, Key, Build } = require("../dbModels/models");
-const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
 const moment = require("moment");
 const logger = require("./logger");
 const { gw2api } = require("./api");
+const { Entries, Giveaway, Key, Build } = require("../dbModels/models");
+const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
 const { buildDbFromApi } = require("./caching");
 
 async function checkNewBuild(bot) {
   const currentBuild = await Build.findOne({});
-  const liveBuild = await gw2api.build().get();
+  const liveBuild = await gw2api.build().live().get();
 
   if (currentBuild.build != liveBuild) {
     await gw2api.flushCacheIfGameUpdated();

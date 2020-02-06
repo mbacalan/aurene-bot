@@ -22,9 +22,9 @@ const endpoints = [
 async function cacheToDbFromApi(endpoint) {
   await cachePvpAmulets();
 
-  const response = await gw2api[endpoint]().live().all().catch((error) => {
+  const response = await gw2api[endpoint]().live().all().catch(() => {
     errors = true;
-    logger.error(`Error getting all ${endpoint} from API`, error);
+    logger.error(`Error getting all ${endpoint} from API`);
     return false;
   });
 
@@ -35,9 +35,9 @@ async function cacheToDbFromApi(endpoint) {
 }
 
 async function cachePvpAmulets() {
-  const pvpAmulets = await gw2api.pvp().amulets().live().all().catch((error) => {
+  const pvpAmulets = await gw2api.pvp().amulets().live().all().catch(() => {
     errors = true;
-    logger.error("Error getting all pvp amulets from API", error);
+    logger.error("Error getting all pvp amulets from API");
     return false;
   });
 

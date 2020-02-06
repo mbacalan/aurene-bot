@@ -84,7 +84,7 @@ module.exports = {
     "[&BBABAAA=][&BJIBAAA=][&BLkCAAA=][&BH8HAAA=][&BBEDAAA=][&BEICAAA=]",
     "[&BCECAAA=][&BC0AAAA=][&BDoBAAA=][&BIkHAAA=][&BO4CAAA=][&BIUCAAA=]",
   ],
-  fractals: {
+  fractalsData: {
     "Aquatic Ruins": [
       7,
       26,
