@@ -1,9 +1,9 @@
-const { Key } = require("../dbModels/models");
+const { Key } = require("../../dbModels/models");
 const { RichEmbed } = require("discord.js");
-const { gw2api } = require("../utils/api");
-const { formatAge, sortAlphabetically } = require("../utils/general");
-const { professions } = require("../utils/gameData");
-const logger = require("../utils/logger");
+const { gw2api } = require("../../utils/api");
+const { formatAge, sortAlphabetically } = require("../../utils/general");
+const { professions } = require("../../utils/gameData");
+const logger = require("../../utils/logger");
 
 class Character {
   constructor() {

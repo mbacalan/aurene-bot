@@ -1,8 +1,8 @@
 const { RichEmbed } = require("discord.js");
-const { sortAlphabetically } = require("../utils/general");
-const { gw2api } = require("../utils/api");
-const { db } = require("../utils/db");
-const { fractalsData } = require("../utils/gameData");
+const { sortAlphabetically } = require("../../utils/general");
+const { gw2api } = require("../../utils/api");
+const { db } = require("../../utils/db");
+const { fractalsData } = require("../../utils/gameData");
 
 class Dailies {
   constructor() {

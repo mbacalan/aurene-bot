@@ -1,7 +1,7 @@
-const { Key } = require("../dbModels/models");
+const { Key } = require("../../dbModels/models");
 const { RichEmbed } = require("discord.js");
-const { gw2api, getLeadingGuilds } = require("../utils/api");
-const { formatAge, filterExpansions } = require("../utils/general");
+const { gw2api, getLeadingGuilds } = require("../../utils/api");
+const { formatAge, filterExpansions } = require("../../utils/general");
 
 class Account {
   constructor() {

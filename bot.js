@@ -1,6 +1,5 @@
-const fs = require("fs");
+const glob = require("glob");
 const discord = require("discord.js");
-const commandFiles = fs.readdirSync("./commands");
 const { checkNewBuild, checkGiveawayOnStartup } = require("./utils/general");
 const { executeCommand } = require("./utils/executeCommand");
 const logger = require("./utils/logger");
@@ -9,10 +8,12 @@ const bot = new discord.Client();
 
 bot.commands = new discord.Collection();
 
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  bot.commands.set(command.name, command);
-}
+glob("./commands/**/*.js", function registerCommands(error, files) {
+  files.forEach((file) => {
+    const command = require(file);
+    bot.commands.set(command.name, command);
+  });
+});
 
 bot.on("ready", async () => {
   await bot.user.setActivity("Guild Wars 2");
