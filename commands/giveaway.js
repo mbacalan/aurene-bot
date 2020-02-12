@@ -33,6 +33,8 @@ class Giveaways {
   }
 
   async execute(message, args) {
+    await this.init(message);
+
     switch (args[0]) {
       case "create": {
         await this.create(message);
@@ -59,7 +61,7 @@ class Giveaways {
       }
         break;
 
-      default: message.reply("invalid argument.");
+      default: await message.reply("invalid argument.");
     }
   }
 
@@ -67,18 +69,19 @@ class Giveaways {
     if (this.dbChecks.active) return message.reply("please wait for current giveaway to end.");
 
     try {
-      logger.info(`${message.author.username} (${message.author.id}) is creating a giveaway`);
       // Create a filter to listen to author's input only
       const filter = m => m.author.id === message.author.id;
-      // Send the initial message asking for user input
       await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
       // Create the collector to learn the giveaway item
-      const collectedItem = await message.channel.awaitMessages(filter, { maxMatches: 1, time: 1500, errors: ["time"] })
-        .catch(() => {
-          message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-        });
+      const collectedItem = await message.channel.awaitMessages(filter, {
+        maxMatches: 1,
+        time: 1500,
+        errors: ["time"],
+      });
 
-      if (!collectedItem) return logger.error("User reply for item timed out", { author: message.author.id });
+      if (!collectedItem) {
+        return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+      }
 
       const item = collectedItem.first().content;
 
@@ -87,18 +90,16 @@ class Giveaways {
         maxMatches: 1,
         time: 15000,
         errors: ["time"],
-      })
-        .catch(() => {
-          message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-        });
+      });
 
-      if (!collectedDuration) return logger.error("User reply for item timed out", { author: message.author.id });
+      if (!collectedDuration) {
+        return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+      }
 
       const duration = collectedDuration.first().content;
 
       if (Number.isNaN(parseInt(duration, 10))) {
         message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-        return logger.error("Can not parse user's reply for duration (isNaN)");
       }
 
       if (
@@ -106,37 +107,21 @@ class Giveaways {
       ) {
         message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
         await clearGiveawayAndEntries();
-        return logger.error("Can not parse user's reply for duration (includesH&M)");
       }
 
-      if (duration.includes("h", 1)) {
-        /* If the collectedDuration includes "h" in it,
-          parse the string into an integer and multiply it with an hour in miliseconds */
-        const intDuration = parseInt(duration, 10);
-        const endTime = moment().add(intDuration, "hours");
+      /* If the collectedDuration includes "h" in it,
+        parse the string into an integer and multiply it with an hour in milliseconds */
+      const durationType = duration.includes("m", 1) ? "minutes" : "hours";
+      const intDuration = parseInt(duration, 10);
+      const endTime = moment().add(intDuration, durationType);
 
-        await createGiveaway(message, item, duration, endTime);
-        await this.setDbChecks(message);
-        this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
+      await createGiveaway(message, item, duration, endTime);
 
-        // ${"" } is used to eat the whitespace to avoid creating a new line.
-        return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
-          `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
-          `The giveaway will end in **${intDuration} hour(s)**.`);
-      }
+      this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
 
-      if (duration.includes("m", 1)) {
-        const intDuration = parseInt(duration, 10);
-        const endTime = moment().add(intDuration, "minutes");
-
-        await createGiveaway(message, item, duration, endTime);
-        await this.setDbChecks(message);
-        this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
-
-        return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
-          `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
-          `The giveaway will end in **${intDuration} minute(s)**.`);
-      }
+      return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
+        `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
+        `The giveaway will end in **${intDuration} ${durationType} .`);
     } catch (error) {
       logger.error("Error in giveaway command, create argument", error);
     }
@@ -149,7 +134,6 @@ class Giveaways {
 
     await createEntry(message);
 
-    logger.info(`${message.author.username}#${message.author.discriminator} entered the giveaway`);
     message.reply("you have entered the giveaway, good luck!");
   }
 
@@ -177,8 +161,6 @@ class Giveaways {
   }
 
   async end(message) {
-    await this.setDbChecks(message);
-
     // TODO: Fix if condition
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
     if (message.author.id !== process.env.OWNER || message.author.id !== this.dbChecks.info[0].userId) {
