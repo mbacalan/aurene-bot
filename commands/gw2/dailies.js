@@ -1,7 +1,7 @@
 const { RichEmbed } = require("discord.js");
 const { sortAlphabetically } = require("../../utils/general");
 const { gw2api } = require("../../utils/api");
-const { db } = require("../../utils/db");
+const { Achievements } = require("../../dbModels/achievements");
 const { fractalsData } = require("../../utils/gameData");
 
 class Dailies {
@@ -23,7 +23,7 @@ class Dailies {
       // Promise.all for async operations while iterating
       const arr = await Promise.all(
         dailies[category].filter((daily) => daily.level.max === 80).map(async (daily) => {
-          return await db.collection("gw2.achievements").findOne({ id: daily.id })
+          return await Achievements.findOne({ id: daily.id })
             .then((result) => {
               if (category === "fractals") {
                 const fractal = result.name.split(/[0-9]/)[1];

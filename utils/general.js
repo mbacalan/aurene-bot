@@ -1,18 +1,18 @@
 const moment = require("moment");
 const logger = require("./logger");
 const { gw2api } = require("./api");
-const { Entries, Giveaway, Key, Build } = require("../dbModels/models");
+const { Entries, Giveaways, Keys, Builds } = require("../dbModels");
 const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
 const { buildDbFromApi } = require("./caching");
 
 async function checkNewBuild(bot) {
-  const currentBuild = await Build.findOne({});
+  const currentBuild = await Builds.findOne({});
   const liveBuild = await gw2api.build().live().get();
 
   if (currentBuild.build != liveBuild) {
     await gw2api.flushCacheIfGameUpdated();
-    await Build.deleteMany({});
-    await Build.create({ build: liveBuild });
+    await Builds.deleteMany({});
+    await Builds.create({ build: liveBuild });
 
     logger.info("(Re)building API cache");
     await bot.user.setStatus("dnd");
@@ -25,7 +25,7 @@ async function checkNewBuild(bot) {
 
 async function checkGiveawayOnStartup(bot) {
   const giveawayChannel = bot.channels.get(process.env.GIVEAWAY_CHANNEL);
-  const giveaway = await Giveaway.find({});
+  const giveaway = await Giveaways.find({});
 
   if (giveaway[0]) {
     const item = giveaway[0].item;
@@ -41,7 +41,7 @@ async function endGiveaway(creator, channel, item) {
   if (!winner) {
     channel.send("Looks like no one entered the giveaway :(");
     logger.info(`No one entered the giveaway of ${item}.`);
-    return await clearGiveawayAndEntries(Giveaway, Entries);
+    return await clearGiveawayAndEntries(Giveaways, Entries);
   }
 
   await createWinner(winner, item);
@@ -51,7 +51,7 @@ async function endGiveaway(creator, channel, item) {
 }
 
 async function initGiveawayTimeout(creator, channel, item) {
-  const giveaway = await Giveaway.findOne({});
+  const giveaway = await Giveaways.findOne({});
   const endTime = giveaway.endTime;
   const duration = endTime - moment();
 
@@ -62,8 +62,8 @@ async function initGiveawayTimeout(creator, channel, item) {
 
 async function validateKey(message, key) {
   const userId = message.author.id;
-  const userHasKey = await Key.findOne({ discordId: userId });
-  const keyExists = await Key.findOne({ key: key });
+  const userHasKey = await Keys.findOne({ discordId: userId });
+  const keyExists = await Keys.findOne({ key: key });
 
   if (!key) {
     message.reply("you didn't provide a key!");

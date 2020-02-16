@@ -1,4 +1,4 @@
-const { Key } = require("../../dbModels/models");
+const { Keys } = require("../../dbModels");
 const { RichEmbed } = require("discord.js");
 const { gw2api } = require("../../utils/api");
 const { formatAge, sortAlphabetically } = require("../../utils/general");
@@ -14,7 +14,7 @@ class Character {
 
   async execute(message, args) {
     const [arg, ...charName] = args;
-    const key = await Key.findOne({ discordId: message.author.id });
+    const key = await Keys.findOne({ discordId: message.author.id });
 
     if (!key) {
       return message.reply("I couldn't find a GW2 API key associated with your Discord account!");

@@ -1,4 +1,4 @@
-const { Bosses } = require("../dbModels/models");
+const { Bosses } = require("../dbModels");
 const logger = require("../utils/logger");
 
 class Guides {

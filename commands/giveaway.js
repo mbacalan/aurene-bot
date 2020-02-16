@@ -1,12 +1,12 @@
 const { RichEmbed } = require("discord.js");
 const { endGiveaway, initGiveawayTimeout } = require("../utils/general");
 const { clearGiveawayAndEntries, createGiveaway, createEntry } = require("../utils/db");
-const { Entries, Giveaway } = require("../dbModels/models");
+const { Entries, Giveaways } = require("../dbModels");
 const logger = require("../utils/logger");
 const moment = require("moment");
 require("moment-countdown");
 
-class Giveaways {
+class Giveaway {
   constructor() {
     this.name = "giveaway";
     this.aliases = ["giffaway", "lottery", "fortunetest"];
@@ -26,9 +26,9 @@ class Giveaways {
   async setDbChecks(message) {
     this.dbChecks = {
       entry: await Entries.findOne({ userId: message.author.id }),
-      creator: await Giveaway.findOne({ userId: message.author.id }),
-      active: await Giveaway.countDocuments({}),
-      info: await Giveaway.find({}),
+      creator: await Giveaways.findOne({ userId: message.author.id }),
+      active: await Giveaways.countDocuments({}),
+      info: await Giveaways.find({}),
     };
   }
 
@@ -190,4 +190,4 @@ class Giveaways {
   }
 }
 
-module.exports = new Giveaways;
+module.exports = new Giveaway;

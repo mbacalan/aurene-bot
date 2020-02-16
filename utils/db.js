@@ -1,4 +1,4 @@
-const { Entries, Giveaway, Winner, Key } = require("../dbModels/models");
+const { Entries, Giveaways, Winners, Keys } = require("../dbModels");
 const logger = require("./logger");
 const mongoose = require("mongoose");
 
@@ -13,7 +13,7 @@ db.on("error", () => logger.error("Error connecting to database"));
 db.once("open", () => logger.info("Successfully connected to database"));
 
 async function createGiveaway(message, item, duration, endTime) {
-  await Giveaway.create({
+  await Giveaways.create({
     userId: message.author.id,
     userName: message.author.username,
     discriminator: message.author.discriminator,
@@ -36,7 +36,7 @@ async function createEntry(message) {
 }
 
 async function createWinner(winner, item) {
-  await Winner.create({
+  await Winners.create({
     userId: winner.userId,
     userName: winner.userName,
     discriminator: winner.discriminator,
@@ -45,7 +45,7 @@ async function createWinner(winner, item) {
 }
 
 async function createKey(message, tokenInfo, account, key) {
-  await Key.create({
+  await Keys.create({
     discordId: message.author.id,
     keyName: tokenInfo.name ? tokenInfo.name : "",
     accountName: account.name,
@@ -55,14 +55,14 @@ async function createKey(message, tokenInfo, account, key) {
 }
 
 async function deleteKey(message) {
-  const userKey = await Key.findOne({ discordId: message.author.id });
+  const userKey = await Keys.findOne({ discordId: message.author.id });
 
   if (!userKey) {
     return message.reply("couldn't find a key you added to delete!");
   }
 
   try {
-    await Key.deleteOne(userKey);
+    await Keys.deleteOne(userKey);
     message.reply("your key has been deleted!");
   } catch (error) {
     message.reply("there was an error with removing your key. Please contact my author");
@@ -76,12 +76,11 @@ async function pickWinner() {
 }
 
 async function clearGiveawayAndEntries() {
-  await Giveaway.collection.deleteMany({});
+  await Giveaways.collection.deleteMany({});
   await Entries.collection.deleteMany({});
 }
 
 module.exports = {
-  db,
   createGiveaway,
   createEntry,
   createWinner,

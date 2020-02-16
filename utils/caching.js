@@ -1,28 +1,26 @@
-const { db } = require("./db");
 const { gw2api } = require("./api");
 const logger = require("./logger");
+const mongoose = require("mongoose");
 
 let errors = false;
 const promises = [];
 const endpoints = [
-  "items",
   "achievements",
-  "itemstats",
-  "titles",
-  "recipes",
-  "skins",
-  "currencies",
-  "skills",
   "specializations",
-  "traits",
+  "titles",
   "worlds",
-  "minis",
+  // "currencies",
+  // "items",
+  // "itemstats",
+  // "minis",
+  // "recipes",
+  // "skins",
+  // "skills",
+  // "traits",
 ];
 
 async function cacheToDbFromApi(endpoint) {
-  await cachePvpAmulets();
-
-  const response = await gw2api[endpoint]().live().all().catch(() => {
+  const response = await gw2api[endpoint.toLowerCase()]().live().all().catch(() => {
     errors = true;
     logger.error(`Error getting all ${endpoint} from API`);
     return false;
@@ -30,21 +28,8 @@ async function cacheToDbFromApi(endpoint) {
 
   if (!response) return;
 
-  await db.collection(`gw2.${endpoint}`).deleteMany({});
-  await db.collection(`gw2.${endpoint}`).insertMany(response);
-}
-
-async function cachePvpAmulets() {
-  const pvpAmulets = await gw2api.pvp().amulets().live().all().catch(() => {
-    errors = true;
-    logger.error("Error getting all pvp amulets from API");
-    return false;
-  });
-
-  if (!pvpAmulets) return;
-
-  await db.collection("gw2.pvpAmulets").deleteMany({});
-  await db.collection("gw2.pvpAmulets").insertMany(pvpAmulets);
+  await mongoose.model(`gw2.${endpoint}`).deleteMany({});
+  await mongoose.model(`gw2.${endpoint}`).create(response);
 }
 
 async function buildDbFromApi() {
