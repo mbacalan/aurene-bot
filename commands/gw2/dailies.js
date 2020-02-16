@@ -14,7 +14,7 @@ class Dailies {
     const dailies = await gw2api.achievements().daily().get();
     const DailiesEmbed = new RichEmbed().setTitle("Dailies");
     const categories = ["PvE", "PvP", "WvW", "Fractals"];
-    const normFractals = [];
+    const normFractals = new Set();
     const recFractals = [];
 
     for (let i = 0; i < categories.length; i++) {
@@ -31,19 +31,16 @@ class Dailies {
                 if (result.name.includes("Recommended")) {
                   const tempFractal = result.name.replace("Daily Recommended Fractal—", "Recommended ");
 
-                  // check if a fractal in fractalsData has the scale of rec. fractal inside it's array of values
+                  // Check if a fractal in fractalsData has the scale of rec. fractal inside it's array of values
                   for (const [key, value] of Object.entries(fractalsData)) {
                     const recFractalScale = parseInt(tempFractal.replace(/[^\d.]/g, ""), 10);
 
-                    if (value.includes(recFractalScale)) {
-                      recFractals.push(`${tempFractal} - ${key}`);
-                    }
+                    if (value.includes(recFractalScale)) recFractals.push(`${tempFractal} - ${key}`);
                   }
                 }
 
-                if (!normFractals.includes(fractal)) {
-                  normFractals.push(fractal);
-                }
+                // Using a Set to avoid duplicates
+                normFractals.add(fractal);
               }
 
               if (result.name.includes(`Daily ${categories[i]}`)) {
