@@ -75,11 +75,10 @@ class Giveaway {
       // Create the collector to learn the giveaway item
       const collectedItem = await message.channel.awaitMessages(filter, {
         maxMatches: 1,
-        time: 1500,
-        errors: ["time"],
+        time: 15000,
       });
 
-      if (!collectedItem) {
+      if (!collectedItem.first()) {
         return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
       }
 
@@ -89,10 +88,9 @@ class Giveaway {
       const collectedDuration = await message.channel.awaitMessages(filter, {
         maxMatches: 1,
         time: 15000,
-        errors: ["time"],
       });
 
-      if (!collectedDuration) {
+      if (!collectedDuration.first()) {
         return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
       }
 
