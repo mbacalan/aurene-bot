@@ -2,7 +2,7 @@ const moment = require("moment");
 const logger = require("./logger");
 const { gw2api } = require("./api");
 const { Entries, Giveaways, Keys, Builds } = require("../dbModels");
-const { createWinner, pickWinner, clearGiveawayAndEntries } = require("./db");
+const { createWinner, clearGiveawayAndEntries } = require("./db");
 const { buildDbFromApi } = require("./caching");
 
 async function checkNewBuild(bot) {
@@ -36,7 +36,7 @@ async function checkGiveawayOnStartup(bot) {
 }
 
 async function endGiveaway(creator, channel, item) {
-  const winner = await pickWinner(Entries);
+  const winner = await Entries.aggregate([{ $sample: { size: 1 } }]).then(doc => doc[0]);
 
   if (!winner) {
     channel.send("Looks like no one entered the giveaway :(");
@@ -55,8 +55,8 @@ async function initGiveawayTimeout(creator, channel, item) {
   const endTime = giveaway.endTime;
   const duration = endTime - moment();
 
-  return setTimeout(() => {
-    endGiveaway(creator, channel, item);
+  return setTimeout(async () => {
+    await endGiveaway(creator, channel, item);
   }, duration);
 }
 

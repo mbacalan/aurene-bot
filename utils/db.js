@@ -70,11 +70,6 @@ async function deleteKey(message) {
   }
 }
 
-async function pickWinner() {
-  const winner = await Entries.aggregate([{ $sample: { size: 1 } }]);
-  return winner[0];
-}
-
 async function clearGiveawayAndEntries() {
   await Giveaways.collection.deleteMany({});
   await Entries.collection.deleteMany({});
@@ -86,6 +81,5 @@ module.exports = {
   createWinner,
   createKey,
   deleteKey,
-  pickWinner,
   clearGiveawayAndEntries,
 };
