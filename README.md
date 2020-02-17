@@ -3,8 +3,8 @@ A Discord Bot, designed to satisfy the needs of a Guild Wars 2 guild.
 
 Features:
  - **Giveaways**: Create a giveaway via user input and pick a random winner
- - **Guides**: Provide usefull links and info about a certain raid boss
- - **Missions**: Provide usefull links and info about a certain Guild Mission
+ - **Guides**: Provide useful links and info about a certain raid boss
+ - **Missions**: Provide useful links and info about a certain Guild Mission
 
 ## Usage
 Since the bot isn't public, you need to host it yourself.
@@ -15,7 +15,7 @@ The bot relies on environment variables. Either set them on your hosting platfor
 ```bash
 MONGO_URI=your://mongodb/uri
 TOKEN=client_token
-OWNER=your_discord_id
+OWNER="your_discord_id"
 LEADERS=highest_role_id
 OFFICERS=officers_role_id
 PREFIX=prefix_of_your_choice

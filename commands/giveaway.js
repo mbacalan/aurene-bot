@@ -161,7 +161,6 @@ class Giveaway {
   }
 
   async end(message) {
-    // TODO: Fix if condition
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
     if (message.author.id !== process.env.OWNER || message.author.id !== this.dbChecks.info[0].userId) {
       return message.reply("only the giveaway creator can end it!");
