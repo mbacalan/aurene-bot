@@ -31,7 +31,7 @@ async function checkGiveawayOnStartup(bot) {
     const item = giveaway[0].item;
     const timeout = giveaway[0].endTime - new Date();
 
-    setTimeout(() => endGiveaway(giveaway[0], giveawayChannel, item), timeout);
+    setTimeout(() => endGiveaway(giveaway[0].userId, giveawayChannel, item), timeout);
   }
 }
 
@@ -45,7 +45,7 @@ async function endGiveaway(creator, channel, item) {
   }
 
   await createWinner(winner, item);
-  channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from <@${creator.userId}>!`);
+  channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from <@${creator}>!`);
   logger.info(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
   await clearGiveawayAndEntries();
 }

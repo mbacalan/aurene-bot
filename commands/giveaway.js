@@ -117,7 +117,7 @@ class Giveaway {
 
       await createGiveaway(message, item, duration, endTime);
 
-      this.timeout = await initGiveawayTimeout(this.dbChecks.creator, this.giveawayChannel, item);
+      this.timeout = await initGiveawayTimeout(message.author.id, this.giveawayChannel, item);
 
       return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
         `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
