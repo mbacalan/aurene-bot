@@ -9,7 +9,6 @@ require("moment-countdown");
 class Giveaway {
   constructor() {
     this.name = "giveaway";
-    this.aliases = ["giffaway", "lottery", "fortunetest"];
     this.description = "Create, enter and view giveaways";
     this.args = true;
     this.usage = "create/enter/entries/info";
@@ -97,13 +96,13 @@ class Giveaway {
       const duration = collectedDuration.first().content;
 
       if (Number.isNaN(parseInt(duration, 10))) {
-        message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+        await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
       }
 
       if (
         (!duration.includes("m") && !duration.includes("h")) || (duration.includes("m") && duration.includes("h"))
       ) {
-        message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+        await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
         await clearGiveawayAndEntries();
       }
 
@@ -119,7 +118,7 @@ class Giveaway {
 
       return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
         `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
-        `The giveaway will end in **${intDuration} ${durationType} .`);
+        `The giveaway will end in **${intDuration} ${durationType}**.`);
     } catch (error) {
       logger.error("Error in giveaway command, create argument", error);
     }
@@ -131,28 +130,27 @@ class Giveaway {
     if (this.dbChecks.entry) return message.reply("you *already* entered this giveaway!");
 
     await createEntry(message);
-
-    message.reply("you have entered the giveaway, good luck!");
+    await message.react("✅");
   }
 
   async info(message) {
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
 
-    const giveawayInfo = this.dbChecks.info[0];
-    const countdownString = moment().countdown(giveawayInfo.endTime).toString();
+    const { endTime, userName, item, duration } = this.dbChecks.info[0];
+    const countdownString = moment().countdown(endTime).toString();
     const entries = await Entries.find({});
     const entryList = entries.map((entrant) => entrant.userName);
     const infoEmbed = new RichEmbed()
-      .setTitle(`Giveaway by ${giveawayInfo.userName}`)
-      .addField("Item", `${giveawayInfo.item}`, true)
-      .addField("Duration", `${giveawayInfo.duration}`, true)
+      .setTitle(`Giveaway by ${userName}`)
+      .addField("Item", `${item}`, true)
+      .addField("Duration", `${duration}`, true)
       .addField("Ends In", `${countdownString}`, true)
       .addField("Entries", `${entryList.length ? entryList : "None, yet"}`)
       .setFooter(`Enter this giveaway by sending: ${process.env.PREFIX}giveaway enter`);
 
     message.channel.send(infoEmbed)
       .catch(() => {
-        message.channel.send(`${giveawayInfo.userName} is giving away **${giveawayInfo.item}**! ` +
+        message.channel.send(`${userName} is giving away **${item}**! ` +
           `The giveaway will end in **${countdownString}**. ` +
           `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
       });
@@ -173,7 +171,7 @@ class Giveaway {
     } catch (error) {
       logger.error("Error in giveaway command, end argument", error);
       // TODO: Standardize error handling
-      message.reply("there is no giveaway to end!");
+      await message.reply("there is no giveaway to end!");
     }
   }
 
@@ -183,7 +181,7 @@ class Giveaway {
       return message.reply("database tables are cleared!");
     }
 
-    message.reply("you don't have permission to use this command!");
+    await message.reply("you don't have permission to use this command!");
   }
 }
 

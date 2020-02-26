@@ -45,7 +45,7 @@ async function endGiveaway(creator, channel, item) {
   }
 
   await createWinner(winner, item);
-  channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from <@${creator}>!`);
+  channel.send(`Congratulations <@${winner.userId}>, you won **${item}** from <@${creator}>! 🎉`);
   logger.info(`The giveaway for ${item} ended, ${winner.userName}#${winner.discriminator} won.`);
   await clearGiveawayAndEntries();
 }
