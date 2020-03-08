@@ -8,10 +8,11 @@ class Missions {
     this.description = "Alert members for starting Guild Missions and provide useful info to them";
   }
 
-  execute(message, args) {
+  // TODO: What the heck is this
+  execute(message, args, isOwner, isRanking) {
     try {
       if (args[0] === "start") {
-        if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
+        if (isOwner || isRanking) {
           if (!args[1]) {
             return message.channel.send(`@everyone grab your omnomberry bars and apple ciders, it's time for Guild Missions! Come to our Guild Hall, join the squad and the voice channel, if you can.
             \nHere are the links to help you with Trek and Bounty missions:

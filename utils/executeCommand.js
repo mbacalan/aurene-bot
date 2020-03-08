@@ -28,13 +28,16 @@ async function executeCommand(bot, message) {
   }
 
   try {
+    const isOwner = message.author.id === process.env.OWNER;
+    const isRanking = message.member.roles.some(role => [process.env.LEADERS, process.env.OFFICERS].includes(role.id));
+
     message.channel.startTyping();
 
     if (command.init) {
       await command.init(message);
     }
 
-    command.execute(message, args);
+    command.execute(message, args, isOwner, isRanking);
     message.channel.stopTyping(true);
   } catch (error) {
     logger.error("Error while executing command", error);

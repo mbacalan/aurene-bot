@@ -31,9 +31,7 @@ class Giveaway {
     };
   }
 
-  async execute(message, args) {
-    await this.init(message);
-
+  async execute(message, args, isOwner, isRanking) {
     switch (args[0]) {
       case "create": {
         await this.create(message);
@@ -51,12 +49,12 @@ class Giveaway {
         break;
 
       case "end": {
-        await this.end(message);
+        await this.end(message, isOwner);
       }
         break;
 
       case "clear": {
-        await this.clear(message);
+        await this.clear(message, isOwner, isRanking);
       }
         break;
 
@@ -156,9 +154,9 @@ class Giveaway {
       });
   }
 
-  async end(message) {
+  async end(message, isOwner) {
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
-    if (message.author.id !== process.env.OWNER || message.author.id !== this.dbChecks.info[0].userId) {
+    if (isOwner || message.author.id !== this.dbChecks.info[0].userId) {
       return message.reply("only the giveaway creator can end it!");
     }
 
@@ -175,8 +173,8 @@ class Giveaway {
     }
   }
 
-  async clear(message) {
-    if (message.author.id === process.env.OWNER || message.member.roles.has(process.env.LEADERS) || message.member.roles.has(process.env.OFFICERS)) {
+  async clear(message, isOwner, isRanking) {
+    if (isOwner || isRanking) {
       await clearGiveawayAndEntries();
       return message.reply("database tables are cleared!");
     }

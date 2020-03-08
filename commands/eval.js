@@ -6,8 +6,8 @@ class Eval {
     this.description = "Evaluate JS code";
   }
 
-  execute(message) {
-    if (message.author.id !== process.env.OWNER) return;
+  execute(message, args, isOwner) {
+    if (!isOwner) return;
 
     try {
       const clean = text => {
