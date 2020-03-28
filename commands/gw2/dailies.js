@@ -23,32 +23,29 @@ class Dailies {
       // Promise.all for async operations while iterating
       const arr = await Promise.all(
         dailies[category].filter((daily) => daily.level.max === 80).map(async (daily) => {
-          return await Achievements.findOne({ id: daily.id })
-            .then((result) => {
-              if (category === "fractals") {
-                const fractal = result.name.split(/[0-9]/)[1];
+          const dAchv = await Achievements.findOne({ id: daily.id });
 
-                if (result.name.includes("Recommended")) {
-                  const tempFractal = result.name.replace("Daily Recommended Fractal—", "Recommended ");
+          const fractal = dAchv.name.split(/[0-9]/)[1];
 
-                  // Check if a fractal in fractalsData has the scale of rec. fractal inside it's array of values
-                  for (const [key, value] of Object.entries(fractalsData)) {
-                    const recFractalScale = parseInt(tempFractal.replace(/[^\d.]/g, ""), 10);
+          if (dAchv.name.includes("Recommended")) {
+            const tempFractal = dAchv.name.replace("Daily Recommended Fractal—", "Recommended ");
 
-                    if (value.includes(recFractalScale)) recFractals.push(`${tempFractal} - ${key}`);
-                  }
-                }
+            // Check if a fractal in fractalsData has the scale of rec. fractal inside it's array of values
+            for (const [key, value] of Object.entries(fractalsData)) {
+              const recFractalScale = parseInt(tempFractal.replace(/[^\d.]/g, ""), 10);
 
-                // Using a Set to avoid duplicates
-                normFractals.add(fractal);
-              }
+              if (value.includes(recFractalScale)) recFractals.push(`${tempFractal} - ${key}`);
+            }
+          }
 
-              if (result.name.includes(`Daily ${categories[i]}`)) {
-                return result.name.replace(`Daily ${categories[i]}`, "");
-              }
+          // Using a Set to avoid duplicates
+          normFractals.add(fractal);
 
-              return result.name.replace("Daily", "");
-            });
+          if (dAchv.name.includes(`Daily ${categories[i]}`)) {
+            return dAchv.name.replace(`Daily ${categories[i]}`, "");
+          }
+
+          return dAchv.name.replace("Daily", "");
         })
       );
 
