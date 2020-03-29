@@ -24,7 +24,7 @@ async function checkNewBuild(bot) {
 }
 
 async function checkGiveawayOnStartup(bot) {
-  const giveawayChannel = bot.channels.get(process.env.GIVEAWAY_CHANNEL);
+  const giveawayChannel = bot.channels.cache.get(process.env.GIVEAWAY_CHANNEL);
   const giveaway = await Giveaways.find({});
 
   if (giveaway[0]) {

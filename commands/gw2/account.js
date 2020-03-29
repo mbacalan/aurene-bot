@@ -1,5 +1,5 @@
 const { Keys, Worlds } = require("../../dbModels");
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { gw2api, getLeadingGuilds } = require("../../utils/api");
 const { formatAge, filterExpansions } = require("../../utils/general");
 
@@ -29,7 +29,7 @@ class Account {
     const pvp = await gw2api.account().pvp().stats().get();
     const { pvp_rank } = pvp;
 
-    const accountEmbed = new RichEmbed()
+    const accountEmbed = new MessageEmbed()
       .setTitle(name)
       .addField("Created at", creationDate, true)
       .addField("Age", age, true)

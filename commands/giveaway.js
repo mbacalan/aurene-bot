@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { endGiveaway, initGiveawayTimeout } = require("../utils/general");
 const { clearGiveawayAndEntries, createGiveaway, createEntry } = require("../utils/db");
 const { Entries, Giveaways } = require("../dbModels");
@@ -18,7 +18,7 @@ class Giveaway {
   }
 
   async init(message) {
-    this.giveawayChannel = message.client.channels.get(process.env.GIVEAWAY_CHANNEL);
+    this.giveawayChannel = message.client.channels.cache.get(process.env.GIVEAWAY_CHANNEL);
     await this.setDbChecks(message);
   }
 
@@ -72,7 +72,7 @@ class Giveaway {
       await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
       // Create the collector to learn the giveaway item
       const collectedItem = await message.channel.awaitMessages(filter, {
-        maxMatches: 1,
+        max: 1,
         time: 15000,
       });
 
@@ -84,7 +84,7 @@ class Giveaway {
 
       await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
       const collectedDuration = await message.channel.awaitMessages(filter, {
-        maxMatches: 1,
+        max: 1,
         time: 15000,
       });
 
@@ -139,7 +139,7 @@ class Giveaway {
     const countdownString = moment().countdown(endTime).toString();
     const entries = await Entries.find({});
     const entryList = entries.map((entrant) => entrant.userName);
-    const infoEmbed = new RichEmbed()
+    const infoEmbed = new MessageEmbed()
       .setTitle(`Giveaway by ${userName}`)
       .addField("Item", `${item}`, true)
       .addField("Duration", `${duration}`, true)
@@ -164,7 +164,7 @@ class Giveaway {
     const item = this.dbChecks.info[0].item;
 
     try {
-      await endGiveaway(this.dbChecks.creator, this.giveawayChannel, item);
+      await endGiveaway(this.dbChecks.creator.userId, this.giveawayChannel, item);
       clearTimeout(this.timeout);
       this.timeout = null;
     } catch (error) {

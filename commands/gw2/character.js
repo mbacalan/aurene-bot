@@ -1,5 +1,5 @@
 const { Keys } = require("../../dbModels");
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { gw2api } = require("../../utils/api");
 const { formatAge, sortAlphabetically } = require("../../utils/general");
 const { professions } = require("../../utils/gameData");
@@ -10,6 +10,7 @@ class Character {
     this.name = "character";
     this.args = true;
     this.description = "See your GW2 character information";
+    this.usage = "list/info charname";
   }
 
   async execute(message, args) {
@@ -31,7 +32,7 @@ class Character {
           .slice().sort((a, b) => sortAlphabetically(a, b))
           .join("\n");
 
-        const characterListEmbed = new RichEmbed()
+        const characterListEmbed = new MessageEmbed()
           .setTitle(`${key.accountName}'s Characters`)
           .addField("\u200b", characterList);
 
@@ -57,7 +58,7 @@ class Character {
         const createdAt = new Date(created).toDateString();
         const formattedAge = formatAge(age);
 
-        const characterEmbed = new RichEmbed()
+        const characterEmbed = new MessageEmbed()
           .setTitle(name)
           .setDescription(`${gender} ${race} ${profession}`)
           .setThumbnail(professionIcon)

@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { sortAlphabetically } = require("../../utils/general");
 const { gw2api } = require("../../utils/api");
 const { Achievements } = require("../../dbModels/");
@@ -12,7 +12,7 @@ class Dailies {
 
   async execute(message) {
     const dailies = await gw2api.achievements().daily().get();
-    const DailiesEmbed = new RichEmbed().setTitle("Dailies");
+    const DailiesEmbed = new MessageEmbed().setTitle("Dailies");
     const categories = ["PvE", "PvP", "WvW", "Fractals"];
     const normFractals = new Set();
     const recFractals = [];
