@@ -62,6 +62,7 @@ class Giveaway {
     }
   }
 
+  // TODO: Don't create a giveaway if this.giveawayChannel isn't set
   async create(message) {
     if (this.dbChecks.active) return message.reply("please wait for current giveaway to end.");
 
@@ -156,7 +157,7 @@ class Giveaway {
 
   async end(message, isOwner) {
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
-    if (isOwner || message.author.id !== this.dbChecks.info[0].userId) {
+    if (!isOwner || message.author.id !== this.dbChecks.info[0].userId) {
       return message.reply("only the giveaway creator can end it!");
     }
 
