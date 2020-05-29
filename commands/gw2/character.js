@@ -15,13 +15,13 @@ class Character {
 
   async execute(message, args) {
     const [arg, ...charName] = args;
-    const key = await Keys.findOne({ discordId: message.author.id });
+    const { key, accountName } = await Keys.findOne({ discordId: message.author.id });
 
     if (!key) {
       return message.reply("I couldn't find a GW2 API key associated with your Discord account!");
     }
 
-    gw2api.authenticate(key.key);
+    gw2api.authenticate(key);
 
     switch (arg) {
       case "list": {
@@ -33,7 +33,7 @@ class Character {
           .join("\n");
 
         const characterListEmbed = new MessageEmbed()
-          .setTitle(`${key.accountName}'s Characters`)
+          .setTitle(`${accountName}'s Characters`)
           .addField("\u200b", characterList);
 
         await message.channel.send(characterListEmbed).catch(() => {

@@ -11,13 +11,13 @@ class Account {
   }
 
   async execute(message) {
-    const key = await Keys.findOne({ discordId: message.author.id });
+    const { key } = await Keys.findOne({ discordId: message.author.id });
 
     if (!key) {
       return message.reply("I couldn't find a GW2 API key associated with your Discord account!");
     }
 
-    gw2api.authenticate(key.key);
+    gw2api.authenticate(key);
 
     const account = await gw2api.account().get();
     const { created, name, wvw_rank, fractal_level, commander } = account;

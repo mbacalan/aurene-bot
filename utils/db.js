@@ -55,14 +55,14 @@ async function createKey(message, tokenInfo, account, key) {
 }
 
 async function deleteKey(message) {
-  const userKey = await Keys.findOne({ discordId: message.author.id });
+  const { key } = await Keys.findOne({ discordId: message.author.id });
 
-  if (!userKey) {
+  if (!key) {
     return message.reply("couldn't find a key you added to delete!");
   }
 
   try {
-    await Keys.deleteOne(userKey);
+    await Keys.deleteOne(key);
     message.reply("your key has been deleted!");
   } catch (error) {
     message.reply("there was an error with removing your key. Please contact my author");
