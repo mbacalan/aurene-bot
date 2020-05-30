@@ -13,7 +13,11 @@ class Starboard {
     if (reaction.emoji.name !== "⭐" || message.author.id === author.id || message.author.bot || !starChannel) return;
 
     const fetchedMessages = await starChannel.messages.fetch({ limit: 100 });
-    const stars = fetchedMessages.find(m => m.embeds[0].footer.text.startsWith("⭐") && m.embeds[0].footer.text.endsWith(message.id));
+    const stars = fetchedMessages.find(m => {
+      if (m.embeds[0] && m.embeds[0].footer) {
+        return m.embeds[0].footer.text.startsWith("⭐") && m.embeds[0].footer.text.endsWith(message.id);
+      }
+    });
 
     // Edit the embed if the message is already on the starboard
     if (stars) {
