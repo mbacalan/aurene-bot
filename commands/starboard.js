@@ -10,6 +10,7 @@ class Starboard {
     const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
     const message = reaction.message;
 
+    if (reaction.emoji.name === "⭐" && message.channel === starChannel) return reaction.remove();
     if (reaction.emoji.name !== "⭐" || message.author.id === author.id || message.author.bot || !starChannel) return;
 
     const fetchedMessages = await starChannel.messages.fetch({ limit: 100 });
