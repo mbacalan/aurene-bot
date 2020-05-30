@@ -39,15 +39,20 @@ class Starboard {
     // Send a new embed if the message not on the starboard
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
+      let starReactionCount = starReactions.count;
 
-      if (starReactions.count < 3) return;
+      if (starReactions.users.cache.get(author.id)) {
+        starReactionCount--;
+      }
+
+      if (starReactionCount < 3) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author, true)
         .addField("Channel", message.channel, true)
         .addField("Message", message.cleanContent)
         .setTimestamp(new Date())
-        .setFooter(`⭐ 1 | ${message.id}`);
+        .setFooter(`⭐ 3 | ${message.id}`);
 
       await starChannel.send({ embed });
     }
@@ -60,7 +65,11 @@ class Starboard {
     if (reaction.emoji.name !== "⭐" || message.author.id === author.id || message.author.bot || !starChannel) return;
 
     const fetchedMessages = await starChannel.messages.fetch({ limit: 100 });
-    const stars = fetchedMessages.find(m => m.embeds[0].footer.text.startsWith("⭐") && m.embeds[0].footer.text.endsWith(message.id));
+    const stars = fetchedMessages.find(m => {
+      if (m.embeds[0] && m.embeds[0].footer) {
+        return m.embeds[0].footer.text.startsWith("⭐") && m.embeds[0].footer.text.endsWith(message.id);
+      }
+    });
 
     // Reduce the amount of stars if the message is already on starboard, remove if no stars left
     if (stars) {
