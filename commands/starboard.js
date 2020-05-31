@@ -46,7 +46,7 @@ class Starboard {
         starReactionCount--;
       }
 
-      if (starReactionCount < 3) return;
+      if (starReactionCount != 3) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author, true)
