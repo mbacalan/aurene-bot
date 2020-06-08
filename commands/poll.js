@@ -7,22 +7,29 @@ class Poll {
     this.name = "poll";
     this.description = "Make a poll with given arguments";
     this.args = true;
-    this.usage = "{question} [option1] [option2] (max. 25)";
+    this.usage = "(optional role to tag) {question} [option1] [option2]";
   }
 
   async execute(message) {
     try {
+      // Get the text inside parenthesis
+      const role = message.content.match(/\(([^)]+)\)/);
       // Get the text inside curly brackets
       const question = message.content.match(/{([^}]+)}/);
       // Get the text inside square brackets
       const options = message.content.match(/[^[\]]+(?=])/g);
+      let matchingRole = null;
 
       if (!question) {
-        return message.reply("you didn't provide a question. To do so, put your question inside curly brackets.");
+        return message.reply("you didn't provide a question. To do so, put your question inside `{curly brackets}`.");
       }
 
       if (!options) {
-        return message.reply("you didn't provide any options. To do so, put each option inside square brackets");
+        return message.reply("you didn't provide any options. To do so, put each option inside seperate `[square brackets]`");
+      }
+
+      if (role[1]) {
+        matchingRole = message.guild.roles.cache.find(r => r.name === role[1]) || null;
       }
 
       const pollEmbed = new MessageEmbed().setTitle(question[1]);
@@ -34,7 +41,7 @@ class Poll {
 
       pollEmbed.addFields(pollOptions);
 
-      const poll = await message.channel.send(pollEmbed).catch(() => {
+      const poll = await message.channel.send(matchingRole, { embed: pollEmbed }).catch(() => {
         message.channel.send("I'm lacking permissions to send an embed!");
       });
 
