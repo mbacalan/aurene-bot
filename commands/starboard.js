@@ -31,6 +31,7 @@ class Starboard {
         .addField("Author", message.author, true)
         .addField("Channel", message.channel, true)
         .addField("Message", foundStarMessage.value)
+        .addField("Go To", `[Message](${message.url})`)
         .setTimestamp()
         .setFooter(`⭐ ${parseInt(star[1]) + 1} | ${message.id}`);
 
@@ -52,6 +53,7 @@ class Starboard {
         .addField("Author", message.author, true)
         .addField("Channel", message.channel, true)
         .addField("Message", message.cleanContent)
+        .addField("Go To", `[Message](${message.url})`)
         .setTimestamp(new Date())
         .setFooter(`⭐ 3 | ${message.id}`);
 
@@ -85,6 +87,7 @@ class Starboard {
         .addField("Author", message.author, true)
         .addField("Channel", message.channel, true)
         .addField("Message", foundStarMessage.value)
+        .addField("Go To", `[Message](${message.url})`)
         .setTimestamp()
         .setFooter(`⭐ ${parseInt(star[1]) - 1} | ${message.id}`);
 
