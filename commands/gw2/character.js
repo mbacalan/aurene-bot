@@ -13,7 +13,7 @@ class Character {
     this.usage = "list/info charname";
   }
 
-  async execute(message, args) {
+  async execute({ message, args }) {
     const [arg, ...charName] = args;
     const { key, accountName } = await Keys.findOne({ discordId: message.author.id });
 

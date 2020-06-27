@@ -8,8 +8,7 @@ class Ping {
     this.description = "Get the avarage heartbeat ping of the websocket";
   }
 
-  execute(message) {
-    try {
+  execute({ message }) {
       const pingEmbed = new MessageEmbed()
         .setColor("#1a9306")
         .setTitle("Pong 🏓")

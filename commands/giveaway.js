@@ -31,7 +31,7 @@ class Giveaway {
     };
   }
 
-  async execute(message, args, isOwner, isRanking) {
+  async execute({ message, args, isOwner, isRanking }) {
     switch (args[0]) {
       case "create": {
         await this.create(message);

@@ -10,7 +10,7 @@ class Key {
     this.description = "Add your GW2 API key";
   }
 
-  async execute(message, args) {
+  async execute({ message, args }) {
     switch (args[0]) {
       case "add": {
         const key = args[1];

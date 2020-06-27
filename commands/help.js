@@ -8,7 +8,7 @@ class Help {
   }
 
   // TODO: Clean up the mess
-  execute(message, args) {
+  execute({ message, args }) {
     const { commands } = message.client;
     const data = [];
 

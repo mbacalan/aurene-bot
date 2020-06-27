@@ -10,8 +10,7 @@ class Poll {
     this.usage = "(optional role to tag) {question} [option1] [option2]";
   }
 
-  async execute(message) {
-    try {
+  async execute({ message }) {
       // Get the text inside parenthesis
       const role = message.content.match(/\(([^)]+)\)/);
       // Get the text inside curly brackets

@@ -10,7 +10,7 @@ class Account {
     this.description = "See your GW2 account information";
   }
 
-  async execute(message) {
+  async execute({ message }) {
     const { key } = await Keys.findOne({ discordId: message.author.id });
 
     if (!key) {

@@ -10,7 +10,7 @@ class Dailies {
     this.description = "See today's dailies";
   }
 
-  async execute(message) {
+  async execute({ message }) {
     const dailies = await gw2api.achievements().daily().get();
     const DailiesEmbed = new MessageEmbed().setTitle("Dailies");
     const categories = ["PvE", "PvP", "WvW", "Fractals"];

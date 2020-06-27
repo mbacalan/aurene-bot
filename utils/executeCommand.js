@@ -37,11 +37,11 @@ async function executeCommand(bot, message) {
       await command.init(message);
     }
 
-    command.execute(message, args, isOwner, isRanking);
+    await command.execute({ message, args, isOwner, isRanking });
     message.channel.stopTyping(true);
   } catch (error) {
-    logger.error("Error while executing command", error);
-    message.reply("there was an error trying to execute that command!");
+    logger.error(`Error while executing ${command.name} command `, error);
+    await message.react("❌");
   }
 }
 

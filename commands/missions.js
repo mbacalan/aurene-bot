@@ -7,8 +7,7 @@ class Missions {
     this.description = "Alert members for joining Guild Missions and provide useful info to them";
   }
 
-  async execute(message, isOwner, isRanking) {
-    try {
+  async execute({ message, isOwner, isRanking }) {
       // TODO: Investigate negative checks for when both isOwner and isRanking is needed
       if (isOwner || isRanking) {
         const missionsChannel = message.client.channels.cache.get(process.env.MISSIONS_CHANNEL);

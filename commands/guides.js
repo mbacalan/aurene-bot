@@ -9,8 +9,7 @@ class Guides {
     this.usage = "bossname";
   }
 
-  async execute(message, args) {
-    const boss = await Bosses.findOne({ name: args.join(" "), alias: args[0] });
+  async execute({ message, args }) {
 
     // if (!boss) {
     //   boss = await Bosses.findOne({ alias: args[0] });

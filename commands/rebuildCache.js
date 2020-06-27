@@ -7,7 +7,7 @@ class RebuildCache {
     this.description = "Rebuild Cache";
   }
 
-  async execute(message, args, isOwner) {
+  async execute({ message, isOwner }) {
     if (!isOwner) return;
 
     logger.info("(Re)building API cache");

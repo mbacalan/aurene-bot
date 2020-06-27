@@ -6,7 +6,7 @@ class Eval {
     this.description = "Evaluate JS code";
   }
 
-  execute(message, args, isOwner) {
+  execute({ message, isOwner }) {
     if (!isOwner) return;
 
     try {
