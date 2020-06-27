@@ -66,61 +66,57 @@ class Giveaway {
   async create(message) {
     if (this.dbChecks.active) return message.reply("please wait for current giveaway to end.");
 
-    try {
-      // Create a filter to listen to author's input only
-      const filter = m => m.author.id === message.author.id;
-      await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
-      // Create the collector to learn the giveaway item
-      const collectedItem = await message.channel.awaitMessages(filter, {
-        max: 1,
-        time: 15000,
-      });
+    // Create a filter to listen to author's input only
+    const filter = m => m.author.id === message.author.id;
+    await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
+    // Create the collector to learn the giveaway item
+    const collectedItem = await message.channel.awaitMessages(filter, {
+      max: 1,
+      time: 15000,
+    });
 
-      if (!collectedItem.first()) {
-        return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-      }
-
-      const item = collectedItem.first().content;
-
-      await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
-      const collectedDuration = await message.channel.awaitMessages(filter, {
-        max: 1,
-        time: 15000,
-      });
-
-      if (!collectedDuration.first()) {
-        return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
-      }
-
-      const duration = collectedDuration.first().content;
-
-      if (Number.isNaN(parseInt(duration, 10))) {
-        await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-      }
-
-      if (
-        (!duration.includes("m") && !duration.includes("h")) || (duration.includes("m") && duration.includes("h"))
-      ) {
-        await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-        await clearGiveawayAndEntries();
-      }
-
-      /* If the collectedDuration includes "h" in it,
-        parse the string into an integer and multiply it with an hour in milliseconds */
-      const durationType = duration.includes("m", 1) ? "minutes" : "hours";
-      const intDuration = parseInt(duration, 10);
-      const endTime = moment().add(intDuration, durationType);
-
-      await createGiveaway(message, item, duration, endTime);
-
-      this.timeout = await initGiveawayTimeout(message.author.id, this.giveawayChannel, item);
-
-      return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
-        `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
-        `The giveaway will end in **${intDuration} ${durationType}**.`);
-    } catch (error) {
-      logger.error("Error in giveaway command, create argument", error);
+    if (!collectedItem.first()) {
+      return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
     }
+
+    const item = collectedItem.first().content;
+
+    await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
+    const collectedDuration = await message.channel.awaitMessages(filter, {
+      max: 1,
+      time: 15000,
+    });
+
+    if (!collectedDuration.first()) {
+      return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+    }
+
+    const duration = collectedDuration.first().content;
+
+    if (Number.isNaN(parseInt(duration, 10))) {
+      await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+    }
+
+    if (
+      (!duration.includes("m") && !duration.includes("h")) || (duration.includes("m") && duration.includes("h"))
+    ) {
+      await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+      await clearGiveawayAndEntries();
+    }
+
+    /* If the collectedDuration includes "h" in it,
+      parse the string into an integer and multiply it with an hour in milliseconds */
+    const durationType = duration.includes("m", 1) ? "minutes" : "hours";
+    const intDuration = parseInt(duration, 10);
+    const endTime = moment().add(intDuration, durationType);
+
+    await createGiveaway(message, item, duration, endTime);
+
+    this.timeout = await initGiveawayTimeout(message.author.id, this.giveawayChannel, item);
+
+    return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
+      `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
+      `The giveaway will end in **${intDuration} ${durationType}**.`);
   }
 
   async enter(message) {
