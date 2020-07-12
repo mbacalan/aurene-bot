@@ -1,16 +1,37 @@
 ## AureneBot
-A Discord Bot, designed to satisfy the needs of a Guild Wars 2 guild.
+A Discord bot designed to make managing a Guild Wars 2 guild server fun and easy.
 
 Features:
  - **Giveaways**: Create a giveaway via user input and pick a random winner
- - **Guides**: Provide useful links and info about a certain raid boss
- - **Missions**: Provide useful links and info about a certain Guild Mission
+ - **Guides**: Provide useful links and info about a given raid boss
+ - **Missions**: Provide useful links and info about a given guild mission
+ - **Starboard**: Save messages with enough stars to a seperate channel for everyone to see
+ - **Poll**: Create a poll directly on Discord with an easy to use syntax
+ - **GW2 API**: Add an API key to see your account info, character info or current dailies
 
 ## Usage
-Since the bot isn't public, you need to host it yourself.
-You can install the dependencies via ``npm`` or ``yarn``.
-After that, you need to set up MongoDB and pass it's URI as environment variable.
-The bot relies on environment variables. Either set them on your hosting platform or use the example below to create a ``.env`` file at folder root.
+Since the bot isn't public, you will have to host it yourself.
+
+You need to set up MongoDB and Redis, then pass their URI's as environment variables (see below).
+
+For development, you also need to set up [heroku local](https://devcenter.heroku.com/articles/heroku-local).
+
+```bash
+# insall dependencies
+npm install
+
+# start the bot
+npm start
+
+# start the bot for development
+npm run dev
+
+# start the bot for development with auto reload
+# requires nodemon
+npm run devmon
+```
+
+Set the environment variables on your hosting platform or use the example below to create a ``.env`` file at folder root.
 
 ```bash
 MONGO_URI=your://mongodb/uri
