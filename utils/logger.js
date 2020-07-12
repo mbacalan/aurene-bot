@@ -1,4 +1,4 @@
-const { createLogger, format, metadata, transports, add } = require("winston");
+const { createLogger, format, transports, add } = require("winston");
 require("winston-mongodb");
 
 /*

@@ -41,13 +41,8 @@ class Starboard {
     // Send a new embed if the message not on the starboard
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
-      let starReactionCount = starReactions.count;
 
-      if (starReactions.users.cache.get(author.id)) {
-        starReactionCount--;
-      }
-
-      if (starReactionCount != 3) return;
+      if (starReactions.count != 3) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author, true)
