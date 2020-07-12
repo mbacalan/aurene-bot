@@ -14,12 +14,15 @@ The bot relies on environment variables. Either set them on your hosting platfor
 
 ```bash
 MONGO_URI=your://mongodb/uri
+REDIS_URL=your://redis/uri
 TOKEN=client_token
-OWNER="your_discord_id"
+OWNER=your_discord_id
 LEADERS=highest_role_id
 OFFICERS=officers_role_id
 PREFIX=prefix_of_your_choice
 GIVEAWAY_CHANNEL=channel_id_for_giveaways
+MISSIONS_CHANNEL=channel_id_for_missions
+STARBOARD_CHANNEL=channel_id_for_starboarrd
 ```
 
 Please keep in mind that this bot is currently experimental.
