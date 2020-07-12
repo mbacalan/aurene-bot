@@ -42,13 +42,13 @@ bot.on("message", async message => {
 bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
 
-  await starboard.addedReaction(bot, reaction, author);
+  await starboard.handleReaction(bot, reaction, author);
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
 
-  await starboard.removedReaction(bot, reaction, author);
+  await starboard.handleReaction(bot, reaction, author, true);
 });
 
 bot.on("error", error => logger.error("General error:", error));
