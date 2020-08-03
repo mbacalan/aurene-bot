@@ -26,8 +26,10 @@ class Poll {
       return message.reply("you didn't provide any options. To do so, put each option inside seperate `[square brackets]`");
     }
 
-    if (role[1]) {
-      matchingRole = message.guild.roles.cache.find(r => r.name === role[1]) || null;
+    if (role && role[1] == "everyone") {
+      matchingRole = "@everyone";
+    } else if (role) {
+      matchingRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === role[1].toLowerCase()) || null;
     }
 
     const pollEmbed = new MessageEmbed().setTitle(question[1]);
