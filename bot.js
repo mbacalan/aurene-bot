@@ -18,16 +18,14 @@ glob("./commands/**/*.js", function registerCommands(error, files) {
 bot.on("ready", async () => {
   await bot.user.setActivity("Guild Wars 2");
 
-  const logs = [
+  [
     `Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`,
     `Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`,
     `Bot's presence is set to: ${bot.user.presence.activities.name}`,
     `Bot is in: ${bot.guilds.size} servers`,
     "Awaiting orders...",
-  ];
-
-  logs.forEach(function log(msg) {
-    logger.verbose(msg);
+  ].forEach((log) => {
+    logger.verbose(log);
   });
 
   await checkGiveawayOnStartup(bot);
