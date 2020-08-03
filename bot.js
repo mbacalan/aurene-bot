@@ -1,6 +1,6 @@
 const glob = require("glob");
 const discord = require("discord.js");
-const { checkNewBuild, checkGiveawayOnStartup } = require("./utils/general");
+const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require("./utils/general");
 const { executeCommand } = require("./utils/executeCommand");
 const logger = require("./utils/logger");
 
@@ -41,14 +41,20 @@ bot.on("message", async message => {
 
 bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
+  const reactionIsValid = checkReactionValidity(bot, reaction, author);
 
-  await starboard.handleReaction(bot, reaction, author);
+  if (reactionIsValid) {
+    await starboard.handleReaction(bot, reaction);
+  }
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
+  const reactionIsValid = checkReactionValidity(bot, reaction, author);
 
-  await starboard.handleReaction(bot, reaction, author, true);
+  if (reactionIsValid) {
+    await starboard.handleReaction(bot, reaction, true);
+  }
 });
 
 bot.on("error", error => logger.error("General error:", error));

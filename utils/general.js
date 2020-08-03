@@ -124,6 +124,22 @@ function sortAlphabetically(a, b) {
   return 0;
 }
 
+function checkReactionValidity(bot, reaction, author) {
+  const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
+  const message = reaction.message;
+
+  if (reaction.emoji.name !== "⭐" || message.author.bot || !starChannel) {
+    return false;
+  }
+
+  if (reaction.emoji.name === "⭐" && message.channel === starChannel || message.author.id === author.id) {
+    reaction.remove();
+    return false;
+  }
+
+  return true;
+}
+
 module.exports = {
   endGiveaway,
   validateKey,
@@ -133,4 +149,5 @@ module.exports = {
   checkNewBuild,
   checkGiveawayOnStartup,
   sortAlphabetically,
+  checkReactionValidity,
 };

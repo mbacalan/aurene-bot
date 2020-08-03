@@ -5,15 +5,9 @@ class Starboard {
     this.name = "starboard";
   }
 
-  async handleReaction(bot, reaction, author, remove = false) {
+  async handleReaction(bot, reaction, remove = false) {
     const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
     const message = reaction.message;
-
-    if (reaction.emoji.name !== "⭐" || message.author.bot || !starChannel) return;
-
-    if (reaction.emoji.name === "⭐" && message.channel === starChannel || message.author.id === author.id) {
-      return reaction.remove();
-    }
 
     const fetchedMessages = await starChannel.messages.fetch({ limit: 100 });
     const stars = fetchedMessages.find(m => {
@@ -26,7 +20,7 @@ class Starboard {
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
 
-      if (starReactions.count != 3) return;
+      if (starReactions && starReactions.count != 3) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author, true)
