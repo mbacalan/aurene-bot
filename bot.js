@@ -4,7 +4,7 @@ const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require
 const { executeCommand } = require("./utils/executeCommand");
 const logger = require("./utils/logger");
 
-const bot = new discord.Client();
+const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
 
 bot.commands = new discord.Collection();
 
@@ -16,6 +16,8 @@ glob("./commands/**/*.js", function registerCommands(error, files) {
 });
 
 bot.on("ready", async () => {
+  const roles = bot.commands.get("roles");
+
   await bot.user.setActivity("Guild Wars 2");
 
   [
@@ -30,6 +32,10 @@ bot.on("ready", async () => {
 
   await checkGiveawayOnStartup(bot);
 
+  if (process.env.PUBLIC_ROLES) {
+    await roles.execute(bot);
+  }
+
   setInterval(async () => await checkNewBuild(bot), 300000);
 });
 
@@ -39,19 +45,33 @@ bot.on("message", async message => {
 
 bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
+  const roles = bot.commands.get("roles");
+
   const reactionIsValid = checkReactionValidity(bot, reaction, author);
+  const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
     await starboard.handleReaction(bot, reaction);
+  }
+
+  if (!author.bot && reaction.message.channel === rolesChannel) {
+    await roles.handleReaction(bot, reaction, author);
   }
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
+  const roles = bot.commands.get("roles");
+
   const reactionIsValid = checkReactionValidity(bot, reaction, author);
+  const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
     await starboard.handleReaction(bot, reaction, true);
+  }
+
+  if (!author.bot && reaction.message.channel === rolesChannel) {
+    await roles.handleReaction(bot, reaction, author, true);
   }
 });
 
