@@ -68,15 +68,15 @@ class Giveaway {
 
     // Create a filter to listen to author's input only
     const filter = m => m.author.id === message.author.id;
-    await message.channel.send("What would you like to giveaway? Please reply in 15 seconds.");
+    await message.channel.send("What would you like to giveaway? Please reply in 20 seconds.");
     // Create the collector to learn the giveaway item
     const collectedItem = await message.channel.awaitMessages(filter, {
       max: 1,
-      time: 15000,
+      time: 20000,
     });
 
     if (!collectedItem.first()) {
-      return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+      return message.reply("you had to reply in 20 seconds, please start over and try to reply in time.");
     }
 
     const item = collectedItem.first().content;
@@ -84,11 +84,11 @@ class Giveaway {
     await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
     const collectedDuration = await message.channel.awaitMessages(filter, {
       max: 1,
-      time: 15000,
+      time: 20000,
     });
 
     if (!collectedDuration.first()) {
-      return message.reply("you had to reply in 15 seconds, please start over and try to reply in time.");
+      return message.reply("you had to reply in 20 seconds, please start over and try to reply in time.");
     }
 
     const duration = collectedDuration.first().content;
