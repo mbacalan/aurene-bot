@@ -109,12 +109,13 @@ class Giveaway {
     const durationType = duration.includes("m", 1) ? "minutes" : "hours";
     const intDuration = parseInt(duration, 10);
     const endTime = moment().add(intDuration, durationType);
+    const role = process.env.GIVEAWAY_ROLE ? `<@&${process.env.GIVEAWAY_ROLE}>` : "@everyone";
 
     await createGiveaway(message, item, duration, endTime);
 
     this.timeout = await initGiveawayTimeout(message.author.id, this.giveawayChannel, item);
 
-    return message.channel.send(`Hey @everyone, ${message.author} is giving away **${item}**! ` +
+    return message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
       `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
       `The giveaway will end in **${intDuration} ${durationType}**.`);
   }
