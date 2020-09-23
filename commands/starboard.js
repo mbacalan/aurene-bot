@@ -1,4 +1,5 @@
 const { MessageEmbed } = require("discord.js");
+const logger = require("../utils/logger");
 
 class Starboard {
   constructor() {
@@ -28,7 +29,7 @@ class Starboard {
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
 
-      if (starReactions && starReactions.count != 3) return;
+      if (!starReactions || (starReactions && starReactions.count <= 3)) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author, true)
