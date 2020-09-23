@@ -9,6 +9,14 @@ class Starboard {
     const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
     const message = reaction.message;
 
+    if (message.partial) {
+      try {
+        await message.fetch();
+      } catch (error) {
+        return logger.error("Something went wrong when fetching the message: ", error);
+      }
+    }
+
     const fetchedMessages = await starChannel.messages.fetch({ limit: 100 });
     const stars = fetchedMessages.find(m => {
       if (m.embeds[0] && m.embeds[0].footer) {

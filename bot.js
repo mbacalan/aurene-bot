@@ -47,7 +47,7 @@ bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
   const roles = bot.commands.get("roles");
 
-  const reactionIsValid = checkReactionValidity(bot, reaction, author);
+  const reactionIsValid = await checkReactionValidity(bot, reaction, author);
   const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
@@ -63,7 +63,15 @@ bot.on("messageReactionRemove", async (reaction, author) => {
   const starboard = bot.commands.get("starboard");
   const roles = bot.commands.get("roles");
 
-  const reactionIsValid = checkReactionValidity(bot, reaction, author);
+  if (reaction.message.partial) {
+    try {
+      await reaction.message.fetch();
+    } catch (error) {
+      return logger.error("Something went wrong when fetching the message: ", error);
+    }
+  }
+
+  const reactionIsValid = await checkReactionValidity(bot, reaction, author);
   const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {

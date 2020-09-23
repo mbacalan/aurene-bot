@@ -124,9 +124,17 @@ function sortAlphabetically(a, b) {
   return 0;
 }
 
-function checkReactionValidity(bot, reaction, author) {
+async function checkReactionValidity(bot, reaction, author) {
   const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
   const message = reaction.message;
+
+  if (message.partial) {
+    try {
+      await message.fetch();
+    } catch (error) {
+      return logger.error("Something went wrong when fetching the message: ", error);
+    }
+  }
 
   if (reaction.emoji.name !== "⭐" || message.author.bot || !starChannel) {
     return false;
