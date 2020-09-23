@@ -2,7 +2,7 @@ const { Entries, Giveaways, Winners, Keys } = require("../dbModels");
 const logger = require("./logger");
 const mongoose = require("mongoose");
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/local", ({
+mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }));
