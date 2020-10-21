@@ -1,5 +1,4 @@
-/node_modules
-/.vscode
-bot_config.json
+src/node_modules/
 .env
+/.vscode
 /.idea
