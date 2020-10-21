@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const { sortAlphabetically } = require("../../utils/general");
 const { gw2api } = require("../../utils/api");
-const { Achievements } = require("../../dbModels/");
+const { Achievements } = require("../../models");
 const { fractalsData } = require("../../utils/gameData");
 
 class Dailies {

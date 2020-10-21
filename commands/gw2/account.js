@@ -1,4 +1,4 @@
-const { Keys, Worlds } = require("../../dbModels");
+const { Keys, Worlds } = require("../../models");
 const { MessageEmbed } = require("discord.js");
 const { gw2api, getLeadingGuilds } = require("../../utils/api");
 const { formatAge, filterExpansions } = require("../../utils/general");

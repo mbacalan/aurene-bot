@@ -8,6 +8,7 @@ const Specializations = require("./specializations");
 const Titles = require("./titles");
 const Winners = require("./winners");
 const Worlds = require("./worlds");
+const Config = require("./config");
 
 module.exports = {
   Achievements,
@@ -20,4 +21,5 @@ module.exports = {
   Titles,
   Winners,
   Worlds,
+  Config,
 };

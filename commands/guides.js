@@ -1,4 +1,4 @@
-const { Bosses } = require("../dbModels");
+const { Bosses } = require("../models");
 
 class Guides {
   constructor() {

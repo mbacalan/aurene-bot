@@ -1,7 +1,7 @@
 const glob = require("glob");
 const discord = require("discord.js");
 const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require("./utils/general");
-const { executeCommand } = require("./utils/executeCommand");
+const CommandHandler = require("./utils/executeCommand");
 const logger = require("./utils/logger");
 
 const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
@@ -18,13 +18,13 @@ glob("./commands/**/*.js", function registerCommands(error, files) {
 bot.on("ready", async () => {
   const roles = bot.commands.get("roles");
 
-  await bot.user.setActivity("Guild Wars 2");
+  await bot.user.setPresence({ activity: { name: "Guild Wars 2", type: "PLAYING" } });
 
   [
     `Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`,
     `Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`,
-    `Bot's presence is set to: ${bot.user.presence.activities.name}`,
-    `Bot is in: ${bot.guilds.size} servers`,
+    `Bot's presence is set to: ${bot.user.presence.activities}`,
+    `Bot is in: ${bot.guilds.cache.size} servers`,
     "Awaiting orders...",
   ].forEach((log) => {
     logger.verbose(log);
@@ -40,7 +40,7 @@ bot.on("ready", async () => {
 });
 
 bot.on("message", async message => {
-  await executeCommand(bot, message);
+  await CommandHandler.execute(bot, message);
 });
 
 bot.on("messageReactionAdd", async (reaction, author) => {

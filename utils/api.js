@@ -2,13 +2,14 @@ const apiClient = require("gw2api-client");
 const redis = require("redis");
 const cacheRedis = require("gw2api-client/src/cache/redis.js");
 
-const options = {
-  redis: redis.createClient(process.env.REDIS_URL),
-};
-
+const redisClient = redis.createClient(process.env.REDIS_URL);
 const gw2api = apiClient();
 
-gw2api.cacheStorage(cacheRedis(options));
+gw2api.cacheStorage(
+  cacheRedis({
+    redis: redisClient,
+  })
+);
 
 async function getLeadingGuilds(account) {
   const guilds = await Promise.all(
@@ -24,4 +25,5 @@ async function getLeadingGuilds(account) {
 module.exports = {
   gw2api,
   getLeadingGuilds,
+  redisClient,
 };

@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const { endGiveaway, initGiveawayTimeout } = require("../utils/general");
 const { clearGiveawayAndEntries, createGiveaway, createEntry } = require("../utils/db");
-const { Entries, Giveaways } = require("../dbModels");
+const { Entries, Giveaways } = require("../models");
 const logger = require("../utils/logger");
 const moment = require("moment");
 require("moment-countdown");

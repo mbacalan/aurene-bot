@@ -1,4 +1,4 @@
-const { Keys } = require("../../dbModels");
+const { Keys } = require("../../models");
 const { MessageEmbed } = require("discord.js");
 const { gw2api } = require("../../utils/api");
 const { formatAge, sortAlphabetically } = require("../../utils/general");

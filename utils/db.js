@@ -1,4 +1,4 @@
-const { Entries, Giveaways, Winners, Keys } = require("../dbModels");
+const { Entries, Giveaways, Winners, Keys } = require("../models");
 const logger = require("./logger");
 const mongoose = require("mongoose");
 

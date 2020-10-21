@@ -1,7 +1,7 @@
 const moment = require("moment");
 const logger = require("./logger");
 const { gw2api } = require("./api");
-const { Entries, Giveaways, Keys, Builds } = require("../dbModels");
+const { Entries, Giveaways, Keys, Builds } = require("../models");
 const { createWinner, clearGiveawayAndEntries } = require("./db");
 const { buildDbFromApi } = require("./caching");
 
