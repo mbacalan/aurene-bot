@@ -24,6 +24,15 @@ class CommandHandler {
 
     if (!prefix) {
       const config = await Config.collection.findOne({});
+
+      if (!config) {
+        await Config.create({
+          prefix: process.env.PREFIX
+        });
+
+        return process.env.PREFIX;
+      }
+
       return config.prefix;
     }
   }
