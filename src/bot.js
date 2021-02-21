@@ -1,3 +1,4 @@
+require("dotenv").config()
 const glob = require("glob");
 const discord = require("discord.js");
 const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require("./utils/general");
