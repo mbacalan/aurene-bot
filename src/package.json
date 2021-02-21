@@ -21,7 +21,7 @@
     "gw2api-client": "^7.4.1",
     "moment": "^2.27.0",
     "moment-countdown": "0.0.3",
-    "mongoose": "^5.9.27",
+    "mongoose": "^5.11.17",
     "redis": "^3.0.2",
     "winston": "^3.3.3",
     "winston-mongodb": "^5.0.1"
