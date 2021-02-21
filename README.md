@@ -14,21 +14,12 @@ Since the bot isn't public, you will have to host it yourself.
 
 You need to set up MongoDB and Redis, then pass their URI's as environment variables (see below).
 
-For development, you also need to set up [heroku local](https://devcenter.heroku.com/articles/heroku-local).
-
 ```bash
 # insall dependencies
 npm install
 
 # start the bot
 npm start
-
-# start the bot for development
-npm run dev
-
-# start the bot for development with auto reload
-# requires nodemon
-npm run devmon
 ```
 
 Set the environment variables on your hosting platform or use the example below to create a ``.env`` file at folder root.
