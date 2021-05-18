@@ -67,7 +67,7 @@ class CommandHandler {
     }
 
     try {
-      const isOwner = message.author.id === process.env.OWNER;
+      const isOwner = message.author.id == process.env.OWNER;
       const isRanking = message.member.roles.cache.some(role => [process.env.LEADERS, process.env.OFFICERS].includes(role.id));
 
       message.channel.startTyping();

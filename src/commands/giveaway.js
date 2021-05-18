@@ -25,7 +25,7 @@ class Giveaway {
   async setDbChecks(message) {
     this.dbChecks = {
       entry: await Entries.findOne({ userId: message.author.id }),
-      creator: await Giveaways.findOne({ userId: message.author.id }),
+      creator: await Giveaways.find({}),
       active: await Giveaways.countDocuments({}),
       info: await Giveaways.find({}),
     };
@@ -154,7 +154,7 @@ class Giveaway {
 
   async end(message, isOwner) {
     if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
-    if (!isOwner || message.author.id !== this.dbChecks.info[0].userId) {
+    if (!isOwner && message.author.id !== this.dbChecks.info[0].userId) {
       return message.reply("only the giveaway creator can end it!");
     }
 
