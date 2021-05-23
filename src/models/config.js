@@ -4,9 +4,32 @@ const configSchema = new mongoose.Schema({
   prefix: {
     type: String,
     required: true,
+    default: "$",
+  },
+  leaders: {
+    type: Number,
+    required: false,
+  },
+  officers: {
+    type: Number,
+    required: false,
+  },
+  giveawayChannel: {
+    type: Number,
+    required: false,
+  },
+  missionsChannel: {
+    type: Number,
+    required: false,
+  },
+  starboardChannel: {
+    type: Number,
+    required: false,
+  },
+  giveawayRole: {
+    type: Number,
+    required: false,
   },
 });
 
-const Config = mongoose.model("config", configSchema);
-
-module.exports = Config;
+module.exports = configSchema;

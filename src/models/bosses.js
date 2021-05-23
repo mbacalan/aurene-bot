@@ -23,6 +23,6 @@ const bossSchema = new mongoose.Schema({
   },
 });
 
-const Bosses = mongoose.model("Bosses", bossSchema);
+const Bosses = mongoose.model("gw2.bosses", bossSchema);
 
 module.exports = Bosses;

@@ -1,16 +1,13 @@
 const mongoose = require("mongoose");
 
+// TODO: Maybe just use userSchema for winners?
 const winnerSchema = new mongoose.Schema({
   userId: {
     type: String,
     required: true,
   },
-  userName: {
+  userTag: {
     type: String,
-    required: true,
-  },
-  discriminator: {
-    type: Number,
     required: true,
   },
   item: {

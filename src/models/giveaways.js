@@ -1,16 +1,17 @@
 const mongoose = require("mongoose");
+const userSchema = require("./users");
 
 const giveawaySchema = new mongoose.Schema({
+  _id: {
+    type: String,
+    required: true,
+  },
   userId: {
     type: String,
     required: true,
   },
-  userName: {
+  userTag: {
     type: String,
-    required: true,
-  },
-  discriminator: {
-    type: Number,
     required: true,
   },
   creationTime: {
@@ -29,8 +30,10 @@ const giveawaySchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  entries: {
+    type: [userSchema],
+    required: false,
+  },
 });
 
-const Giveaways = mongoose.model("Giveaways", giveawaySchema);
-
-module.exports = Giveaways;
+module.exports = giveawaySchema;

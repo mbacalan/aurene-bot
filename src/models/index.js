@@ -1,25 +1,21 @@
 const Achievements = require("./achievements");
 const Bosses = require("./bosses");
 const Builds = require("./builds");
-const Entries = require("./entries");
-const Giveaways = require("./giveaways");
+const Guild = require("./guilds");
 const Keys = require("./keys");
 const Specializations = require("./specializations");
 const Titles = require("./titles");
 const Winners = require("./winners");
 const Worlds = require("./worlds");
-const Config = require("./config");
 
 module.exports = {
   Achievements,
   Bosses,
   Builds,
-  Entries,
-  Giveaways,
+  Guild,
   Keys,
   Specializations,
   Titles,
   Winners,
   Worlds,
-  Config,
 };
