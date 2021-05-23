@@ -1,6 +1,6 @@
-const { validateKey } = require("../utils/general");
-const { createKey, deleteKey } = require("../utils/db");
+const { validateKey } = require("../utils");
 const { gw2api } = require("../utils/api");
+const { Keys } = require("../models");
 const logger = require("../utils/logger");
 
 class Key {
@@ -27,7 +27,14 @@ class Key {
         try {
           const account = await gw2api.account().get(key);
 
-          await createKey(message, tokenInfo, account, key);
+          await Keys.create({
+            discordId: message.author.id,
+            keyName: tokenInfo.name ? tokenInfo.name : "",
+            accountName: account.name,
+            permissions: tokenInfo.permissions,
+            key,
+          });
+
           await message.delete();
           await message.reply("your key has been saved and your message has been deleted for privacy.");
         } catch (error) {
@@ -38,7 +45,19 @@ class Key {
         break;
 
       case "delete": {
-        await deleteKey(message);
+        const { key } = await Keys.findOne({ discordId: message.author.id });
+
+        if (!key) {
+          return message.reply("couldn't find a key you added to delete!");
+        }
+
+        try {
+          await Keys.deleteOne(key);
+          message.reply("your key has been deleted!");
+        } catch (error) {
+          message.reply("there was an error with removing your key. Please contact my author");
+          logger.error("Error while deleting key", error);
+        }
       }
     }
   }
