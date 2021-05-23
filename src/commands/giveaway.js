@@ -1,39 +1,26 @@
 const { MessageEmbed } = require("discord.js");
-const { endGiveaway, initGiveawayTimeout } = require("../utils/general");
-const { clearGiveawayAndEntries, createGiveaway, createEntry } = require("../utils/db");
-const { Entries, Giveaways } = require("../models");
-const logger = require("../utils/logger");
+const { endGiveaway, createGiveawayEntryCollector } = require("../utils");
+const { Guild } = require("../models");
 const moment = require("moment");
 require("moment-countdown");
 
 class Giveaway {
   constructor() {
     this.name = "giveaway";
-    this.description = "Create, enter and view giveaways";
+    this.description = "Create a giveaway";
     this.args = true;
-    this.usage = "create/enter/entries/info";
+    this.usage = "Create";
     this.timeout = null;
     this.giveawayChannel = null;
-    this.dbChecks = {};
   }
 
-  async init(message) {
+  async execute({ message, args }) {
+    // TODO: Add error handling for if GIVEAWAY_CHANNEL is unset, get GIVEAWAY_CHANNEL from guild config
     this.giveawayChannel = message.client.channels.cache.get(process.env.GIVEAWAY_CHANNEL);
-    await this.setDbChecks(message);
-  }
 
-  async setDbChecks(message) {
-    this.dbChecks = {
-      entry: await Entries.findOne({ userId: message.author.id }),
-      creator: await Giveaways.find({}),
-      active: await Giveaways.countDocuments({}),
-      info: await Giveaways.find({}),
-    };
-  }
-
-  async execute({ message, args, isOwner, isRanking }) {
     switch (args[0]) {
       case "create": {
+        // TODO: Pass args here to create giveaways with single command
         await this.create(message);
       }
         break;
@@ -43,33 +30,22 @@ class Giveaway {
       }
         break;
 
-      case "info": {
-        await this.info(message);
-      }
-        break;
-
-      case "end": {
-        await this.end(message, isOwner);
-      }
-        break;
-
-      case "clear": {
-        await this.clear(message, isOwner, isRanking);
-      }
-        break;
-
       default: await message.reply("invalid argument.");
+
+      // TODO: Since we support multiple giveaways at once, the info command needs a rework
+      // to display information about any given active giveaway without cluttering the channel.
+      // Code below is currently not in use.
     }
   }
 
-  // TODO: Don't create a giveaway if this.giveawayChannel isn't set
   async create(message) {
-    if (this.dbChecks.active) return message.reply("please wait for current giveaway to end.");
+    if (message.channel.id != this.giveawayChannel) {
+      message.reply(`you can only create giveaways in ${this.giveawayChannel} channel.`);
+      return false;
+    }
 
-    // Create a filter to listen to author's input only
     const filter = m => m.author.id === message.author.id;
-    await message.channel.send("What would you like to giveaway? Please reply in 20 seconds.");
-    // Create the collector to learn the giveaway item
+    const itemQuestion = await message.channel.send("What would you like to giveaway? Please reply in 20 seconds.");
     const collectedItem = await message.channel.awaitMessages(filter, {
       max: 1,
       time: 20000,
@@ -80,8 +56,7 @@ class Giveaway {
     }
 
     const item = collectedItem.first().content;
-
-    await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
+    const durationQuestion = await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
     const collectedDuration = await message.channel.awaitMessages(filter, {
       max: 1,
       time: 20000,
@@ -93,91 +68,66 @@ class Giveaway {
 
     const duration = collectedDuration.first().content;
 
-    if (Number.isNaN(parseInt(duration, 10))) {
-      await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-    }
-
     if (
-      (!duration.includes("m") && !duration.includes("h")) || (duration.includes("m") && duration.includes("h"))
+      Number.isNaN(parseInt(duration, 10)) ||
+      (!duration.includes("m") && !duration.includes("h")) ||
+      (duration.includes("m") && duration.includes("h"))
     ) {
       await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
-      await clearGiveawayAndEntries();
     }
 
     /* If the collectedDuration includes "h" in it,
       parse the string into an integer and multiply it with an hour in milliseconds */
-    const durationType = duration.includes("m", 1) ? "minutes" : "hours";
+    const durationType = duration.includes("m", 1) ? "minute" : "hour";
     const intDuration = parseInt(duration, 10);
     const endTime = moment().add(intDuration, durationType);
     const role = process.env.GIVEAWAY_ROLE ? `<@&${process.env.GIVEAWAY_ROLE}>` : "@everyone";
 
-    await createGiveaway(message, item, duration, endTime);
-
-    this.timeout = await initGiveawayTimeout(message.author.id, this.giveawayChannel, item);
-
-    return message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
-      `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it! ` +
-      `The giveaway will end in **${intDuration} ${durationType}**.`);
-  }
-
-  async enter(message) {
-    if (!this.dbChecks.active) return message.reply("there is no active giveaway to enter.");
-    if (this.dbChecks.creator) return message.reply("you can't enter your own giveaway!");
-    if (this.dbChecks.entry) return message.reply("you *already* entered this giveaway!");
-
-    await createEntry(message);
-    await message.react("✅");
-  }
-
-  async info(message) {
-    if (!this.dbChecks.active) return message.reply("there is no active giveaway to show the info of.");
-
-    const { endTime, userName, item, duration } = this.dbChecks.info[0];
-    const countdownString = moment().countdown(endTime).toString();
-    const entries = await Entries.find({});
-    const entryList = entries.map((entrant) => entrant.userName);
     const infoEmbed = new MessageEmbed()
-      .setTitle(`Giveaway by ${userName}`)
-      .addField("Item", `${item}`, true)
-      .addField("Duration", `${duration}`, true)
-      .addField("Ends In", `${countdownString}`, true)
-      .addField("Entries", `${entryList.length ? entryList : "None, yet"}`)
-      .setFooter(`Enter this giveaway by sending: ${process.env.PREFIX}giveaway enter`);
+      .setTitle(item)
+      .addField("Hosted By", message.author.tag, true)
+      .addField("Duration", duration, true)
+      .setFooter("Enter this giveaway by reacting with checkmark below.");
 
-    message.channel.send(infoEmbed)
+    const giveawayMessage = await message.channel.send(role, infoEmbed)
       .catch(() => {
-        message.channel.send(`${userName} is giving away **${item}**! ` +
-          `The giveaway will end in **${countdownString}**. ` +
-          `Use \`\`${process.env.PREFIX}giveaway enter\`\` to have a chance at grabbing it!`);
+        message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
+          "Use the reaction below to enter. " +
+          `This giveaway will end in **${intDuration} ${durationType}**.`);
       });
-  }
 
-  async end(message, isOwner) {
-    if (!this.dbChecks.active) return message.reply("there is no active giveaway to end.");
-    if (!isOwner && message.author.id !== this.dbChecks.info[0].userId) {
-      return message.reply("only the giveaway creator can end it!");
-    }
+    await giveawayMessage.react("✅");
 
-    const item = this.dbChecks.info[0].item;
+    const guild = await Guild.findOne({ _id: message.guild.id });
 
-    try {
-      await endGiveaway(this.dbChecks.creator.userId, this.giveawayChannel, item);
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    } catch (error) {
-      logger.error("Error in giveaway command, end argument", error);
-      // TODO: Standardize error handling
-      await message.reply("there is no giveaway to end!");
-    }
-  }
+    await guild.giveaways.push({
+      _id: giveawayMessage.id,
+      userId: message.author.id,
+      userTag: message.author.tag,
+      creationTime: `${message.createdAt}`,
+      item: item,
+      duration: duration,
+      endTime: endTime,
+    });
 
-  async clear(message, isOwner, isRanking) {
-    if (isOwner || isRanking) {
-      await clearGiveawayAndEntries();
-      return message.reply("database tables are cleared!");
-    }
+    await guild.save();
 
-    await message.reply("you don't have permission to use this command!");
+    const entryCollector = createGiveawayEntryCollector(guild, this.giveawayChannel, giveawayMessage);
+
+    this.timeout = setTimeout(async () => {
+      await endGiveaway(giveawayMessage, this.giveawayChannel);
+      entryCollector.stop();
+    }, endTime.diff(moment(), "milliseconds"));
+
+    [
+      message,
+      itemQuestion,
+      durationQuestion,
+      collectedItem.first(),
+      collectedDuration.first(),
+    ].forEach(async (m) => {
+      await m.delete();
+    });
   }
 }
 
