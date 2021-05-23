@@ -1,7 +1,9 @@
-require("dotenv").config()
-const glob = require("glob");
+require("dotenv").config();
+require("./utils/db");
 const discord = require("discord.js");
-const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require("./utils/general");
+const glob = require("glob");
+const Guild = require("./models/guilds");
+const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require("./utils");
 const CommandHandler = require("./utils/executeCommand");
 const logger = require("./utils/logger");
 
@@ -31,7 +33,19 @@ bot.on("ready", async () => {
     logger.verbose(log);
   });
 
-  await checkGiveawayOnStartup(bot);
+  bot.guilds.cache.forEach(async (guild) => {
+    const guildDoc = await Guild.findOne({ _id: guild.id });
+
+    if (!guildDoc) {
+      await Guild.create({
+        _id: guild.id,
+      });
+
+      return false;
+    }
+
+    await checkGiveawayOnStartup(bot, guildDoc);
+  });
 
   if (process.env.PUBLIC_ROLES) {
     await roles.execute(bot);

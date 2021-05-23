@@ -7,6 +7,6 @@ const buildSchema = new mongoose.Schema({
   },
 });
 
-const Builds = mongoose.model("Builds", buildSchema);
+const Builds = mongoose.model("gw2.builds", buildSchema);
 
 module.exports = Builds;

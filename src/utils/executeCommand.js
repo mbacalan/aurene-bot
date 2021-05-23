@@ -1,6 +1,6 @@
 const logger = require("./logger");
 const { redisClient } = require("./api");
-const { Config } = require("../models");
+const { Guild } = require("../models");
 
 class CommandHandler {
   constructor() {
@@ -11,7 +11,7 @@ class CommandHandler {
     return CommandHandler.instance;
   }
 
-  async getPrefix() {
+  async getPrefix(message) {
     let prefix;
 
     redisClient.get("prefix", function(err, val) {
@@ -23,27 +23,34 @@ class CommandHandler {
     });
 
     if (!prefix) {
-      const config = await Config.collection.findOne({});
+      const guild = await Guild.findOne({ _id: message.guild.id });
 
-      if (!config) {
-        await Config.create({
-          prefix: process.env.PREFIX
+      if (!guild.config) {
+        await guild.config.push({
+          prefix: process.env.PREFIX,
         });
 
         return process.env.PREFIX;
       }
 
-      return config.prefix;
+      return guild.config.prefix;
     }
   }
 
   async execute(bot, message) {
-    const prefix = await this.getPrefix();
+    // Ignore messages from bots
+    if (message.author.bot) {
+      return false;
+    }
+
+    const prefix = await this.getPrefix(message);
 
     // Prefix is either what's defined or the tag of the bot
     const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${await prefix})\\s*`);
 
-    if (!prefixRegex.test(message.content) || message.author.bot) return;
+    if (!prefixRegex.test(message.content)) {
+      return false;
+    }
 
     const [, matchedPrefix] = message.content.match(prefixRegex);
     const args = message.content.slice(matchedPrefix.length).trim().split(/ +/);
@@ -54,7 +61,9 @@ class CommandHandler {
       cmd => cmd.aliases && cmd.aliases.includes(commandName)
     );
 
-    if (!command) return;
+    if (!command) {
+      return false;
+    }
 
     if (command.args && !args.length) {
       let reply = `You didn't provide any arguments, ${message.author}!`;
@@ -71,11 +80,6 @@ class CommandHandler {
       const isRanking = message.member.roles.cache.some(role => [process.env.LEADERS, process.env.OFFICERS].includes(role.id));
 
       message.channel.startTyping();
-
-      if (command.init) {
-        await command.init(message);
-      }
-
       await command.execute({ message, args, isOwner, isRanking });
       message.channel.stopTyping(true);
     } catch (error) {
