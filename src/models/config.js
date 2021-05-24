@@ -4,7 +4,7 @@ const configSchema = new mongoose.Schema({
   prefix: {
     type: String,
     required: true,
-    default: "$",
+    default: ">",
   },
   leaders: {
     type: Number,
