@@ -30,16 +30,18 @@ class CommandHandler {
           prefix: process.env.PREFIX,
         });
 
+        redisClient.set("prefix", process.env.PREFIX);
         return process.env.PREFIX;
       }
 
+      redisClient.set("prefix", guild.config.prefix, "ex", 600);
       return guild.config.prefix;
     }
   }
 
   async execute(bot, message) {
-    // Ignore messages from bots
-    if (message.author.bot) {
+    // Ignore messages from bots and DMs
+    if (message.author.bot || !message.guild) {
       return false;
     }
 
