@@ -3,7 +3,7 @@ require("./utils/db");
 const discord = require("discord.js");
 const glob = require("glob");
 const Guild = require("./models/guilds");
-const { checkNewBuild, checkGiveawayOnStartup, checkReactionValidity } = require("./utils");
+const { checkGiveawayOnStartup, checkReactionValidity } = require("./utils");
 const CommandHandler = require("./utils/executeCommand");
 const logger = require("./utils/logger");
 
@@ -51,7 +51,8 @@ bot.on("ready", async () => {
     await roles.execute(bot);
   }
 
-  setInterval(async () => await checkNewBuild(bot), 300000);
+  // Disabled until related function is fixed
+  // setInterval(async () => await checkNewBuild(bot), 300000);
 });
 
 bot.on("message", async message => {
