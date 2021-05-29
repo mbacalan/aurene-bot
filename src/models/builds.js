@@ -4,6 +4,7 @@ const buildSchema = new mongoose.Schema({
   build: {
     type: String,
     required: true,
+    index: true,
   },
 });
 
