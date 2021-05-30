@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 const { endGiveaway, createGiveawayEntryCollector } = require("../utils");
 const { Guild } = require("../models");
 const moment = require("moment");
-require("moment-countdown");
+const logger = require("utils/logger");
 
 class Giveaway {
   constructor() {
@@ -10,7 +10,6 @@ class Giveaway {
     this.description = "Create a giveaway";
     this.args = true;
     this.usage = "Create";
-    this.timeout = null;
     this.giveawayChannel = null;
   }
 
@@ -100,21 +99,26 @@ class Giveaway {
 
     const guild = await Guild.findOne({ _id: message.guild.id });
 
-    await guild.giveaways.push({
-      _id: giveawayMessage.id,
-      userId: message.author.id,
-      userTag: message.author.tag,
-      creationTime: `${message.createdAt}`,
-      item: item,
-      duration: duration,
-      endTime: endTime,
-    });
+    try {
+      guild.giveaways.push({
+        _id: giveawayMessage.id,
+        userId: message.author.id,
+        userTag: message.author.tag,
+        creationTime: `${message.createdAt}`,
+        item: item,
+        duration: duration,
+        endTime: endTime,
+      });
 
-    await guild.save();
+      await guild.save();
+    } catch (error) {
+      logger.error("Error creating giveaway ", error);
+      return message.react("❌");
+    }
 
     const entryCollector = createGiveawayEntryCollector(guild, this.giveawayChannel, giveawayMessage);
 
-    this.timeout = setTimeout(async () => {
+    setTimeout(async () => {
       await endGiveaway(giveawayMessage, this.giveawayChannel);
       entryCollector.stop();
     }, endTime.diff(moment(), "milliseconds"));
