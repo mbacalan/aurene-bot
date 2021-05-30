@@ -24,11 +24,6 @@ class Giveaway {
       }
         break;
 
-      case "enter": {
-        await this.enter(message);
-      }
-        break;
-
       default: await message.reply("invalid argument.");
 
       // TODO: Since we support multiple giveaways at once, the info command needs a rework

@@ -15,7 +15,7 @@ const giveawaySchema = new mongoose.Schema({
     required: true,
   },
   creationTime: {
-    type: String,
+    type: Date,
     required: true,
   },
   item: {
