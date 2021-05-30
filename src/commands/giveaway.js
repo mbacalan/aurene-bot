@@ -104,7 +104,7 @@ class Giveaway {
         _id: giveawayMessage.id,
         userId: message.author.id,
         userTag: message.author.tag,
-        creationTime: `${message.createdAt}`,
+        creationTime: message.createdAt,
         item: item,
         duration: duration,
         endTime: endTime,
