@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 const { endGiveaway, createGiveawayEntryCollector } = require("../utils");
 const { Guild } = require("../models");
 const moment = require("moment");
-const logger = require("utils/logger");
+const logger = require("../utils/logger");
 
 class Giveaway {
   constructor() {
