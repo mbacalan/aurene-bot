@@ -1,0 +1,33 @@
+{
+  "name": "aurenebot",
+  "version": "2.0.0",
+  "description": "A Guild Wars 2 themed bot for Discord",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node build/bot.js",
+    "dev": "nodemon start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbacalan/aurene-bot"
+  },
+  "author": "Penemue#8514",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^9.0.2",
+    "emoji-dictionary": "^1.0.11",
+    "glob": "^7.1.7",
+    "gw2api-client": "^7.4.2",
+    "moment": "^2.29.1",
+    "mongoose": "^5.12.10",
+    "redis": "^3.1.2",
+    "winston": "^3.3.3",
+    "winston-mongodb": "^5.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "nodemon": "^2.0.7",
+    "typescript": "^4.3.2"
+  }
+}
