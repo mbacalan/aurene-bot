@@ -1,5 +1,5 @@
-const { createLogger, format, transports, add } = require("winston");
-require("winston-mongodb");
+import { createLogger, format, transports, add } from "winston";
+import "winston-mongodb";
 
 /*
   {
@@ -29,7 +29,7 @@ const logTransports = {
   ),
 };
 
-const logger = createLogger({
+export const logger = createLogger({
   format: format.combine(
     format.errors({ stack: true }),
     format.metadata({ fillExcept: ["message", "level"] }),
@@ -52,5 +52,3 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 add(logger);
-
-module.exports = logger;

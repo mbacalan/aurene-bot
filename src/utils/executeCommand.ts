@@ -1,8 +1,12 @@
 const logger = require("./logger");
 const { redisClient } = require("./api");
 const { Guild } = require("../models");
+import { Client, Message } from "discord.js";
+import { Command } from "../types";
 
 class CommandHandler {
+  static instance: CommandHandler;
+
   constructor() {
     if (!CommandHandler.instance) {
       CommandHandler.instance = this;
@@ -11,10 +15,10 @@ class CommandHandler {
     return CommandHandler.instance;
   }
 
-  async getPrefix(message) {
-    let prefix;
+  async getPrefix(message: Message) {
+    let prefix: string;
 
-    redisClient.get("prefix", function(err, val) {
+    redisClient.get("prefix", function(err, val: string) {
       if (err) {
         return logger.error("Error reading from Redis: ", err);
       }
@@ -39,7 +43,7 @@ class CommandHandler {
     }
   }
 
-  async execute(bot, message) {
+  async execute(bot: Client, message: Message) {
     // Ignore messages from bots and DMs
     if (message.author.bot || !message.guild) {
       return false;
@@ -59,7 +63,7 @@ class CommandHandler {
     const commandName = args.shift().toLowerCase();
 
     // Check commands by name and alias
-    const command = bot.commands.get(commandName) || bot.commands.find(
+    const command: Command = bot.commands.get(commandName) || bot.commands.find(
       cmd => cmd.aliases && cmd.aliases.includes(commandName)
     );
 
@@ -91,4 +95,4 @@ class CommandHandler {
   }
 }
 
-module.exports = new CommandHandler();
+export = new CommandHandler();
