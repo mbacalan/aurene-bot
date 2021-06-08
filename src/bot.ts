@@ -1,11 +1,12 @@
 require("dotenv").config();
 require("./utils/db");
-const discord = require("discord.js");
-const glob = require("glob");
-const Guild = require("./models/guilds");
-const { checkGiveawayOnStartup, checkReactionValidity } = require("./utils");
-const CommandHandler = require("./utils/executeCommand");
-const logger = require("./utils/logger");
+import discord from "discord.js";
+import glob from "glob";
+import Guild from "./models/guilds";
+import { StaticCommand } from "./types";
+import { checkGiveawayOnStartup, checkReactionValidity } from "./utils";
+import CommandHandler from "./utils/executeCommand";
+import { logger } from "./utils/logger";
 
 const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
 
@@ -60,8 +61,9 @@ bot.on("message", async message => {
 });
 
 bot.on("messageReactionAdd", async (reaction, author) => {
-  const starboard = bot.commands.get("starboard");
-  const roles = bot.commands.get("roles");
+  // TODO: Type Casting
+  const starboard = <StaticCommand>bot.commands.get("starboard");
+  const roles = <StaticCommand>bot.commands.get("roles");
 
   const reactionIsValid = await checkReactionValidity(bot, reaction, author);
   const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
@@ -76,8 +78,9 @@ bot.on("messageReactionAdd", async (reaction, author) => {
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
-  const starboard = bot.commands.get("starboard");
-  const roles = bot.commands.get("roles");
+  // TODO: Type Casting
+  const starboard = <StaticCommand>bot.commands.get("starboard");
+  const roles = <StaticCommand>bot.commands.get("roles");
 
   if (reaction.message.partial) {
     try {
