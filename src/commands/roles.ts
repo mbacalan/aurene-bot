@@ -1,19 +1,19 @@
-const { MessageEmbed } = require("discord.js");
-const emoji = require("emoji-dictionary");
-const { roleEmojis, roleEmojiUnicodes } = require("../utils/emojiData");
-const logger = require("../utils/logger");
+import { Command } from "../types";
+import { MessageEmbed, Client } from "discord.js";
+import emoji from "emoji-dictionary";
+import { roleEmojis, roleEmojiUnicodes } from "../utils/emojiData";
+import { logger } from "../utils/logger";
+import { TextChannel } from "discord.js";
 
-class Roles {
-  constructor() {
-    this.name = "roles";
-    this.description = "Join/leave a public role";
-    this.roles = process.env.PUBLIC_ROLES ? process.env.PUBLIC_ROLES.split(",") : null;
-    this.roleEmbedFields = [];
-    this.oldEmbed = null;
-  }
+class Roles implements Command {
+  name = "roles";
+  description = "Join/leave a public role";
+  roles = process.env.PUBLIC_ROLES ? process.env.PUBLIC_ROLES.split(",") : null;
+  roleEmbedFields = [];
+  oldEmbed = null;
 
-  async execute(bot) {
-    const channel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
+  async execute(bot: Client) {
+    const channel = <TextChannel>bot.channels.cache.get(process.env.ROLES_CHANNEL);
     const fetchedMessages = await channel.messages.fetch({ limit: 50 });
 
     this.oldEmbed = fetchedMessages.find(msg => {
@@ -92,4 +92,4 @@ class Roles {
   }
 }
 
-module.exports = new Roles;
+export = new Roles();

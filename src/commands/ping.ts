@@ -1,13 +1,12 @@
-const { MessageEmbed } = require("discord.js");
+import { Command, CommandParams } from "../types";
+import { MessageEmbed } from "discord.js";
 
-class Ping {
-  constructor() {
-    this.name = "ping";
-    this.aliases = ["pong"];
-    this.description = "Get the avarage heartbeat ping of the websocket";
-  }
+class Ping implements Command {
+  name = "ping";
+  aliases = ["pong"];
+  description = "Get the avarage heartbeat ping of the websocket";
 
-  execute({ message }) {
+  execute({ message }: CommandParams) {
     const pingEmbed = new MessageEmbed()
       .setColor("#1a9306")
       .setTitle("Pong 🏓")
@@ -19,4 +18,4 @@ class Ping {
   }
 }
 
-module.exports = new Ping;
+export = new Ping();

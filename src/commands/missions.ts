@@ -1,14 +1,16 @@
-class Missions {
-  constructor() {
-    this.name = "missions";
-    this.aliases = ["gm", "guildmissions"];
-    this.description = "Alert members for joining Guild Missions and provide useful info to them";
-  }
+import { VoiceChannel } from "discord.js";
+import { Command, CommandParams } from "../types";
 
-  async execute({ message, isOwner, isRanking }) {
+class Missions implements Command {
+  name = "missions";
+  aliases = ["gm", "guildmissions"];
+  description = "Alert members for joining Guild Missions and provide useful info to them";
+
+  async execute({ message, isOwner, isRanking }: CommandParams) {
     // TODO: Investigate negative checks for when both isOwner and isRanking is needed
     if (isOwner || isRanking) {
-      const missionsChannel = message.client.channels.cache.get(process.env.MISSIONS_CHANNEL);
+      // TODO: Type Casting
+      const missionsChannel = <VoiceChannel>message.client.channels.cache.get(process.env.MISSIONS_CHANNEL);
       const membersToMention = missionsChannel.members.array().map((member) => `<@!${member.id}>`);
 
       return message.channel.send(
@@ -25,4 +27,4 @@ class Missions {
   }
 }
 
-module.exports = new Missions;
+export = new Missions();

@@ -1,14 +1,14 @@
-class Help {
-  constructor() {
-    this.name = "help";
-    this.args = false;
-    this.description = "List all of my commands or info about a specific command.";
-    this.aliases = ["commands"];
-    this.usage = "[command name]";
-  }
+import { Command, CommandParams } from "../types";
+
+class Help implements Command {
+  name = "help";
+  description = "List all of my commands or info about a specific command.";
+  args = false;
+  aliases = ["commands"];
+  usage = "[command name]";
 
   // TODO: Clean up the mess
-  execute({ message, args }) {
+  execute({ message, args }: CommandParams) {
     const { commands } = message.client;
     const data = [];
 
@@ -39,4 +39,4 @@ class Help {
   }
 }
 
-module.exports = new Help;
+export = new Help();

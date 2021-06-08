@@ -1,13 +1,12 @@
-const { MessageEmbed } = require("discord.js");
-const logger = require("../utils/logger");
+import { Client, TextChannel, MessageReaction, MessageEmbed } from "discord.js";
+import { StaticCommand } from "../types";
+import { logger } from "../utils/logger";
 
-class Starboard {
-  constructor() {
-    this.name = "starboard";
-  }
+class Starboard implements StaticCommand {
+  name = "starboard";
 
-  async handleReaction(bot, reaction, remove = false) {
-    const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
+  async handleReaction(bot: Client, reaction: MessageReaction, remove = false) {
+    const starChannel = <TextChannel>bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
     const message = reaction.message;
 
     if (message.partial) {
@@ -71,4 +70,4 @@ class Starboard {
   }
 }
 
-module.exports = new Starboard;
+export = new Starboard();

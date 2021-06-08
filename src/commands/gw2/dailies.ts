@@ -1,16 +1,15 @@
-const { MessageEmbed } = require("discord.js");
-const { sortAlphabetically } = require("../../utils");
-const { gw2api } = require("../../utils/api");
-const { Achievements } = require("../../models");
-const { fractalsData } = require("../../utils/gameData");
+import { MessageEmbed } from "discord.js";
+import { sortAlphabetically } from "../../utils";
+import { gw2api } from "../../utils/api";
+import { fractalsData } from "../../utils/gameData";
+import { Achievements } from "../../models";
+import { Command, CommandParams } from "../../types";
 
-class Dailies {
-  constructor() {
-    this.name = "dailies";
-    this.description = "See today's dailies";
-  }
+class Dailies implements Command {
+  name = "dailies";
+  description = "See today's dailies";
 
-  async execute({ message }) {
+  async execute({ message }: CommandParams) {
     const dailies = await gw2api.achievements().daily().get();
     const DailiesEmbed = new MessageEmbed().setTitle("Dailies");
     const categories = ["PvE", "PvP", "WvW", "Fractals"];
@@ -50,6 +49,7 @@ class Dailies {
       );
 
       if (category === "fractals") {
+        // TODO: ts(2569) requires downlevelIteration
         const dailyFractals = [...normFractals, ...recFractals].sort((a, b) => sortAlphabetically(a, b)).join("\n");
         DailiesEmbed.addField("Fractals", dailyFractals);
       } else {
@@ -65,4 +65,4 @@ class Dailies {
   }
 }
 
-module.exports = new Dailies;
+export = new Dailies();

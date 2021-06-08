@@ -1,10 +1,10 @@
-class Eval {
-  constructor() {
-    this.name = "eval";
-    this.description = "Evaluate JS code";
-  }
+import { Command, CommandParams } from "../types";
 
-  execute({ message, isOwner }) {
+class Eval implements Command {
+  name = "eval";
+  description = "Evaluate JS code";
+
+  execute({ message, isOwner }: CommandParams) {
     if (!isOwner) return;
 
     const clean = text => {
@@ -32,4 +32,4 @@ class Eval {
   }
 }
 
-module.exports = new Eval;
+export = new Eval();

@@ -1,16 +1,15 @@
-const { validateKey } = require("../utils");
-const { gw2api } = require("../utils/api");
-const { Keys } = require("../models");
-const logger = require("../utils/logger");
+import { validateKey } from "../utils";
+import { gw2api } from "../utils/api";
+import { Keys } from "../models";
+import { logger } from "../utils/logger";
+import { Command, CommandParams } from "../types";
 
-class Key {
-  constructor() {
-    this.name = "key";
-    this.args = true;
-    this.description = "Add your GW2 API key";
-  }
+class Key implements Command {
+  name = "key";
+  args = true;
+  description = "Add your GW2 API key";
 
-  async execute({ message, args }) {
+  async execute({ message, args }: CommandParams) {
     switch (args[0]) {
       case "add": {
         const key = args[1];
@@ -63,4 +62,4 @@ class Key {
   }
 }
 
-module.exports = new Key;
+export = new Key();

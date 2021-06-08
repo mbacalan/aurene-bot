@@ -1,14 +1,13 @@
-const { Guild } = require("../models");
-const { redisClient } = require("../utils/api");
-const logger = require("../utils/logger");
+import { Command, CommandParams } from "../types";
+import { Guild } from "../models";
+import { redisClient } from "../utils/api";
+import { logger } from "../utils/logger";
 
-class Prefix {
-  constructor() {
-    this.name = "prefix";
-    this.description = "Change bot's prefix";
-  }
+class Prefix implements Command {
+  name = "prefix";
+  description = "Change bot's prefix";
 
-  async execute({ message, args, isOwner, isRanking }) {
+  async execute({ message, args, isOwner, isRanking }: CommandParams) {
     if (!args.length) {
       redisClient.get("prefix", (err, val) => {
         if (err) {
@@ -35,4 +34,4 @@ class Prefix {
   }
 }
 
-module.exports = new Prefix;
+export = new Prefix();

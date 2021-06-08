@@ -1,15 +1,14 @@
-const { MessageEmbed } = require("discord.js");
-const { pollEmojis, pollEmojiUnicodes } = require("../utils/emojiData");
+import { MessageEmbed } from "discord.js";
+import { Command, CommandParams } from "../types";
+import { pollEmojis, pollEmojiUnicodes } from "../utils/emojiData";
 
-class Poll {
-  constructor() {
-    this.name = "poll";
-    this.description = "Make a poll with given arguments";
-    this.args = true;
-    this.usage = "(optional role to tag) {question} [option1] [option2]";
-  }
+class Poll implements Command {
+  name = "poll";
+  description = "Make a poll with given arguments";
+  args = true;
+  usage = "(optional role to tag) {question} [option1] [option2]";
 
-  async execute({ message }) {
+  async execute({ message }: CommandParams) {
     // Get the text inside parenthesis
     const role = message.content.match(/\(([^)]+)\)/);
     // Get the text inside curly brackets
@@ -55,4 +54,4 @@ class Poll {
   }
 }
 
-module.exports = new Poll;
+export = new Poll();

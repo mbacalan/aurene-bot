@@ -1,19 +1,18 @@
-const { MessageEmbed } = require("discord.js");
-const { endGiveaway, createGiveawayEntryCollector } = require("../utils");
-const { Guild } = require("../models");
-const moment = require("moment");
-const logger = require("../utils/logger");
+import moment from "moment";
+import { Message, MessageEmbed } from "discord.js";
+import { Guild } from "../models";
+import { endGiveaway, createGiveawayEntryCollector } from "../utils";
+import { logger } from "../utils/logger";
+import { Command, CommandParams } from "../types";
 
-class Giveaway {
-  constructor() {
-    this.name = "giveaway";
-    this.description = "Create a giveaway";
-    this.args = true;
-    this.usage = "Create";
-    this.giveawayChannel = null;
-  }
+class Giveaway implements Command {
+  name = "giveaway";
+  description = "Create a giveaway";
+  args = true;
+  usage = "Create";
+  giveawayChannel = null;
 
-  async execute({ message, args }) {
+  async execute({ message, args }: CommandParams) {
     // TODO: Add error handling for if GIVEAWAY_CHANNEL is unset, get GIVEAWAY_CHANNEL from guild config
     this.giveawayChannel = message.client.channels.cache.get(process.env.GIVEAWAY_CHANNEL);
 
@@ -32,7 +31,7 @@ class Giveaway {
     }
   }
 
-  async create(message) {
+  async create(message: Message) {
     if (message.channel.id != this.giveawayChannel) {
       message.reply(`you can only create giveaways in ${this.giveawayChannel} channel.`);
       return false;
@@ -83,7 +82,9 @@ class Giveaway {
       .addField("Duration", duration, true)
       .setFooter("Enter this giveaway by reacting with checkmark below.");
 
-    const giveawayMessage = await message.channel.send(role, infoEmbed)
+
+    // TODO: Type Casting
+    const giveawayMessage = <Message>await message.channel.send(role, infoEmbed)
       .catch(() => {
         message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
           "Use the reaction below to enter. " +
@@ -130,4 +131,4 @@ class Giveaway {
   }
 }
 
-module.exports = new Giveaway;
+export = new Giveaway();

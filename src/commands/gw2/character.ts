@@ -1,19 +1,18 @@
-const { Keys } = require("../../models");
-const { MessageEmbed } = require("discord.js");
-const { gw2api } = require("../../utils/api");
-const { formatAge, sortAlphabetically } = require("../../utils");
-const { professions } = require("../../utils/gameData");
-const logger = require("../../utils/logger");
+import { MessageEmbed } from "discord.js";
+import { Keys } from "../../models";
+import { gw2api } from "../../utils/api";
+import { formatAge, sortAlphabetically } from "../../utils";
+import { professions } from "../../utils/gameData";
+import { logger } from "../../utils/logger";
+import { Command, CommandParams } from "../../types";
 
-class Character {
-  constructor() {
-    this.name = "character";
-    this.args = true;
-    this.description = "See your GW2 character information";
-    this.usage = "list/info charname";
-  }
+class Character implements Command {
+  name = "character";
+  args = true;
+  description = "See your GW2 character information";
+  usage = "list/info charname";
 
-  async execute({ message, args }) {
+  async execute({ message, args }: CommandParams) {
     const [arg, ...charName] = args;
     const { key, accountName } = await Keys.findOne({ discordId: message.author.id });
 
@@ -81,4 +80,4 @@ class Character {
   }
 }
 
-module.exports = new Character;
+export = new Character();

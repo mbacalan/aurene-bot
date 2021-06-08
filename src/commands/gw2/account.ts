@@ -1,16 +1,15 @@
-const { Keys, Worlds } = require("../../models");
-const { MessageEmbed } = require("discord.js");
-const { gw2api, getLeadingGuilds } = require("../../utils/api");
-const { formatAge, filterExpansions } = require("../../utils");
+import { MessageEmbed } from "discord.js";
+import { Keys, Worlds } from "../../models";
+import { gw2api, getLeadingGuilds } from "../../utils/api";
+import { formatAge, filterExpansions } from "../../utils";
+import { Command, CommandParams } from "../../types";
 
-class Account {
-  constructor() {
-    this.name = "account";
-    this.args = false;
-    this.description = "See your GW2 account information";
-  }
+class Account implements Command {
+  name = "account";
+  args = false;
+  description = "See your GW2 account information";
 
-  async execute({ message }) {
+  async execute({ message }: CommandParams) {
     const { key } = await Keys.findOne({ discordId: message.author.id });
 
     if (!key) {
@@ -45,10 +44,10 @@ class Account {
       .addField("\u200b", "\u200b", true)
       .addField("Leads", guilds, true);
 
-    await message.channel.send(accountEmbed).catch(() => {
+    message.channel.send(accountEmbed).catch(() => {
       message.channel.send("I'm lacking permissions to send an embed!");
     });
   }
 }
 
-module.exports = new Account;
+export = new Account();

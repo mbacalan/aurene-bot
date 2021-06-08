@@ -1,13 +1,12 @@
-const { buildDbFromApi } = require("../utils/caching");
-const logger = require("../utils/logger");
+import { Command, CommandParams } from "../types";
+import { buildDbFromApi } from "../utils/caching";
+import { logger } from "../utils/logger";
 
-class RebuildCache {
-  constructor() {
-    this.name = "rebuildcache";
-    this.description = "Rebuild Cache";
-  }
+class RebuildCache implements Command {
+  name = "rebuildcache";
+  description = "Rebuild Cache";
 
-  async execute({ message, isOwner }) {
+  async execute({ message, isOwner }: CommandParams) {
     if (!isOwner) return;
 
     logger.info("(Re)building API cache");
@@ -19,4 +18,4 @@ class RebuildCache {
   }
 }
 
-module.exports = new RebuildCache();
+export = new RebuildCache();
