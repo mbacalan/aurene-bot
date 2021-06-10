@@ -12,7 +12,7 @@ const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
 
 bot.commands = new discord.Collection();
 
-glob("./commands/**/*.js", function registerCommands(error, files) {
+glob("./commands/**/*.js", { cwd: 'build' }, (error, files) => {
   files.forEach((file) => {
     const command = require(file);
     bot.commands.set(command.name, command);
