@@ -13,7 +13,7 @@ class Roles implements Command {
   oldEmbed = null;
 
   async execute(bot: Client) {
-    const channel = <TextChannel>bot.channels.cache.get(process.env.ROLES_CHANNEL);
+    const channel = bot.channels.cache.get(process.env.ROLES_CHANNEL) as TextChannel;
     const fetchedMessages = await channel.messages.fetch({ limit: 50 });
 
     this.oldEmbed = fetchedMessages.find(msg => {

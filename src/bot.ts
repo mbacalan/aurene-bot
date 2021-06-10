@@ -61,9 +61,8 @@ bot.on("message", async message => {
 });
 
 bot.on("messageReactionAdd", async (reaction, author) => {
-  // TODO: Type Casting
-  const starboard = <StaticCommand>bot.commands.get("starboard");
-  const roles = <StaticCommand>bot.commands.get("roles");
+  const starboard: StaticCommand = bot.commands.get("starboard");
+  const roles: StaticCommand = bot.commands.get("roles");
 
   const reactionIsValid = await checkReactionValidity(bot, reaction, author);
   const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
@@ -78,9 +77,8 @@ bot.on("messageReactionAdd", async (reaction, author) => {
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
-  // TODO: Type Casting
-  const starboard = <StaticCommand>bot.commands.get("starboard");
-  const roles = <StaticCommand>bot.commands.get("roles");
+  const starboard: StaticCommand = bot.commands.get("starboard");
+  const roles: StaticCommand = bot.commands.get("roles");
 
   if (reaction.message.partial) {
     try {

@@ -83,10 +83,9 @@ class Giveaway implements Command {
       .setFooter("Enter this giveaway by reacting with checkmark below.");
 
 
-    // TODO: Type Casting
-    const giveawayMessage = <Message>await message.channel.send(role, infoEmbed)
+    const giveawayMessage = await message.channel.send(role, infoEmbed)
       .catch(() => {
-        message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
+        return message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
           "Use the reaction below to enter. " +
           `This giveaway will end in **${intDuration} ${durationType}**.`);
       });

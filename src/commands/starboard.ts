@@ -6,7 +6,7 @@ class Starboard implements StaticCommand {
   name = "starboard";
 
   async handleReaction(bot: Client, reaction: MessageReaction, remove = false) {
-    const starChannel = <TextChannel>bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
+    const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL) as TextChannel;
     const message = reaction.message;
 
     if (message.partial) {
