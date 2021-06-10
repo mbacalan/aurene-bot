@@ -2,14 +2,14 @@ import moment from "moment";
 import { Message, MessageEmbed } from "discord.js";
 import { Guild } from "../models";
 import { endGiveaway, createGiveawayEntryCollector } from "../utils";
-import { logger } from "../utils/logger";
+import logger from "../utils/logger";
 import { Command, CommandParams } from "../types";
 
 class Giveaway implements Command {
   name = "giveaway";
   description = "Create a giveaway";
   args = true;
-  usage = "Create";
+  usage = "create";
   giveawayChannel = null;
 
   async execute({ message, args }: CommandParams) {
@@ -33,7 +33,7 @@ class Giveaway implements Command {
 
   async create(message: Message) {
     if (message.channel.id != this.giveawayChannel) {
-      message.reply(`you can only create giveaways in ${this.giveawayChannel} channel.`);
+      message.reply(`you can only create giveaways in <#${this.giveawayChannel}> channel.`);
       return false;
     }
 

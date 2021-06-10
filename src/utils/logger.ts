@@ -29,7 +29,7 @@ const logTransports = {
   ),
 };
 
-export const logger = createLogger({
+const logger = createLogger({
   format: format.combine(
     format.errors({ stack: true }),
     format.metadata({ fillExcept: ["message", "level"] }),
@@ -52,3 +52,5 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 add(logger);
+
+export = logger;

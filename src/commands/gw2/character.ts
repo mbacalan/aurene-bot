@@ -3,7 +3,7 @@ import { Keys } from "../../models";
 import { gw2api } from "../../utils/api";
 import { formatAge, sortAlphabetically } from "../../utils";
 import { professions } from "../../utils/gameData";
-import { logger } from "../../utils/logger";
+import logger from "../../utils/logger";
 import { Command, CommandParams } from "../../types";
 
 class Character implements Command {

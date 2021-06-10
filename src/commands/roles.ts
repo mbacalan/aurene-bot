@@ -2,7 +2,7 @@ import { Command } from "../types";
 import { MessageEmbed, Client } from "discord.js";
 import emoji from "emoji-dictionary";
 import { roleEmojis, roleEmojiUnicodes } from "../utils/emojiData";
-import { logger } from "../utils/logger";
+import logger from "../utils/logger";
 import { TextChannel } from "discord.js";
 
 class Roles implements Command {

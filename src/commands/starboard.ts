@@ -1,6 +1,6 @@
 import { Client, TextChannel, MessageReaction, MessageEmbed } from "discord.js";
 import { StaticCommand } from "../types";
-import { logger } from "../utils/logger";
+import logger from "../utils/logger";
 
 class Starboard implements StaticCommand {
   name = "starboard";
@@ -28,7 +28,7 @@ class Starboard implements StaticCommand {
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
 
-      if (!starReactions || (starReactions && starReactions.count < 3)) return;
+      if (!starReactions || (starReactions && starReactions.count < 2)) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author, true)

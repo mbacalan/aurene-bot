@@ -1,7 +1,7 @@
 import { validateKey } from "../utils";
 import { gw2api } from "../utils/api";
 import { Keys } from "../models";
-import { logger } from "../utils/logger";
+import logger from "../utils/logger";
 import { Command, CommandParams } from "../types";
 
 class Key implements Command {

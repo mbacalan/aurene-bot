@@ -6,7 +6,7 @@ import Guild from "./models/guilds";
 import { StaticCommand } from "./types";
 import { checkGiveawayOnStartup, checkReactionValidity } from "./utils";
 import CommandHandler from "./utils/executeCommand";
-import { logger } from "./utils/logger";
+import logger from "./utils/logger";
 
 const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
 
