@@ -5,7 +5,8 @@
   "main": "bot.js",
   "scripts": {
     "start": "node build/bot.js",
-    "dev": "nodemon start"
+    "dev": "tsc --watch",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
