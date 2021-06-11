@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
+import { IBoss } from "../types";
 
-const bossSchema = new mongoose.Schema({
+const bossSchema = new Schema<IBoss>({
   name: {
     type: String,
     required: true,
@@ -23,6 +24,4 @@ const bossSchema = new mongoose.Schema({
   },
 });
 
-const Bosses = mongoose.model("gw2.bosses", bossSchema);
-
-module.exports = Bosses;
+export const Bosses = model<IBoss>("gw2.bosses", bossSchema);

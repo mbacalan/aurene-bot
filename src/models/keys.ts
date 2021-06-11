@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
+import { IKey } from '../types';
 
-const keySchema = new mongoose.Schema({
+const keySchema = new Schema<IKey>({
   discordId: {
     type: String,
     required: true,
@@ -23,6 +24,4 @@ const keySchema = new mongoose.Schema({
   },
 });
 
-const Keys = mongoose.model("Keys", keySchema);
-
-module.exports = Keys;
+export const Keys = model<IKey>("Keys", keySchema);

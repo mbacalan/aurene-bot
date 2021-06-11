@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
+import { ISpecialization } from '../types';
 
-const specializationsSchema = new mongoose.Schema({
+const specializationsSchema = new Schema<ISpecialization>({
   id: {
     type: Number,
     required: true,
@@ -27,6 +28,4 @@ const specializationsSchema = new mongoose.Schema({
   },
 });
 
-const Specializations = mongoose.model("gw2.specializations", specializationsSchema);
-
-module.exports = Specializations;
+export const Specializations = model<ISpecialization>("gw2.specializations", specializationsSchema);

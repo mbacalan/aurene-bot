@@ -1,7 +1,8 @@
-const mongoose = require("mongoose");
-const userSchema = require("./users");
+import { Schema } from "mongoose";
+import userSchema from "./users";
+import { IGiveaway } from '../types';
 
-const giveawaySchema = new mongoose.Schema({
+const giveawaySchema = new Schema<IGiveaway>({
   _id: {
     type: String,
     required: true,
@@ -36,4 +37,4 @@ const giveawaySchema = new mongoose.Schema({
   },
 });
 
-module.exports = giveawaySchema;
+export = giveawaySchema;

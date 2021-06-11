@@ -1,7 +1,8 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
+import { IWinner } from "../types";
 
 // TODO: Maybe just use userSchema for winners?
-const winnerSchema = new mongoose.Schema({
+const winnerSchema = new Schema<IWinner>({
   userId: {
     type: String,
     required: true,
@@ -16,6 +17,4 @@ const winnerSchema = new mongoose.Schema({
   },
 });
 
-const Winners = mongoose.model("Winners", winnerSchema);
-
-module.exports = Winners;
+export const Winners = model<IWinner>("Winners", winnerSchema);

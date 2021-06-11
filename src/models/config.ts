@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import { Schema } from "mongoose";
+import { IConfig } from '../types';
 
-const configSchema = new mongoose.Schema({
+const configSchema = new Schema<IConfig>({
   prefix: {
     type: String,
     required: true,
@@ -32,4 +33,4 @@ const configSchema = new mongoose.Schema({
   },
 });
 
-module.exports = configSchema;
+export = configSchema;
