@@ -1,5 +1,5 @@
 import { Command, CommandParams } from "../types";
-import { Guild } from "../models";
+import { Guilds } from "../models";
 import { redisClient } from "../utils/api";
 import logger from "../utils/logger";
 
@@ -24,12 +24,12 @@ class Prefix implements Command {
       return message.reply("prefix can only be 1 character.");
     }
 
-    const guild = await Guild.findOne({ _id: message.guild.id });
+    const guild = await Guilds.findOne({ _id: message.guild.id });
 
     guild.config.prefix = args[0];
 
     guild.save();
-    redisClient.set("prefix", process.env.PREFIX);
+    redisClient.set("prefix", args[0]);
     message.react("✅");
   }
 }

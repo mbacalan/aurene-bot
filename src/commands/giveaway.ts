@@ -1,9 +1,9 @@
 import moment from "moment";
 import { Message, MessageEmbed } from "discord.js";
-import { Guild } from "../models";
+import { Guilds } from "../models";
 import { endGiveaway, createGiveawayEntryCollector } from "../utils";
 import logger from "../utils/logger";
-import { Command, CommandParams } from "../types";
+import { Command, CommandParams, IGiveaway } from "../types";
 
 class Giveaway implements Command {
   name = "giveaway";
@@ -92,7 +92,7 @@ class Giveaway implements Command {
 
     await giveawayMessage.react("✅");
 
-    const guild = await Guild.findOne({ _id: message.guild.id });
+    const guild = await Guilds.findOne({ _id: message.guild.id });
 
     try {
       guild.giveaways.push({
@@ -103,7 +103,7 @@ class Giveaway implements Command {
         item: item,
         duration: duration,
         endTime: endTime,
-      });
+      } as IGiveaway);
 
       await guild.save();
     } catch (error) {

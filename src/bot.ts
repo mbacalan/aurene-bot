@@ -2,7 +2,7 @@ require("dotenv").config();
 require("./utils/db");
 import discord from "discord.js";
 import glob from "glob";
-import Guild from "./models/guilds";
+import { Guilds } from "./models/guilds";
 import { StaticCommand } from "./types";
 import { checkGiveawayOnStartup, checkReactionValidity } from "./utils";
 import CommandHandler from "./utils/executeCommand";
@@ -35,10 +35,10 @@ bot.on("ready", async () => {
   });
 
   bot.guilds.cache.forEach(async (guild) => {
-    const guildDoc = await Guild.findOne({ _id: guild.id });
+    const guildDoc = await Guilds.findOne({ _id: guild.id });
 
     if (!guildDoc) {
-      await Guild.create({
+      await Guilds.create({
         _id: guild.id,
       });
 

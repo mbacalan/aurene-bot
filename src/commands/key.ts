@@ -51,7 +51,7 @@ class Key implements Command {
         }
 
         try {
-          await Keys.deleteOne(key);
+          await Keys.deleteOne({ key });
           message.reply("your key has been deleted!");
         } catch (error) {
           message.reply("there was an error with removing your key. Please contact my author");

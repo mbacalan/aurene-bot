@@ -1,6 +1,6 @@
-const logger = require("./logger");
-const { redisClient } = require("./api");
-const { Guild } = require("../models");
+import logger from "./logger";
+import { redisClient } from "./api";
+import { Guilds } from "../models";
 import { Client, Message } from "discord.js";
 import { Command } from "../types";
 
@@ -27,12 +27,12 @@ class CommandHandler {
     });
 
     if (!prefix) {
-      const guild = await Guild.findOne({ _id: message.guild.id });
+      const guild = await Guilds.findOne({ _id: message.guild.id });
 
       if (!guild.config) {
-        await guild.config.push({
+        guild.config = {
           prefix: process.env.PREFIX,
-        });
+        };
 
         redisClient.set("prefix", process.env.PREFIX);
         return process.env.PREFIX;
@@ -52,7 +52,7 @@ class CommandHandler {
     const prefix = await this.getPrefix(message);
 
     // Prefix is either what's defined or the tag of the bot
-    const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${await prefix})\\s*`);
+    const prefixRegex = new RegExp(`^(<@!?${bot.user.id}>|\\${prefix})\\s*`);
 
     if (!prefixRegex.test(message.content)) {
       return false;
