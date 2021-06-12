@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import { Moment } from "moment";
+import { Types, Document } from "mongoose";
 
 declare module "discord.js" {
   interface Client {
@@ -57,12 +58,14 @@ export interface IAchievement {
   description: string;
 }
 
+// TODO: endTime is used as Date or Moment but the union type fails
 export interface IGiveaway {
+  id: string,
   _id: string,
   userId: string,
   userTag: string,
   creationTime: Date | Moment,
-  endTime: Date | Moment,
+  endTime: any,
   item: string,
   duration: string,
   entries: IUser[]
@@ -71,8 +74,8 @@ export interface IGiveaway {
 export interface IGuild {
   _id: string,
   config: IConfig,
-  giveaways: IGiveaway[],
-  giveawayWinners: [],
+  giveaways: Types.DocumentArray<IGiveaway & Document>,
+  giveawayWinners: object[],
 }
 
 export interface IBoss {
