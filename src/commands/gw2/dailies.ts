@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { sortAlphabetically } from "../../utils";
 import { gw2api } from "../../utils/api";
-import { fractalsData } from "../../utils/gameData";
+import gameData from "../../utils/gameData";
 import { Achievements } from "../../models";
 import { Command, CommandParams } from "../../types";
 
@@ -30,7 +30,7 @@ class Dailies implements Command {
             const tempFractal = dAchv.name.replace("Daily Recommended Fractal—", "Recommended ");
 
             // Check if a fractal in fractalsData has the scale of rec. fractal inside it's array of values
-            for (const [key, value] of Object.entries(fractalsData)) {
+            for (const [key, value] of Object.entries(gameData.fractals)) {
               const recFractalScale = parseInt(tempFractal.replace(/[^\d.]/g, ""), 10);
 
               if (value.includes(recFractalScale)) recFractals.push(`${tempFractal} - ${key}`);
@@ -53,7 +53,7 @@ class Dailies implements Command {
         const dailyFractals = [...normFractals, ...recFractals].sort((a, b) => sortAlphabetically(a, b)).join("\n");
         DailiesEmbed.addField("Fractals", dailyFractals);
       } else {
-        const dailyArr = arr.sort((a, b) => sortAlphabetically(a, b)).join("\n");
+        const dailyArr = arr.sort((a: string, b: string) => sortAlphabetically(a, b)).join("\n");
         DailiesEmbed.addField(categories[i], dailyArr);
       }
     }

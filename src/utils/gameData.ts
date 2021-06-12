@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   professions: {
     elementalist: {
       color: "0xDC423E",
@@ -84,7 +84,7 @@ module.exports = {
     "[&BBABAAA=][&BJIBAAA=][&BLkCAAA=][&BH8HAAA=][&BBEDAAA=][&BEICAAA=]",
     "[&BCECAAA=][&BC0AAAA=][&BDoBAAA=][&BIkHAAA=][&BO4CAAA=][&BIUCAAA=]",
   ],
-  fractalsData: {
+  fractals: {
     "Aquatic Ruins": [
       7,
       26,

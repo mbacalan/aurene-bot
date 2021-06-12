@@ -49,7 +49,7 @@ const roleEmojiUnicodes = [
   "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣",
 ];
 
-module.exports = {
+export {
   pollEmojis,
   pollEmojiUnicodes,
   roleEmojis,

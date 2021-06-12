@@ -1,10 +1,12 @@
-const mongoose = require("mongoose");
-const logger = require("./logger");
-const { gw2api } = require("./api");
-const { Keys, Builds, Winners, Guild } = require("../models");
-const { buildDbFromApi } = require("./caching");
+import { Types, Document, Number } from "mongoose";
+import logger from "./logger";
+import { gw2api } from "./api";
+import { Keys, Builds, Winners, Guilds } from "../models";
+import { buildDbFromApi } from "./caching";
+import { Client, Message, MessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import { IGuild } from "../types";
 
-async function checkNewBuild(bot) {
+async function checkNewBuild(bot: Client) {
   const currentBuild = await Builds.findOne({});
   const liveBuild = await gw2api.build().live().get();
 
@@ -22,12 +24,12 @@ async function checkNewBuild(bot) {
   }
 }
 
-async function checkGiveawayOnStartup(bot, guild) {
+async function checkGiveawayOnStartup(bot: Client, guild: IGuild & Document) {
   if (!guild.giveaways && !guild.giveaways.length) {
     return false;
   }
 
-  const giveawayChannel = bot.channels.cache.get(process.env.GIVEAWAY_CHANNEL);
+  const giveawayChannel = bot.channels.cache.get(process.env.GIVEAWAY_CHANNEL) as TextChannel;
 
   guild.giveaways.forEach(async (giveaway) => {
     const giveawayMessage = await giveawayChannel.messages.fetch(giveaway._id);
@@ -41,16 +43,16 @@ async function checkGiveawayOnStartup(bot, guild) {
     setTimeout(async () => {
       await endGiveaway(giveawayMessage, giveawayChannel);
       entryCollector.stop();
-    }, giveaway.endTime - new Date());
+    }, giveaway.endTime - Date.now());
   });
 }
 
-function createGiveawayEntryCollector(guild, giveawayChannel, giveawayMessage) {
+function createGiveawayEntryCollector(guild: IGuild & Document, giveawayChannel: TextChannel, giveawayMessage: Message) {
   const entryCollector = giveawayMessage.createReactionCollector(reaction => ["✅", "❗"].includes(reaction.emoji.name));
 
   entryCollector.on("collect", async (reaction, user) => {
     const giveaway = guild.giveaways.id(reaction.message.id);
-    const isCreator = await giveaway.userId == user.id;
+    const isCreator = giveaway.userId == user.id;
 
     if (isCreator && reaction.emoji.name == "❗") {
       await endGiveaway(giveawayMessage, giveawayChannel);
@@ -58,8 +60,8 @@ function createGiveawayEntryCollector(guild, giveawayChannel, giveawayMessage) {
       return false;
     }
 
-    const entries = await giveaway.entries;
-    const hasEntered = await entries.find(entry => entry.userId == user.id);
+    const entries = giveaway.entries;
+    const hasEntered = entries.find(entry => entry.userId == user.id);
 
     if (hasEntered) {
       return false;
@@ -70,21 +72,20 @@ function createGiveawayEntryCollector(guild, giveawayChannel, giveawayMessage) {
       return false;
     }
 
-    await entries.push({
+    entries.push({
       userId: user.id,
       userTag: user.tag,
-      entryTime: `${new Date()}`,
     });
 
-    guild.save();
+    await guild.save();
   });
 
   return entryCollector;
 }
 
-async function endGiveaway(giveawayMessage, channel) {
-  const guild = await Guild.findOne({ _id: giveawayMessage.guild.id });
-  const giveaway = await guild.giveaways.id(giveawayMessage.id);
+async function endGiveaway(giveawayMessage: Message, channel: TextChannel) {
+  const guild = await Guilds.findOne({ _id: giveawayMessage.guild.id });
+  const giveaway = guild.giveaways.id(giveawayMessage.id);
   const winner = giveaway.entries[giveaway.entries.length * Math.random() | 0];
 
   if (!winner) {
@@ -95,7 +96,7 @@ async function endGiveaway(giveawayMessage, channel) {
   }
 
   const winnerDoc = new Winners({
-    _id: new mongoose.Types.ObjectId(),
+    _id: new Types.ObjectId(),
     userId: winner.userId,
     userTag: winner.userTag,
     item: giveaway.item,
@@ -117,7 +118,7 @@ async function endGiveaway(giveawayMessage, channel) {
   });
 }
 
-async function validateKey(message, key) {
+async function validateKey(message: Message, key: string) {
   const userId = message.author.id;
   const userHasKey = await Keys.findOne({ discordId: userId });
   const keyExists = await Keys.findOne({ key: key });
@@ -148,7 +149,7 @@ async function validateKey(message, key) {
   return true;
 }
 
-function formatAge(age) {
+function formatAge(age: number) {
   const hours = Math.floor(age / 3600);
   const minutes = Math.round((age % 3600) / 60);
 
@@ -166,7 +167,7 @@ function filterExpansions(account) {
     .join("\n");
 }
 
-function sortAlphabetically(a, b) {
+function sortAlphabetically(a: string, b: string) {
   const A = a.toLowerCase();
   const B = b.toLowerCase();
 
@@ -181,7 +182,7 @@ function sortAlphabetically(a, b) {
   return 0;
 }
 
-async function checkReactionValidity(bot, reaction, author) {
+async function checkReactionValidity(bot: Client, reaction: MessageReaction, author: User | PartialUser) {
   const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
   const message = reaction.message;
 
@@ -205,7 +206,7 @@ async function checkReactionValidity(bot, reaction, author) {
   return true;
 }
 
-module.exports = {
+export {
   endGiveaway,
   createGiveawayEntryCollector,
   validateKey,

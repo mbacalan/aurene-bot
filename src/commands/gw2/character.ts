@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { Keys } from "../../models";
 import { gw2api } from "../../utils/api";
 import { formatAge, sortAlphabetically } from "../../utils";
-import { professions } from "../../utils/gameData";
+import gameData from "../../utils/gameData";
 import logger from "../../utils/logger";
 import { Command, CommandParams } from "../../types";
 
@@ -52,7 +52,7 @@ class Character implements Command {
         const { profession, deaths, age, created, name, gender, race } = character;
         const guild = await gw2api.guild().get(character.guild);
         const title = await gw2api.titles().get(character.title).catch(() => "No Title");
-        const professionIcon = professions[profession.toLowerCase()].icon;
+        const professionIcon = gameData.professions[profession.toLowerCase()].icon;
         const deathsPerHour = (deaths / (age / 3600)).toFixed(1);
         const createdAt = new Date(created).toDateString();
         const formattedAge = formatAge(age);

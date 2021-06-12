@@ -1,17 +1,13 @@
-const mongoose = require("mongoose");
-const logger = require("./logger");
+import { connect, connection } from "mongoose";
+import logger from "./logger";
 
-mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
+connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
 }));
 
-const db = mongoose.connection;
+export const db = connection;
 
 db.on("error", () => logger.error("Error connecting to database"));
 db.once("open", () => logger.info("Successfully connected to database"));
-
-module.exports = {
-  db,
-};

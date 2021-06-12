@@ -82,7 +82,6 @@ class Giveaway implements Command {
       .addField("Duration", duration, true)
       .setFooter("Enter this giveaway by reacting with checkmark below.");
 
-
     const giveawayMessage = await message.channel.send(role, infoEmbed)
       .catch(() => {
         return message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +

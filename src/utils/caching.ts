@@ -1,6 +1,6 @@
-const { gw2api } = require("./api");
-const logger = require("./logger");
-const mongoose = require("mongoose");
+import { gw2api } from "./api";
+import logger from "./logger";
+import { model } from "mongoose";
 
 let errors = false;
 const promises = [];
@@ -28,11 +28,11 @@ async function cacheToDbFromApi(endpoint) {
 
   if (!response) return;
 
-  await mongoose.model(`gw2.${endpoint}`).deleteMany({});
-  await mongoose.model(`gw2.${endpoint}`).create(response);
+  await model(`gw2.${endpoint}`).deleteMany({});
+  await model(`gw2.${endpoint}`).create(response);
 }
 
-async function buildDbFromApi() {
+export async function buildDbFromApi() {
   endpoints.forEach(function pushToPromises(endpoint) {
     promises.push(cacheToDbFromApi(endpoint));
   });
@@ -45,7 +45,3 @@ async function buildDbFromApi() {
 
   logger.info("Successfully cached API to DB");
 }
-
-module.exports = {
-  buildDbFromApi,
-};
