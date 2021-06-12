@@ -1,6 +1,5 @@
-import { gw2api } from "./api";
-import logger from "./logger";
 import { model } from "mongoose";
+import { gw2api, logger } from "./";
 
 let errors = false;
 const promises = [];

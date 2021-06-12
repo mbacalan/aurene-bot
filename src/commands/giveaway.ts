@@ -1,9 +1,8 @@
 import moment from "moment";
 import { Message, MessageEmbed } from "discord.js";
 import { Guilds } from "../models";
-import { endGiveaway, createGiveawayEntryCollector } from "../utils";
-import logger from "../utils/logger";
 import { Command, CommandParams, IGiveaway } from "../types";
+import { logger, endGiveaway, createGiveawayEntryCollector } from "../utils";
 
 class Giveaway implements Command {
   name = "giveaway";

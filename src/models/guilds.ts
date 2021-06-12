@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
+import { IGuild } from '../types';
 import configSchema from "./config";
 import giveawaySchema from "./giveaways";
-import { IGuild } from '../types';
 
 const guildSchema = new Schema<IGuild>({
   _id: {

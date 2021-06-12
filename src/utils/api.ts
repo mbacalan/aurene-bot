@@ -1,5 +1,5 @@
-import apiClient from "gw2api-client";
 import redis from "redis";
+import apiClient from "gw2api-client";
 import cacheRedis from "gw2api-client/src/cache/redis.js";
 
 const redisClient = redis.createClient(process.env.REDIS_URL);

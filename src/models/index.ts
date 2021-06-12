@@ -1,21 +1,9 @@
-import { Achievements } from "./achievements";
-import { Bosses } from "./bosses";
-import { Builds } from "./builds";
-import { Guilds } from "./guilds";
-import { Keys } from "./keys";
-import { Specializations } from "./specializations";
-import { Titles } from "./titles";
-import { Winners } from "./winners";
-import { Worlds } from "./worlds";
-
-export {
-  Achievements,
-  Bosses,
-  Builds,
-  Guilds,
-  Keys,
-  Specializations,
-  Titles,
-  Winners,
-  Worlds,
-};
+export * from "./achievements";
+export * from "./bosses";
+export * from "./builds";
+export * from "./guilds";
+export * from "./keys";
+export * from "./specializations";
+export * from "./titles";
+export * from "./winners";
+export * from "./worlds";

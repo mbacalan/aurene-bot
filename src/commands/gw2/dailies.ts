@@ -1,9 +1,8 @@
 import { MessageEmbed } from "discord.js";
-import { sortAlphabetically } from "../../utils";
-import { gw2api } from "../../utils/api";
-import gameData from "../../utils/gameData";
 import { Achievements } from "../../models";
 import { Command, CommandParams } from "../../types";
+import { gw2api, sortAlphabetically } from "../../utils";
+import { gameData } from "../../data/";
 
 class Dailies implements Command {
   name = "dailies";

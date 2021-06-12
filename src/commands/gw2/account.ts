@@ -1,8 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { Keys, Worlds } from "../../models";
-import { gw2api, getLeadingGuilds } from "../../utils/api";
-import { formatAge, filterExpansions } from "../../utils";
 import { Command, CommandParams } from "../../types";
+import { gw2api, getLeadingGuilds, formatAge, filterExpansions } from "../../utils";
 
 class Account implements Command {
   name = "account";

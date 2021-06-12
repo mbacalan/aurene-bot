@@ -1,7 +1,6 @@
-import { Command, CommandParams } from "../types";
 import { Guilds } from "../models";
-import { redisClient } from "../utils/api";
-import logger from "../utils/logger";
+import { Command, CommandParams } from "../types";
+import { redisClient, logger } from "../utils/";
 
 class Prefix implements Command {
   name = "prefix";

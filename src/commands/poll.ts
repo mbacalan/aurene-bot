@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { Command, CommandParams } from "../types";
-import { pollEmojis, pollEmojiUnicodes } from "../utils/emojiData";
+import { pollEmojis, pollEmojiUnicodes } from "../data/";
 
 class Poll implements Command {
   name = "poll";

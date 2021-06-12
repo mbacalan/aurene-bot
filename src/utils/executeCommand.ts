@@ -1,8 +1,7 @@
-import logger from "./logger";
-import { redisClient } from "./api";
-import { Guilds } from "../models";
 import { Client, Message } from "discord.js";
+import { Guilds } from "../models";
 import { Command } from "../types";
+import { logger, redisClient } from "./";
 
 class CommandHandler {
   static instance: CommandHandler;
@@ -95,4 +94,4 @@ class CommandHandler {
   }
 }
 
-export = new CommandHandler();
+export const commandHandler = new CommandHandler();

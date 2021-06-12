@@ -4,9 +4,7 @@ import discord from "discord.js";
 import glob from "glob";
 import { Guilds } from "./models/guilds";
 import { StaticCommand } from "./types";
-import { checkGiveawayOnStartup, checkReactionValidity } from "./utils";
-import CommandHandler from "./utils/executeCommand";
-import logger from "./utils/logger";
+import { logger, commandHandler, checkGiveawayOnStartup, checkReactionValidity } from "./utils";
 
 const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
 
@@ -57,7 +55,7 @@ bot.on("ready", async () => {
 });
 
 bot.on("message", async message => {
-  await CommandHandler.execute(bot, message);
+  await commandHandler.execute(bot, message);
 });
 
 bot.on("messageReactionAdd", async (reaction, author) => {

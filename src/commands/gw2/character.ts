@@ -1,10 +1,8 @@
 import { MessageEmbed } from "discord.js";
 import { Keys } from "../../models";
-import { gw2api } from "../../utils/api";
-import { formatAge, sortAlphabetically } from "../../utils";
-import gameData from "../../utils/gameData";
-import logger from "../../utils/logger";
 import { Command, CommandParams } from "../../types";
+import { gw2api, formatAge, sortAlphabetically, logger } from "../../utils";
+import { gameData } from "../../data/";
 
 class Character implements Command {
   name = "character";

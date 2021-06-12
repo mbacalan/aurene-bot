@@ -1,5 +1,5 @@
-import { Command, CommandParams } from "../types";
 import { Bosses } from "../models";
+import { Command, CommandParams } from "../types";
 
 class Guides implements Command {
   name = "guide";

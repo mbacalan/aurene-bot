@@ -1,6 +1,6 @@
 import { Client, TextChannel, MessageReaction, MessageEmbed } from "discord.js";
 import { StaticCommand } from "../types";
-import logger from "../utils/logger";
+import { logger } from "../utils/";
 
 class Starboard implements StaticCommand {
   name = "starboard";

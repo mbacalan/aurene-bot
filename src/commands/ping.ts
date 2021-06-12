@@ -1,5 +1,5 @@
-import { Command, CommandParams } from "../types";
 import { MessageEmbed } from "discord.js";
+import { Command, CommandParams } from "../types";
 
 class Ping implements Command {
   name = "ping";
