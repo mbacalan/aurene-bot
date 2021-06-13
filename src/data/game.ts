@@ -1,4 +1,4 @@
-export = {
+export const gameData = {
   professions: {
     elementalist: {
       color: "0xDC423E",
