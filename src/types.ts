@@ -1,5 +1,4 @@
 import { Message } from "discord.js";
-import { Moment } from "moment";
 import { Types, Document } from "mongoose";
 
 declare module "discord.js" {
@@ -64,7 +63,7 @@ export interface IGiveaway {
   _id: string,
   userId: string,
   userTag: string,
-  creationTime: Date | Moment,
+  creationTime: Date,
   endTime: any,
   item: string,
   duration: string,

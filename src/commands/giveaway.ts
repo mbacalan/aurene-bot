@@ -1,5 +1,4 @@
-import moment from "moment";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, MessageEmbed, TextChannel } from "discord.js";
 import { Guilds } from "../models";
 import { Command, CommandParams, IGiveaway } from "../types";
 import { logger, endGiveaway, createGiveawayEntryCollector } from "../utils";
@@ -72,8 +71,14 @@ class Giveaway implements Command {
       parse the string into an integer and multiply it with an hour in milliseconds */
     const durationType = duration.includes("m", 1) ? "minute" : "hour";
     const intDuration = parseInt(duration, 10);
-    const endTime = moment().add(intDuration, durationType);
     const role = process.env.GIVEAWAY_ROLE ? `<@&${process.env.GIVEAWAY_ROLE}>` : "@everyone";
+    let endTime = new Date();
+
+    if (durationType == "minute") {
+      endTime.setMinutes(endTime.getMinutes() + intDuration);
+    } else if (durationType == "hour") {
+      endTime.setHours(endTime.getHours() + intDuration);
+    }
 
     const infoEmbed = new MessageEmbed()
       .setTitle(item)
@@ -114,7 +119,7 @@ class Giveaway implements Command {
     setTimeout(async () => {
       await endGiveaway(giveawayMessage, this.giveawayChannel);
       entryCollector.stop();
-    }, endTime.diff(moment(), "milliseconds"));
+    }, endTime.getTime() - Date.now());
 
     [
       message,
