@@ -1,6 +1,6 @@
 {
   "name": "aurenebot",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A Guild Wars 2 themed bot for Discord",
   "main": "bot.js",
   "scripts": {
