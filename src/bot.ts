@@ -1,5 +1,9 @@
-require("dotenv").config();
-require("./utils/db");
+import { resolve } from "path";
+import { config } from "dotenv";
+
+config({ path: resolve(__dirname, "../.env") });
+
+import "./utils/db";
 import discord from "discord.js";
 import glob from "glob";
 import { Guilds } from "./models/guilds";
