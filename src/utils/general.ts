@@ -2,9 +2,7 @@ import { Types, Document } from "mongoose";
 import { Client, Message, MessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Keys, Builds, Winners, Guilds } from "../models";
 import { IGuild } from "../types";
-import { logger } from "./logger";
-import { gw2api } from "./api";
-import { buildDbFromApi } from "./caching";
+import { logger, gw2api, buildDbFromApi } from "./";
 
 async function checkNewBuild(bot: Client) {
   const currentBuild = await Builds.findOne({});

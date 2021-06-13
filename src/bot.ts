@@ -8,7 +8,7 @@ import discord from "discord.js";
 import glob from "glob";
 import { Guilds } from "./models/guilds";
 import { StaticCommand } from "./types";
-import { logger, commandHandler, checkGiveawayOnStartup, checkReactionValidity } from "./utils";
+import { logger, commandHandler, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } from "./utils";
 
 const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
 
@@ -54,8 +54,7 @@ bot.on("ready", async () => {
     await roles.execute(bot);
   }
 
-  // Disabled until related function is fixed
-  // setInterval(async () => await checkNewBuild(bot), 300000);
+  setInterval(async () => await checkNewBuild(bot), 300000);
 });
 
 bot.on("message", async message => {
