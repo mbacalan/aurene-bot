@@ -89,7 +89,10 @@ async function endGiveaway(giveawayMessage: Message, channel: TextChannel) {
   const winner = giveaway.entries[giveaway.entries.length * Math.random() | 0];
 
   if (!winner) {
-    await giveawayMessage.edit("This giveaway has ended. Looks like no one entered!");
+    await giveawayMessage.edit(
+      "This giveaway has ended. Looks like no one entered!",
+      giveawayMessage.embeds[0]
+    );
     await giveaway.remove();
     await guild.save();
     return false;
@@ -111,7 +114,10 @@ async function endGiveaway(giveawayMessage: Message, channel: TextChannel) {
       _id: winnerDoc._id,
     });
 
-    giveawayMessage.edit(`This giveaway has ended. <@${winner.userId}> won ${giveaway.item} from <@${giveaway.userId}>! 🎉`);
+    giveawayMessage.edit(
+      `This giveaway has ended. <@${winner.userId}> won ${giveaway.item} from <@${giveaway.userId}>! 🎉`,
+      giveawayMessage.embeds[0]
+    );
     channel.send(`Congratulations <@${winner.userId}>, you won **${giveaway.item}** from <@${giveaway.userId}>! 🎉`);
     await giveaway.remove();
     await guild.save();

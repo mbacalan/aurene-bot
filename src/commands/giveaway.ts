@@ -8,11 +8,11 @@ class Giveaway implements Command {
   description = "Create a giveaway";
   args = true;
   usage = "create";
-  giveawayChannel = null;
+  giveawayChannel: TextChannel;
 
   async execute({ message, args }: CommandParams) {
     // TODO: Add error handling for if GIVEAWAY_CHANNEL is unset, get GIVEAWAY_CHANNEL from guild config
-    this.giveawayChannel = message.client.channels.cache.get(process.env.GIVEAWAY_CHANNEL);
+    this.giveawayChannel = message.client.channels.cache.get(process.env.GIVEAWAY_CHANNEL) as TextChannel;
 
     switch (args[0]) {
       case "create": {
@@ -30,8 +30,8 @@ class Giveaway implements Command {
   }
 
   async create(message: Message) {
-    if (message.channel.id != this.giveawayChannel) {
-      message.reply(`you can only create giveaways in <#${this.giveawayChannel}> channel.`);
+    if (message.channel.id != this.giveawayChannel.id) {
+      message.reply(`you can only create giveaways in ${this.giveawayChannel} channel.`);
       return false;
     }
 
