@@ -1,5 +1,5 @@
 import { Types, Document } from "mongoose";
-import { Client, Message, MessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Keys, Builds, Winners, Guilds } from "../models";
 import { IGuild } from "../types";
 import { logger, gw2api, buildDbFromApi } from "./";
@@ -14,11 +14,11 @@ async function checkNewBuild(bot: Client) {
     await Builds.create({ build: liveBuild });
 
     logger.info("(Re)building API cache");
-    await bot.user.setStatus("dnd");
-    await bot.user.setActivity("Building API Cache", { type: "LISTENING" });
+    bot.user.setStatus("dnd");
+    bot.user.setActivity("Building API Cache", { type: "LISTENING" });
     await buildDbFromApi();
-    await bot.user.setStatus("online");
-    await bot.user.setActivity("Guild Wars 2");
+    bot.user.setStatus("online");
+    bot.user.setActivity("Guild Wars 2");
   }
 }
 
@@ -46,7 +46,9 @@ async function checkGiveawayOnStartup(bot: Client, guild: IGuild & Document) {
 }
 
 function createGiveawayEntryCollector(guild: IGuild & Document, giveawayChannel: TextChannel, giveawayMessage: Message) {
-  const entryCollector = giveawayMessage.createReactionCollector(reaction => ["✅", "❗"].includes(reaction.emoji.name));
+  const entryCollector = giveawayMessage.createReactionCollector({
+    filter: reaction => ["✅", "❗"].includes(reaction.emoji.name)
+  });
 
   entryCollector.on("collect", async (reaction, user) => {
     const giveaway = guild.giveaways.id(reaction.message.id);
@@ -87,10 +89,7 @@ async function endGiveaway(giveawayMessage: Message, channel: TextChannel) {
   const winner = giveaway.entries[giveaway.entries.length * Math.random() | 0];
 
   if (!winner) {
-    await giveawayMessage.edit(
-      "This giveaway has ended. Looks like no one entered!",
-      giveawayMessage.embeds[0]
-    );
+    await giveawayMessage.edit("This giveaway has ended. Looks like no one entered!");
     await giveaway.remove();
     await guild.save();
     return false;
@@ -113,8 +112,7 @@ async function endGiveaway(giveawayMessage: Message, channel: TextChannel) {
     });
 
     giveawayMessage.edit(
-      `This giveaway has ended. <@${winner.userId}> won ${giveaway.item} from <@${giveaway.userId}>! 🎉`,
-      giveawayMessage.embeds[0]
+      `This giveaway has ended. <@${winner.userId}> won ${giveaway.item} from <@${giveaway.userId}>! 🎉`
     );
     channel.send(`Congratulations <@${winner.userId}>, you won **${giveaway.item}** from <@${giveaway.userId}>! 🎉`);
     await giveaway.remove();
@@ -186,7 +184,7 @@ function sortAlphabetically(a: string, b: string) {
   return 0;
 }
 
-async function checkReactionValidity(bot: Client, reaction: MessageReaction, author: User | PartialUser) {
+async function checkReactionValidity(bot: Client, reaction: MessageReaction | PartialMessageReaction, author: User | PartialUser) {
   const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
   const message = reaction.message;
 

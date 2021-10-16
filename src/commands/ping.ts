@@ -12,7 +12,7 @@ class Ping implements Command {
       .setTitle("Pong 🏓")
       .addField("Websocket Latency:", `${Math.round(message.client.ws.ping)}ms`, true);
 
-    message.channel.send(pingEmbed).catch(() => {
+    message.channel.send({ embeds: [pingEmbed] }).catch(() => {
       message.channel.send(`Websocket latency is ${Math.round(message.client.ws.ping)}ms.`);
     });
   }

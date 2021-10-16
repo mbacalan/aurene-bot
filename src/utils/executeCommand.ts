@@ -71,22 +71,21 @@ class CommandHandler {
     }
 
     if (command.args && !args.length) {
-      let reply = `You didn't provide any arguments, ${message.author}!`;
+      let reply = `You didn't provide any arguments!`;
 
       if (command.usage) {
         reply += `\nThe proper usage would be: \`${process.env.PREFIX}${command.name} ${command.usage}\``;
       }
 
-      return message.channel.send(reply);
+      return message.reply(reply);
     }
 
     try {
       const isOwner = message.author.id == process.env.OWNER;
       const isRanking = message.member.roles.cache.some(role => [process.env.LEADERS, process.env.OFFICERS].includes(role.id));
 
-      message.channel.startTyping();
+      await message.channel.sendTyping();
       await command.execute({ message, args, isOwner, isRanking });
-      message.channel.stopTyping(true);
     } catch (error) {
       logger.error(`Error while executing ${command.name} command `, error);
       await message.react("❌");

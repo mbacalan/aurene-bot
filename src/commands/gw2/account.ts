@@ -35,16 +35,16 @@ class Account implements Command {
       .addField("Has Expansions", expansions, true)
       .addField("World", world.name, true)
       .addField("\u200b", "\u200b", true)
-      .addField("WvW Rank", wvw_rank, true)
-      .addField("PvP Rank", pvp_rank, true)
+      .addField("WvW Rank", String(wvw_rank), true)
+      .addField("PvP Rank", String(pvp_rank), true)
       .addField("\u200b", "\u200b", true)
-      .addField("Fractal Level", fractal_level, true)
+      .addField("Fractal Level", String(fractal_level), true)
       .addField("Commander", commander ? "Yes" : "No", true)
       .addField("\u200b", "\u200b", true)
       .addField("Leads", guilds, true);
 
-    message.channel.send(accountEmbed).catch(() => {
-      message.channel.send("I'm lacking permissions to send an embed!");
+    message.reply({ embeds: [accountEmbed]} ).catch(() => {
+      message.reply("I'm lacking permissions to send an embed!");
     });
   }
 }

@@ -6,6 +6,7 @@ class Key implements Command {
   name = "key";
   args = true;
   description = "Add your GW2 API key";
+  usage = "add/delete";
 
   async execute({ message, args }: CommandParams) {
     switch (args[0]) {
@@ -18,7 +19,7 @@ class Key implements Command {
         gw2api.authenticate(key);
         const tokenInfo = await gw2api.tokeninfo().get(key).catch(() => {
           message.delete();
-          message.reply("there is either an issue with the API or your key. Please try again later.");
+          message.reply("There is either an issue with the API or your key. Please try again later.");
         });
 
         try {
@@ -33,9 +34,9 @@ class Key implements Command {
           });
 
           await message.delete();
-          await message.reply("your key has been saved and your message has been deleted for privacy.");
+          await message.channel.send("Your key has been saved and your message has been deleted for privacy.");
         } catch (error) {
-          message.channel.send("There was an issue while trying to save your key. Please contact my author.");
+          message.reply("There was an issue while trying to save your key. Please contact my author.");
           logger.error("Error in key command, argument add", error);
         }
       }
@@ -45,14 +46,14 @@ class Key implements Command {
         const { key } = await Keys.findOne({ discordId: message.author.id });
 
         if (!key) {
-          return message.reply("couldn't find a key you added to delete!");
+          return message.reply("Couldn't find a key you added to delete!");
         }
 
         try {
           await Keys.deleteOne({ key });
-          message.reply("your key has been deleted!");
+          message.reply("Your key has been deleted!");
         } catch (error) {
-          message.reply("there was an error with removing your key. Please contact my author");
+          message.reply("There was an error with removing your key. Please contact my author");
           logger.error("Error while deleting key", error);
         }
       }

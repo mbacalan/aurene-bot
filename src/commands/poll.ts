@@ -18,11 +18,11 @@ class Poll implements Command {
     let matchingRole = null;
 
     if (!question) {
-      return message.reply("you didn't provide a question. To do so, put your question inside `{curly brackets}`.");
+      return message.reply("You didn't provide a question. To do so, put your question inside `{curly brackets}`.");
     }
 
     if (!options) {
-      return message.reply("you didn't provide any options. To do so, put each option inside seperate `[square brackets]`");
+      return message.reply("You didn't provide any options. To do so, put each option inside seperate `[square brackets]`");
     }
 
     if (role && role[1] == "everyone") {
@@ -40,7 +40,7 @@ class Poll implements Command {
 
     pollEmbed.addFields(pollOptions);
 
-    const poll = await message.channel.send(matchingRole, { embed: pollEmbed }).catch(() => {
+    const poll = await message.channel.send({ content: matchingRole, embeds: [pollEmbed] }).catch(() => {
       message.channel.send("I'm lacking permissions to send an embed!");
     });
 

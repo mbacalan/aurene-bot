@@ -1,9 +1,11 @@
-import { Client, TextChannel, MessageEmbed } from "discord.js";
+import { TextChannel, MessageEmbed } from "discord.js";
 import emoji from "emoji-dictionary";
-import { Command } from "../types";
+import { Command, CommandParams } from "../types";
 import { logger } from "../utils/";
 import { roleEmojis, roleEmojiUnicodes } from "../data/";
 
+
+// TODO: Doesn't work, unused, disable?
 class Roles implements Command {
   name = "roles";
   description = "Join/leave a public role";
@@ -11,8 +13,8 @@ class Roles implements Command {
   roleEmbedFields = [];
   oldEmbed = null;
 
-  async execute(bot: Client) {
-    const channel = bot.channels.cache.get(process.env.ROLES_CHANNEL) as TextChannel;
+  async execute({ message }: CommandParams) {
+    const channel = message.client.channels.cache.get(process.env.ROLES_CHANNEL) as TextChannel;
     const fetchedMessages = await channel.messages.fetch({ limit: 50 });
 
     this.oldEmbed = fetchedMessages.find(msg => {
@@ -55,7 +57,7 @@ class Roles implements Command {
 
       rolesEmbed.setTitle("Public Roles").addFields(this.roleEmbedFields);
 
-      const rolesMessage = await channel.send(rolesEmbed);
+      const rolesMessage = await channel.send({ embeds: [rolesEmbed] });
 
       this.roles.forEach(async (role, i) => {
         await rolesMessage.react(roleEmojiUnicodes[i]);

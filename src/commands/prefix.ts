@@ -13,14 +13,14 @@ class Prefix implements Command {
           return logger.error("Error reading from Redis: ", err);
         }
 
-        message.reply(`current prefix is: "${val}"`);
+        message.reply(`Current prefix is: "${val}"`);
       });
 
       return;
     }
 
     if (args.length > 1 && (isOwner || isRanking)) {
-      return message.reply("prefix can only be 1 character.");
+      return message.reply("Prefix can only be 1 character long.");
     }
 
     const guild = await Guilds.findOne({ _id: message.guild.id });

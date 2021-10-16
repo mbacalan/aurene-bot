@@ -11,16 +11,18 @@ class Missions implements Command {
 
       // TODO: Dynamic commendation emote / no emote
       return message.channel.send(
-        "Grab your omnomberry bars and apple ciders, it's time for Guild Missions!" +
-        "\nCome to our Guild Hall to join the squad." +
-        "\n\nHere are the links to help you with Trek and Bounty missions:" +
-        "\n<https://wiki.guildwars2.com/wiki/Guild_Trek#Possible_locations>" +
-        "\n<https://wiki.guildwars2.com/wiki/Guild_Bounty#Possible_targets>" +
-        "\n\nLet's go get those <:commend:528271266864431134>'s!"
+        {
+          content: "Grab your omnomberry bars and apple ciders, it's time for Guild Missions!" +
+          "\nCome to our Guild Hall to join the squad." +
+          "\n\nHere are the links to help you with Trek and Bounty missions:" +
+          "\n<https://wiki.guildwars2.com/wiki/Guild_Trek#Possible_locations>" +
+          "\n<https://wiki.guildwars2.com/wiki/Guild_Bounty#Possible_targets>" +
+          "\n\nLet's go get those <:commend:528271266864431134>'s!"
+        }
       );
     }
 
-    return message.reply("only the owner, leaders and officers can use this command.");
+    return message.reply("Only the owner, leaders and officers can use this command.");
   }
 }
 

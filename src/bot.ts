@@ -4,13 +4,23 @@ import { config } from "dotenv";
 config({ path: resolve(__dirname, "../.env") });
 
 import "./utils/db";
-import discord from "discord.js";
+import discord, { Intents } from "discord.js";
 import glob from "glob";
 import { Guilds } from "./models/guilds";
 import { StaticCommand } from "./types";
 import { logger, commandHandler, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } from "./utils";
 
-const bot = new discord.Client({ partials: ["MESSAGE", "REACTION"] });
+const bot = new discord.Client({
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_PRESENCES,
+    Intents.FLAGS.GUILD_MESSAGE_TYPING
+  ],
+  partials: ["MESSAGE", "REACTION"]
+});
 
 bot.commands = new discord.Collection();
 
@@ -24,12 +34,11 @@ glob("./commands/**/*.js", { cwd: 'build' }, (error, files) => {
 bot.on("ready", async () => {
   const roles = bot.commands.get("roles");
 
-  await bot.user.setPresence({ activity: { name: "Guild Wars 2", type: "PLAYING" } });
+  bot.user.setPresence({ activities: [{ name: "Guild Wars 2", type: "PLAYING" }] });
 
   [
     `Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`,
     `Invite link is: https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=1`,
-    `Bot's presence is set to: ${bot.user.presence.activities}`,
     `Bot is in: ${bot.guilds.cache.size} servers`,
     "Awaiting orders...",
   ].forEach((log) => {
@@ -57,7 +66,7 @@ bot.on("ready", async () => {
   setInterval(async () => await checkNewBuild(bot), 300000);
 });
 
-bot.on("message", async message => {
+bot.on("messageCreate", async message => {
   await commandHandler.execute(bot, message);
 });
 
@@ -85,7 +94,8 @@ bot.on("messageReactionRemove", async (reaction, author) => {
     try {
       await reaction.message.fetch();
     } catch (error) {
-      return logger.error("Something went wrong when fetching the message: ", error);
+      logger.error("Something went wrong when fetching the message: ", error);
+      return;
     }
   }
 
@@ -101,7 +111,9 @@ bot.on("messageReactionRemove", async (reaction, author) => {
   }
 });
 
-bot.on("error", error => logger.error("General error:", error));
+bot.on("error", (error) => {
+  logger.error("General error:", error)
+});
 process.on("unhandledRejection", error => logger.error("Uncaught Promise Rejection:", error));
 
 bot.login(process.env.TOKEN);
