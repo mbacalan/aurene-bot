@@ -15,11 +15,11 @@
   "author": "Penemue#8514",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.2.0",
     "dotenv": "^9.0.2",
     "emoji-dictionary": "^1.0.11",
     "glob": "^7.1.7",
-    "gw2api-client": "^7.4.2",
+    "gw2api-client": "^7.5.1",
     "mongoose": "^5.12.13",
     "redis": "^3.1.2",
     "winston": "^3.3.3",

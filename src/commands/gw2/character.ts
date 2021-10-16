@@ -33,8 +33,8 @@ class Character implements Command {
           .setTitle(`${accountName}'s Characters`)
           .addField("\u200b", characterList);
 
-        await message.channel.send(characterListEmbed).catch(() => {
-          message.channel.send("I'm lacking permissions to send an embed!");
+        await message.reply({ embeds: [characterListEmbed] }).catch(() => {
+          message.reply("I'm lacking permissions to send an embed!");
         });
       }
         break;
@@ -59,19 +59,19 @@ class Character implements Command {
           .setTitle(name)
           .setDescription(`${gender} ${race} ${profession}`)
           .setThumbnail(professionIcon)
-          .addField("Level", character.level, true)
+          .addField("Level", String(character.level), true)
           .addField("Title", title.name ? title.name : title, true)
           .addField("\u200b", "\u200b", true)
           .addField("Created At", createdAt, true)
           .addField("Played For", formattedAge, true)
           .addField("\u200b", "\u200b", true)
-          .addField("Deaths", deaths, true)
-          .addField("Deaths Per Hour", deathsPerHour, true)
+          .addField("Deaths", String(deaths), true)
+          .addField("Deaths Per Hour", String(deathsPerHour), true)
           .addField("\u200b", "\u200b", true)
           .addField("Representing", `${guild.name} [${guild.tag}]`);
 
-        message.channel.send(characterEmbed).catch(() => {
-          message.channel.send("I'm lacking permissions to send an embed!");
+        message.reply({ embeds: [characterEmbed] }).catch(() => {
+          message.reply("I'm lacking permissions to send an embed!");
         });
       }
     }

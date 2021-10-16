@@ -16,7 +16,7 @@ class Guides implements Command {
 
     const bossName = boss.name.charAt(0).toUpperCase() + boss.name.slice(1);
 
-    message.channel.send(`${bossName} - ${boss.raidIndex}
+    message.reply(`${bossName} - ${boss.raidIndex}
     \nWiki Guide: ${boss.wiki}
     \nVideo Guide: ${boss.video}
     \nGood luck!`);

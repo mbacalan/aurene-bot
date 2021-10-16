@@ -31,14 +31,14 @@ class Starboard implements StaticCommand {
       if (!starReactions || (starReactions && starReactions.count < 2)) return;
 
       const embed = new MessageEmbed()
-        .addField("Author", message.author, true)
-        .addField("Channel", message.channel, true)
+        .addField("Author", message.author.username, true)
+        .addField("Channel", message.channel.id, true)
         .addField("Message", message.cleanContent)
         .addField("Go To", `[Message](${message.url})`)
         .setTimestamp(new Date())
         .setFooter(`⭐ 3 | ${message.id}`);
 
-      await starChannel.send({ embed });
+      await starChannel.send({ embeds: [embed] });
     }
 
     // Edit the embed if the message is already on the starboard
@@ -48,24 +48,24 @@ class Starboard implements StaticCommand {
       const foundStarEmbed = stars.embeds[0];
       const foundStarMessage = foundStarEmbed.fields.find(field => field.name === "Message");
       const embed = new MessageEmbed()
-        .addField("Author", message.author, true)
-        .addField("Channel", message.channel, true)
+        .addField("Author", message.author.username, true)
+        .addField("Channel", message.channel.id, true)
         .addField("Message", foundStarMessage.value)
         .addField("Go To", `[Message](${message.url})`)
         .setTimestamp();
 
       if (remove) {
       // Reduce the amount of stars if the message is already on starboard, remove if no stars left
-        if (parseInt(star[1]) - 1 == 0) return starEmbed.delete({ timeout: 1000 });
+        if (parseInt(star[1]) - 1 == 0) return starEmbed.delete();
 
         embed.setFooter(`⭐ ${parseInt(star[1]) - 1} | ${message.id}`);
 
-        return await starEmbed.edit({ embed });
+        return await starEmbed.edit({ embeds: [embed] });
       }
 
       embed.setFooter(`⭐ ${parseInt(star[1]) + 1} | ${message.id}`);
 
-      await starEmbed.edit({ embed });
+      await starEmbed.edit({ embeds: [embed] });
     }
   }
 }

@@ -21,25 +21,25 @@ class Giveaway implements Command {
       }
         break;
 
-      default: await message.reply("invalid argument.");
+      default: await message.reply("Invalid argument.");
 
       // TODO: Since we support multiple giveaways at once, the info command needs a rework
       // to display information about any given active giveaway without cluttering the channel.
-      // Code below is currently not in use.
     }
   }
 
   async create(message: Message) {
     if (message.channel.id != this.giveawayChannel.id) {
-      message.reply(`you can only create giveaways in ${this.giveawayChannel} channel.`);
+      message.reply(`You can only create giveaways in ${this.giveawayChannel} channel.`);
       return false;
     }
 
-    const filter = m => m.author.id === message.author.id;
-    const itemQuestion = await message.channel.send("What would you like to giveaway? Please reply in 20 seconds.");
-    const collectedItem = await message.channel.awaitMessages(filter, {
-      max: 1,
+    const filter = (m: { author: { id: string; }; }) => m.author.id === message.author.id;
+    const itemQuestion = await message.reply("What would you like to giveaway? Please reply in 20 seconds.");
+    const collectedItem = await message.channel.awaitMessages({
+      filter,
       time: 20000,
+      max: 1
     });
 
     if (!collectedItem.first()) {
@@ -47,8 +47,9 @@ class Giveaway implements Command {
     }
 
     const item = collectedItem.first().content;
-    const durationQuestion = await message.channel.send("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
-    const collectedDuration = await message.channel.awaitMessages(filter, {
+    const durationQuestion = await message.reply("Got it. How long will the giveaway run for? Example: ``5min`` or ``2h``");
+    const collectedDuration = await message.channel.awaitMessages({
+      filter,
       max: 1,
       time: 20000,
     });
@@ -65,6 +66,7 @@ class Giveaway implements Command {
       (duration.includes("m") && duration.includes("h"))
     ) {
       await message.reply("I don't understand your reply. Please start over and try something like: ``5min`` or ``2h``");
+      return;
     }
 
     /* If the collectedDuration includes "h" in it,
@@ -86,7 +88,7 @@ class Giveaway implements Command {
       .addField("Duration", duration, true)
       .setFooter("Enter this giveaway by reacting with checkmark below.");
 
-    const giveawayMessage = await message.channel.send(role, infoEmbed)
+    const giveawayMessage = await message.channel.send({ content: role, embeds: [infoEmbed] })
       .catch(() => {
         return message.channel.send(`Hey ${role}, ${message.author} is giving away **${item}**! ` +
           "Use the reaction below to enter. " +

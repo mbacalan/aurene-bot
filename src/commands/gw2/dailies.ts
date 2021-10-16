@@ -58,8 +58,8 @@ class Dailies implements Command {
     }
 
     // TODO: Add PSNA
-    await message.channel.send(DailiesEmbed).catch(() => {
-      message.channel.send("I'm lacking permissions to send an embed!");
+    await message.reply({ embeds: [DailiesEmbed] }).catch(() => {
+      message.reply("I'm lacking permissions to send an embed!");
     });
   }
 }

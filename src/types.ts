@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Collection, Message } from "discord.js";
 import { Types, Document } from "mongoose";
 
 declare module "discord.js" {

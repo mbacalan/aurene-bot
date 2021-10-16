@@ -1,4 +1,5 @@
 import { Command, CommandParams } from "../types";
+import { Util } from 'discord.js';
 
 class Help implements Command {
   name = "help";
@@ -29,9 +30,9 @@ class Help implements Command {
       if (command.usage) data.push(`**Usage:** ${process.env.PREFIX}${command.name} ${command.usage}`);
     }
 
-    message.author.send(data, { split: true })
+    message.author.send({ content: data.join("\n") })
       .then(() => {
-        if (message.channel.type !== "dm") {
+        if (message.channel.type !== "DM") {
           message.channel.send("I've sent you a DM with all my commands!");
         }
       })
