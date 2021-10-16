@@ -33,7 +33,7 @@ class Help implements Command {
     message.author.send({ content: data.join("\n") })
       .then(() => {
         if (message.channel.type !== "DM") {
-          message.channel.send("I've sent you a DM with all my commands!");
+          message.reply("I've sent you a DM with all my commands!");
         }
       })
       .catch(() => message.reply("it seems like I can't DM you!"));
