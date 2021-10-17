@@ -1,7 +1,7 @@
 import { Types, Document } from "mongoose";
-import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import { Client, CommandInteraction, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Keys, Builds, Winners, Guilds } from "../models";
-import { IGuild } from "../types";
+import { Command, IGuild } from "../types";
 import { logger, gw2api, buildDbFromApi } from "./";
 
 async function checkNewBuild(bot: Client) {
@@ -120,8 +120,8 @@ async function endGiveaway(giveawayMessage: Message, channel: TextChannel) {
   });
 }
 
-async function validateKey(message: Message, key: string) {
-  const userId = message.author.id;
+async function validateKey(message: any, key: string) {
+  const userId = message.author?.id || message.user.id;
   const userHasKey = await Keys.findOne({ discordId: userId });
   const keyExists = await Keys.findOne({ key: key });
 

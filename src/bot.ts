@@ -4,13 +4,13 @@ import { config } from "dotenv";
 config({ path: resolve(__dirname, "../.env") });
 
 import "./utils/db";
-import discord, { Intents } from "discord.js";
+import { Client, Collection, Intents } from "discord.js";
 import glob from "glob";
 import { Guilds } from "./models/guilds";
 import { StaticCommand } from "./types";
 import { logger, commandHandler, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } from "./utils";
 
-const bot = new discord.Client({
+const bot = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
@@ -22,13 +22,21 @@ const bot = new discord.Client({
   partials: ["MESSAGE", "REACTION"]
 });
 
-bot.commands = new discord.Collection();
+bot.commands = new Collection();
+bot.slashCommands = new Collection();
 
 glob("./commands/**/*.js", { cwd: 'build' }, (error, files) => {
   files.forEach((file) => {
     const command = require(file);
     bot.commands.set(command.name, command);
   });
+});
+
+const globCommands = glob.sync("./slash-commands/**/*.js", { cwd: 'build' });
+
+globCommands.forEach((file) => {
+  const command = require(file);
+  bot.slashCommands.set(command.name, command);
 });
 
 bot.on("ready", async () => {
@@ -64,6 +72,21 @@ bot.on("ready", async () => {
   }
 
   setInterval(async () => await checkNewBuild(bot), 300000);
+});
+
+bot.on("interactionCreate", async interaction => {
+  if (!interaction.isCommand()) return;
+
+  const command = bot.slashCommands.get(interaction.commandName);
+
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+  }
 });
 
 bot.on("messageCreate", async message => {
@@ -111,9 +134,20 @@ bot.on("messageReactionRemove", async (reaction, author) => {
   }
 });
 
+bot.on("guildCreate", async (guild) => {
+  const guildDoc = await Guilds.findOne({ _id: guild.id });
+
+  if (!guildDoc) {
+    await Guilds.create({
+      _id: guild.id,
+    });
+  }
+});
+
 bot.on("error", (error) => {
   logger.error("General error:", error)
 });
-process.on("unhandledRejection", error => logger.error("Uncaught Promise Rejection:", error));
 
 bot.login(process.env.TOKEN);
+
+process.on("unhandledRejection", error => logger.error("Uncaught Promise Rejection:", error));
