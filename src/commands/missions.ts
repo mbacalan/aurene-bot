@@ -10,7 +10,7 @@ class Missions implements Command {
     if (isOwner || isRanking) {
 
       // TODO: Dynamic commendation emote / no emote
-      return message.channel.send(
+      return message.reply(
         {
           content: "Grab your omnomberry bars and apple ciders, it's time for Guild Missions!" +
           "\nCome to our Guild Hall to join the squad." +
