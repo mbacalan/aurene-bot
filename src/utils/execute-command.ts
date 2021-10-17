@@ -1,7 +1,7 @@
 import { Client, Message } from "discord.js";
 import { Guilds } from "../models";
 import { Command } from "../types";
-import { logger, redisClient } from "./";
+import { logger, redisClient } from ".";
 
 class CommandHandler {
   static instance: CommandHandler;

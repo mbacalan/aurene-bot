@@ -1,5 +1,5 @@
 import { Command, CommandParams } from "../types";
-import { logger, buildDbFromApi } from "../utils/";
+import { logger, buildDbFromApi } from "../utils";
 
 class RebuildCache implements Command {
   name = "rebuildcache";
