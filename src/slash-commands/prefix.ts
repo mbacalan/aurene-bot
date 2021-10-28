@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { redisClient, logger } from "../utils";
 import { Guilds } from "../models";
-import { Interaction, InteractionParams } from "../types";
+import { Interaction } from "../types";
 import { CommandInteraction } from "discord.js";
 
 class Prefix implements Interaction {
@@ -9,7 +9,12 @@ class Prefix implements Interaction {
   data = new SlashCommandBuilder()
     .setName(this.name)
     .setDescription("Change bot's prefix")
-    .addStringOption(option => option.setName("prefix").setDescription("Enter a new prefix")).setDefaultPermission(false)
+    .setDefaultPermission(false)
+    .addStringOption(option =>
+      option
+        .setName("prefix")
+        .setDescription("Enter a new prefix")
+      );
 
   async execute(interaction: CommandInteraction) {
     const newPrefix = interaction.options.getString("prefix");

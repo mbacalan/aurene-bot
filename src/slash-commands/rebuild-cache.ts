@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Command } from "../types";
 import { logger, buildDbFromApi } from "../utils";
+import { Command } from "../types";
 
 class RebuildCache implements Command {
   name = "rebuildcache";
@@ -9,7 +9,7 @@ class RebuildCache implements Command {
   data = new SlashCommandBuilder()
     .setName(this.name)
     .setDescription(this.description)
-    .setDefaultPermission(false)
+    .setDefaultPermission(false);
 
   async execute(interaction: CommandInteraction) {
     interaction.deferReply({ ephemeral: true });

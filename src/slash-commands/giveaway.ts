@@ -35,7 +35,7 @@ class Giveaway implements Command {
     );
 
   async execute(interaction: CommandInteraction) {
-    // TODO: Add error handling for if GIVEAWAY_CHANNEL is unset, get GIVEAWAY_CHANNEL from guild config
+    // TODO: Get GIVEAWAY_CHANNEL from guild config
     this.giveawayChannel = interaction.client.channels.cache.get(process.env.GIVEAWAY_CHANNEL) as TextChannel;
 
     await this.create(interaction);

@@ -6,7 +6,6 @@ import { Command } from "../types";
 class Guides implements Command {
   name = "guide";
   description = "Get some guide links for the raid boss of your choice";
-  usage = "bossname";
   data = new SlashCommandBuilder()
     .setName(this.name)
     .setDescription(this.description)
@@ -21,7 +20,8 @@ class Guides implements Command {
     const bossData = await Bosses.findOne({ name: selectedBoss });
 
     if (!bossData) {
-      return interaction.reply("I couldn't find info about that boss");
+      interaction.reply("I couldn't find info about that boss");
+      return;
     }
 
     const bossName = bossData.name.charAt(0).toUpperCase() + bossData.name.slice(1);

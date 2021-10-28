@@ -7,11 +7,10 @@ class Missions implements Command {
   description = "Alert members for joining Guild Missions and provide useful info to them";
   data = new SlashCommandBuilder()
     .setName(this.name)
-    .setDescription(this.description)
+    .setDescription(this.description);
 
   async execute(interaction: CommandInteraction) {
     // TODO: Add owner / ranking permissons
-    // TODO: Dynamic commendation emote / no emote
     return interaction.reply(
       {
         content: "Grab your omnomberry bars and apple ciders, it's time for Guild Missions!" +
@@ -19,7 +18,7 @@ class Missions implements Command {
         "\n\nHere are the links to help you with Trek and Bounty missions:" +
         "\n<https://wiki.guildwars2.com/wiki/Guild_Trek#Possible_locations>" +
         "\n<https://wiki.guildwars2.com/wiki/Guild_Bounty#Possible_targets>" +
-        "\n\nLet's go get those <:commend:528271266864431134>'s!"
+        "\n\nLet's go get those commendations!"
       }
     );
   }

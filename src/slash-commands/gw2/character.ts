@@ -27,14 +27,15 @@ class Character implements Command {
             .setDescription('Name of the character, case sensitive')
             .setRequired(true)
         )
-    )
+    );
 
   async execute(interaction: CommandInteraction) {
     const subCommand = interaction.options.getSubcommand();
     const { key, accountName } = await Keys.findOne({ discordId: interaction.user.id });
 
     if (!key) {
-      return interaction.reply("I couldn't find a GW2 API key associated with your Discord account!");
+      interaction.reply("I couldn't find a GW2 API key associated with your Discord account!");
+      return;
     }
 
     gw2api.authenticate(key);

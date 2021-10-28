@@ -1,15 +1,15 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { gw2api, getLeadingGuilds, formatAge, filterExpansions } from "../../utils";
 import { Keys, Worlds } from "../../models";
 import { Command } from "../../types";
-import { gw2api, getLeadingGuilds, formatAge, filterExpansions } from "../../utils";
 
 class Account implements Command {
   name = "account";
   description = "See your GW2 account information";
   data = new SlashCommandBuilder()
     .setName(this.name)
-    .setDescription(this.description)
+    .setDescription(this.description);
 
   async execute(interaction: CommandInteraction) {
     const { key } = await Keys.findOne({ discordId: interaction.user.id });
