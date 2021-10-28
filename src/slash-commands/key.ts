@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageEmbed } from "discord.js";
+import { CommandInteraction, MessageEmbed } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, logger, validateKey } from "../utils";
 import { Keys } from "../models";
@@ -7,7 +7,6 @@ import { Command } from "../types";
 class Key implements Command {
   name = "key";
   description = "Add, view or delete your GW2 API key";
-  usage = "add/delete";
   data = new SlashCommandBuilder()
     .setName(this.name)
     .setDescription(this.description)
@@ -36,14 +35,16 @@ class Key implements Command {
   async execute(interaction: CommandInteraction) {
     const subCommand = interaction.options.getSubcommand();
 
+    interaction.deferReply({ ephemeral: true });
+
     switch (subCommand) {
       case "add": {
         const key = interaction.options.getString("key");
         const keyIsValid = await validateKey(interaction, key);
 
         if (!keyIsValid) {
-          interaction.reply(
-            { content: "Your key is invalid. Please double check and don't wrap it in any brackets, quotes etc.", ephemeral: true }
+          interaction.editReply(
+            { content: "Your key is invalid. Please double check and don't wrap it in any brackets, quotes etc." }
           );
 
           return;
@@ -52,8 +53,8 @@ class Key implements Command {
         gw2api.authenticate(key);
 
         const tokenInfo = await gw2api.tokeninfo().get(key).catch(() => {
-          interaction.reply(
-            { content: "There is either an issue with the API or your key. Please try again later.", ephemeral: true }
+          interaction.editReply(
+            { content: "There is either an issue with the API or your key. Please try again later." }
           );
         });
 
@@ -68,9 +69,9 @@ class Key implements Command {
             key,
           });
 
-          await interaction.reply({ content: "Your key has been saved!", ephemeral: true });
+          await interaction.editReply({ content: "Your key has been saved!" });
         } catch (error) {
-          interaction.reply("There was an issue while trying to save your key.");
+          interaction.editReply("There was an issue while trying to save your key.");
           logger.error("Error in key command, argument add", error);
         }
       }
@@ -80,7 +81,7 @@ class Key implements Command {
         const key = await Keys.findOne({ discordId: interaction.user.id });
 
         if (!key) {
-          interaction.reply("Couldn't find a saved key to show!");
+          interaction.editReply("Couldn't find a saved key to show!");
           return;
         }
 
@@ -90,8 +91,8 @@ class Key implements Command {
           .addField("Key", key.key)
           .addField("Permissions", key.permissions.join(", "));
 
-        interaction.reply({ embeds: [keyEmbed], ephemeral: true }).catch(() => {
-          interaction.reply({ content: `Saved key is ${key.keyName} - ${key.key}`, ephemeral: true });
+        interaction.editReply({ embeds: [keyEmbed] }).catch(() => {
+          interaction.editReply({ content: `Saved key is ${key.keyName} - ${key.key}` });
         });
       }
         break;
@@ -100,16 +101,16 @@ class Key implements Command {
         const { key } = await Keys.findOne({ discordId: interaction.user.id });
 
         if (!key) {
-          interaction.reply("Couldn't find a saved key to delete!");
+          interaction.editReply("Couldn't find a saved key to delete!");
           return;
         }
 
         try {
           await Keys.deleteOne({ key });
-          interaction.reply({ content: "Your key has been deleted!", ephemeral: true });
+          interaction.editReply({ content: "Your key has been deleted!" });
         } catch (error) {
-          interaction.reply({
-            content: "There was an error with removing your key. Please contact my author", ephemeral: true }
+          interaction.editReply({
+            content: "There was an error with removing your key. Please contact my author" }
           );
           logger.error("Error while deleting key", error);
         }

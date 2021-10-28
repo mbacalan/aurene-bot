@@ -23,6 +23,8 @@ class Account implements Command {
       return;
     }
 
+    interaction.deferReply();
+
     gw2api.authenticate(key);
 
     const account = await gw2api.account().get();
@@ -51,8 +53,8 @@ class Account implements Command {
       .addField("\u200b", "\u200b", true)
       .addField("Leads", guilds, true);
 
-    interaction.reply({ embeds: [accountEmbed]} ).catch(() => {
-      interaction.reply({ content: "I'm lacking permissions to send an embed!", ephemeral: true });
+    interaction.editReply({ embeds: [accountEmbed]} ).catch(() => {
+      interaction.editReply({ content: "I'm lacking permissions to send an embed!" });
     });
   }
 }

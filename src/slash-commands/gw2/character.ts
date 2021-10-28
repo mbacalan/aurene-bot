@@ -38,6 +38,8 @@ class Character implements Command {
       return;
     }
 
+    interaction.deferReply();
+
     gw2api.authenticate(key);
 
     switch (subCommand) {
@@ -53,8 +55,8 @@ class Character implements Command {
           .setTitle(`${accountName}'s Characters`)
           .addField("\u200b", characterList);
 
-        await interaction.reply({ embeds: [characterListEmbed] }).catch(() => {
-          interaction.reply("I'm lacking permissions to send an embed!");
+        await interaction.editReply({ embeds: [characterListEmbed] }).catch(() => {
+          interaction.editReply("I'm lacking permissions to send an embed!");
         });
       }
         break;
@@ -63,10 +65,11 @@ class Character implements Command {
         const characterName = interaction.options.getString('character')
         const character = await gw2api.characters(characterName).core().get().catch((error) => {
           logger.error(`${error.content.text}: ${characterName}`);
+          return false;
         });
 
         if (!character) {
-          interaction.reply({ content: "couldn't find that character.", ephemeral: true });
+          interaction.editReply({ content: "couldn't find that character." });
           return;
         }
 
@@ -93,8 +96,8 @@ class Character implements Command {
           .addField("\u200b", "\u200b", true)
           .addField("Representing", `${guild.name} [${guild.tag}]`);
 
-        interaction.reply({ embeds: [characterEmbed] }).catch(() => {
-          interaction.reply({ content: "I'm lacking permissions to send an embed!", ephemeral: true });
+        interaction.editReply({ embeds: [characterEmbed] }).catch(() => {
+          interaction.editReply({ content: "I'm lacking permissions to send an embed!" });
         });
       }
     }

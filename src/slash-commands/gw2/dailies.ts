@@ -10,9 +10,11 @@ class Dailies implements Command {
   description = "See today's GW2 dailies";
   data = new SlashCommandBuilder()
     .setName(this.name)
-    .setDescription(this.description)
+    .setDescription(this.description);
 
   async execute(interaction: CommandInteraction) {
+    interaction.deferReply();
+
     const dailies = await gw2api.achievements().daily().get();
     const DailiesEmbed = new MessageEmbed().setTitle("Dailies");
     const categories = ["PvE", "PvP", "WvW", "Fractals"];
@@ -62,8 +64,8 @@ class Dailies implements Command {
     }
 
     // TODO: Add PSNA
-    await interaction.reply({ embeds: [DailiesEmbed] }).catch(() => {
-      interaction.reply({ content: "I'm lacking permissions to send an embed!", ephemeral: true });
+    await interaction.editReply({ embeds: [DailiesEmbed] }).catch(() => {
+      interaction.editReply({ content: "I'm lacking permissions to send an embed!" });
     });
   }
 }
