@@ -1,9 +1,10 @@
-import { Collection, Message } from "discord.js";
+import { Collection, CommandInteraction, Message } from "discord.js";
 import { Types, Document } from "mongoose";
 
 declare module "discord.js" {
   interface Client {
     commands: Collection<string, Command>;
+    slashCommands: Collection<string, Command>;
   }
 }
 
@@ -28,11 +29,25 @@ export interface Command {
   execute: Function,
 };
 
+export interface Interaction {
+  name: string,
+  args?: boolean,
+  usage?: string,
+  execute: Function,
+};
+
 export interface CommandParams {
   message: Message,
   args: string[],
   isOwner: boolean,
   isRanking: boolean,
+};
+
+export interface InteractionParams {
+  interaction: CommandInteraction,
+  args?: string[],
+  isOwner?: boolean,
+  isRanking?: boolean,
 };
 
 // Mongoose Models
@@ -93,7 +108,7 @@ export interface IKey {
   discordId: string,
   keyName: string,
   accountName: string,
-  permissions: string,
+  permissions: string[],
   key: string
 }
 
