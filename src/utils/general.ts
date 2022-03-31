@@ -1,7 +1,7 @@
 import { Types, Document } from "mongoose";
-import { Client, CommandInteraction, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Keys, Builds, Winners, Guilds } from "../models";
-import { Command, IGuild } from "../types";
+import { IGuild } from "../types";
 import { logger, gw2api, buildDbFromApi } from "./";
 
 async function checkNewBuild(bot: Client) {
@@ -27,7 +27,7 @@ async function checkGiveawayOnStartup(bot: Client, guild: IGuild & Document) {
     return false;
   }
 
-  const giveawayChannel = bot.channels.cache.get(process.env.GIVEAWAY_CHANNEL) as TextChannel;
+  const giveawayChannel = await bot.channels.fetch(guild.config.giveawayChannel) as TextChannel;
 
   guild.giveaways.forEach(async (giveaway) => {
     const giveawayMessage = await giveawayChannel.messages.fetch(giveaway._id);

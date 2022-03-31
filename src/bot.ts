@@ -8,7 +8,7 @@ import { Client, Collection, Intents } from "discord.js";
 import glob from "glob";
 import { Guilds } from "./models/guilds";
 import { StaticCommand } from "./types";
-import { logger, commandHandler, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } from "./utils";
+import { logger, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } from "./utils";
 
 const bot = new Client({
   intents: [
@@ -22,21 +22,21 @@ const bot = new Client({
   partials: ["MESSAGE", "REACTION"]
 });
 
+bot.statics = new Collection();
 bot.commands = new Collection();
-bot.slashCommands = new Collection();
 
-glob("./commands/**/*.js", { cwd: 'build' }, (error, files) => {
+glob("./commands/statics/**/*.js", { cwd: 'build' }, (_error, files) => {
   files.forEach((file) => {
     const command = require(file);
-    bot.commands.set(command.name, command);
+    bot.statics.set(command.name, command);
   });
 });
 
-const globCommands = glob.sync("./slash-commands/**/*.js", { cwd: 'build' });
+const globCommands = glob.sync("./commands/**/*.js", { cwd: 'build' });
 
 globCommands.forEach((file) => {
   const command = require(file);
-  bot.slashCommands.set(command.name, command);
+  bot.commands.set(command.name, command);
 });
 
 bot.on("ready", async () => {
@@ -77,7 +77,7 @@ bot.on("ready", async () => {
 bot.on("interactionCreate", async interaction => {
   if (!interaction.isCommand()) return;
 
-  const command = bot.slashCommands.get(interaction.commandName);
+  const command = bot.commands.get(interaction.commandName);
 
   if (!command) return;
 
@@ -89,13 +89,9 @@ bot.on("interactionCreate", async interaction => {
   }
 });
 
-bot.on("messageCreate", async message => {
-  await commandHandler.execute(bot, message);
-});
-
 bot.on("messageReactionAdd", async (reaction, author) => {
-  const starboard: StaticCommand = bot.commands.get("starboard");
-  const roles: StaticCommand = bot.commands.get("roles");
+  const starboard: StaticCommand = bot.statics.get("starboard");
+  const roles: StaticCommand = bot.statics.get("roles");
 
   const reactionIsValid = await checkReactionValidity(bot, reaction, author);
   const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
@@ -110,8 +106,8 @@ bot.on("messageReactionAdd", async (reaction, author) => {
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
-  const starboard: StaticCommand = bot.commands.get("starboard");
-  const roles: StaticCommand = bot.commands.get("roles");
+  const starboard: StaticCommand = bot.statics.get("starboard");
+  const roles: StaticCommand = bot.statics.get("roles");
 
   if (reaction.message.partial) {
     try {

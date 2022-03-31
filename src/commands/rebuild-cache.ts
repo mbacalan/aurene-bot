@@ -1,20 +1,25 @@
-import { Command, CommandParams } from "../types";
+import { CommandInteraction } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { logger, buildDbFromApi } from "../utils";
+import { Command } from "../types";
 
 class RebuildCache implements Command {
   name = "rebuildcache";
   description = "Rebuild Cache";
+  data = new SlashCommandBuilder()
+    .setName(this.name)
+    .setDescription(this.description)
+    .setDefaultPermission(false);
 
-  async execute({ message, isOwner }: CommandParams) {
-    if (!isOwner) return;
-
+  async execute(interaction: CommandInteraction) {
+    interaction.deferReply({ ephemeral: true });
     logger.info("(Re)building API cache");
-    message.client.user.setStatus("dnd");
-    message.client.user.setActivity("Building API Cache", { type: "LISTENING" });
+    interaction.client.user.setStatus("dnd");
+    interaction.client.user.setActivity("Building API Cache", { type: "LISTENING" });
     await buildDbFromApi();
-    message.client.user.setStatus("online");
-    message.client.user.setActivity("Guild Wars 2");
-    message.react("✅");
+    interaction.client.user.setStatus("online");
+    interaction.client.user.setActivity("Guild Wars 2");
+    interaction.editReply({ content: "Done" });
   }
 }
 

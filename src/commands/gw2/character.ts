@@ -1,26 +1,48 @@
-import { MessageEmbed } from "discord.js";
-import { Keys } from "../../models";
-import { Command, CommandParams } from "../../types";
+import { CommandInteraction, MessageEmbed } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, formatAge, sortAlphabetically, logger } from "../../utils";
 import { gameData } from "../../data/";
+import { Keys } from "../../models";
+import { Command } from "../../types";
 
 class Character implements Command {
   name = "character";
-  args = true;
   description = "See your GW2 character information";
   usage = "list/info charname";
+  data = new SlashCommandBuilder()
+    .setName(this.name)
+    .setDescription(this.description)
+    .addSubcommand(sub =>
+      sub
+        .setName('list')
+        .setDescription('List all your characters')
+    )
+    .addSubcommand(sub =>
+      sub
+        .setName('info')
+        .setDescription('See information about given character')
+        .addStringOption(option =>
+          option
+            .setName('character')
+            .setDescription('Name of the character, case sensitive')
+            .setRequired(true)
+        )
+    );
 
-  async execute({ message, args }: CommandParams) {
-    const [arg, ...charName] = args;
-    const { key, accountName } = await Keys.findOne({ discordId: message.author.id });
+  async execute(interaction: CommandInteraction) {
+    const subCommand = interaction.options.getSubcommand();
+    const { key, accountName } = await Keys.findOne({ discordId: interaction.user.id });
 
     if (!key) {
-      return message.reply("I couldn't find a GW2 API key associated with your Discord account!");
+      interaction.reply("I couldn't find a GW2 API key associated with your Discord account!");
+      return;
     }
+
+    interaction.deferReply();
 
     gw2api.authenticate(key);
 
-    switch (arg) {
+    switch (subCommand) {
       case "list": {
         const characters = await gw2api.characters().all();
         // TODO: Add profession icons as emotes
@@ -33,19 +55,23 @@ class Character implements Command {
           .setTitle(`${accountName}'s Characters`)
           .addField("\u200b", characterList);
 
-        await message.reply({ embeds: [characterListEmbed] }).catch(() => {
-          message.reply("I'm lacking permissions to send an embed!");
+        await interaction.editReply({ embeds: [characterListEmbed] }).catch(() => {
+          interaction.editReply("I'm lacking permissions to send an embed!");
         });
       }
         break;
 
       case "info": {
-        const characterName = charName.join(" ");
+        const characterName = interaction.options.getString('character')
         const character = await gw2api.characters(characterName).core().get().catch((error) => {
           logger.error(`${error.content.text}: ${characterName}`);
+          return false;
         });
 
-        if (!character) return message.reply("couldn't find that character.");
+        if (!character) {
+          interaction.editReply({ content: "couldn't find that character." });
+          return;
+        }
 
         const { profession, deaths, age, created, name, gender, race } = character;
         const guild = await gw2api.guild().get(character.guild);
@@ -70,8 +96,8 @@ class Character implements Command {
           .addField("\u200b", "\u200b", true)
           .addField("Representing", `${guild.name} [${guild.tag}]`);
 
-        message.reply({ embeds: [characterEmbed] }).catch(() => {
-          message.reply("I'm lacking permissions to send an embed!");
+        interaction.editReply({ embeds: [characterEmbed] }).catch(() => {
+          interaction.editReply({ content: "I'm lacking permissions to send an embed!" });
         });
       }
     }

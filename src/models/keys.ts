@@ -15,7 +15,7 @@ const keySchema = new Schema<IKey>({
     required: true,
   },
   permissions: {
-    type: Array,
+    type: [String],
     required: true,
   },
   key: {

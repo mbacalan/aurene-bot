@@ -3,8 +3,8 @@ import { Types, Document } from "mongoose";
 
 declare module "discord.js" {
   interface Client {
+    statics: Collection<string, Command>;
     commands: Collection<string, Command>;
-    slashCommands: Collection<string, Command>;
   }
 }
 
@@ -52,12 +52,11 @@ export interface InteractionParams {
 
 // Mongoose Models
 export interface IConfig {
-  prefix: string,
   leaders?: number,
   officers?: number,
-  giveawayChannel?: number,
-  missionsChannel?: number,
-  starboardChannel?: number,
+  giveawayChannel?: string,
+  missionsChannel?: string,
+  starboardChannel?: string,
   giveawayRole?: number
 }
 

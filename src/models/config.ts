@@ -1,12 +1,8 @@
 import { Schema } from "mongoose";
 import { IConfig } from '../types';
 
+// TODO: Ranks might be required
 const configSchema = new Schema<IConfig>({
-  prefix: {
-    type: String,
-    required: true,
-    default: ">",
-  },
   leaders: {
     type: Number,
     required: false,
@@ -16,15 +12,15 @@ const configSchema = new Schema<IConfig>({
     required: false,
   },
   giveawayChannel: {
-    type: Number,
+    type: String,
     required: false,
   },
   missionsChannel: {
-    type: Number,
+    type: String,
     required: false,
   },
   starboardChannel: {
-    type: Number,
+    type: String,
     required: false,
   },
   giveawayRole: {

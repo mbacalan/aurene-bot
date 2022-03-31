@@ -1,56 +1,63 @@
-import { MessageEmbed } from "discord.js";
-import { Command, CommandParams } from "../types";
+import { CommandInteraction, MessageEmbed } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { pollEmojis, pollEmojiUnicodes } from "../data/";
+import { Command } from "../types";
 
 class Poll implements Command {
   name = "poll";
   description = "Make a poll with given arguments";
-  args = true;
-  usage = "(optional role to tag) {question} [option1] [option2]";
+  data = new SlashCommandBuilder()
+    .setName(this.name)
+    .setDescription(this.description)
+    .addStringOption(option =>
+      option
+        .setName("title")
+        .setDescription("The title of the poll")
+        .setRequired(true)
+    )
+    .addStringOption(option =>
+      option
+        .setName("options")
+        .setDescription("The options for the poll, seperated with a -")
+        .setRequired(true)
+    )
+    .addMentionableOption(option =>
+      option
+        .setName("role")
+        .setDescription("Optionally, mention a role with the poll")
+    );
 
-  async execute({ message }: CommandParams) {
-    // Get the text inside parenthesis
-    const role = message.content.match(/\(([^)]+)\)/);
-    // Get the text inside curly brackets
-    const question = message.content.match(/{([^}]+)}/);
-    // Get the text inside square brackets
-    const options = message.content.match(/[^[\]]+(?=])/g);
-    let matchingRole = null;
+  async execute(interaction: CommandInteraction) {
+    const role = interaction.options.getMentionable("role");
+    const question = interaction.options.getString("title");
+    const options = interaction.options.getString("options");
 
-    if (!question) {
-      return message.reply("You didn't provide a question. To do so, put your question inside `{curly brackets}`.");
-    }
-
-    if (!options) {
-      return message.reply("You didn't provide any options. To do so, put each option inside seperate `[square brackets]`");
-    }
-
-    if (role && role[1] == "everyone") {
-      matchingRole = "@everyone";
-    } else if (role) {
-      matchingRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === role[1].toLowerCase()) || null;
-    }
-
-    const pollEmbed = new MessageEmbed().setTitle(question[1]);
+    const pollEmbed = new MessageEmbed().setTitle(question);
+    const parsedOptions = options.split("-");
     const pollOptions = [];
 
-    for (let i = 0; i < options.length; i++) {
-      pollOptions.push({ name: "\u200b", value: `${pollEmojis[i]} ${options[i]}` });
+    for (let i = 0; i < parsedOptions.length; i++) {
+      pollOptions.push({ name: "\u200b", value: `${pollEmojis[i]} ${parsedOptions[i]}` });
     }
 
     pollEmbed.addFields(pollOptions);
 
-    const poll = await message.channel.send({ content: matchingRole, embeds: [pollEmbed] }).catch(() => {
-      message.channel.send("I'm lacking permissions to send an embed!");
+    const poll = await interaction.channel.send({
+      content: role?.toString() || "Here's a poll for you!",
+      embeds: [pollEmbed]
+    }).catch(() => {
+      interaction.reply("I'm lacking permissions to send an embed!");
     });
 
     if (!poll) return;
 
-    for (let i = 0; i < options.length; i++) {
+    interaction.deferReply({ ephemeral: true });
+
+    for (let i = 0; i < parsedOptions.length; i++) {
       await poll.react(pollEmojiUnicodes[i]);
     }
 
-    message.delete();
+    interaction.editReply({ content: "Poll created!" });
   }
 }
 

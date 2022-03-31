@@ -1,19 +1,29 @@
-import { MessageEmbed } from "discord.js";
-import { Keys, Worlds } from "../../models";
-import { Command, CommandParams } from "../../types";
+import { CommandInteraction, MessageEmbed } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, getLeadingGuilds, formatAge, filterExpansions } from "../../utils";
+import { Keys, Worlds } from "../../models";
+import { Command } from "../../types";
 
 class Account implements Command {
   name = "account";
-  args = false;
   description = "See your GW2 account information";
+  data = new SlashCommandBuilder()
+    .setName(this.name)
+    .setDescription(this.description);
 
-  async execute({ message }: CommandParams) {
-    const { key } = await Keys.findOne({ discordId: message.author.id });
+  async execute(interaction: CommandInteraction) {
+    const { key } = await Keys.findOne({ discordId: interaction.user.id });
 
     if (!key) {
-      return message.reply("I couldn't find a GW2 API key associated with your Discord account!");
+      interaction.reply({
+        content: "I couldn't find a GW2 API key associated with your Discord account!",
+        ephemeral: true
+      });
+
+      return;
     }
+
+    interaction.deferReply();
 
     gw2api.authenticate(key);
 
@@ -43,8 +53,8 @@ class Account implements Command {
       .addField("\u200b", "\u200b", true)
       .addField("Leads", guilds, true);
 
-    message.reply({ embeds: [accountEmbed]} ).catch(() => {
-      message.reply("I'm lacking permissions to send an embed!");
+    interaction.editReply({ embeds: [accountEmbed]} ).catch(() => {
+      interaction.editReply({ content: "I'm lacking permissions to send an embed!" });
     });
   }
 }

@@ -1,24 +1,34 @@
+import { CommandInteraction } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { Bosses } from "../models";
-import { Command, CommandParams } from "../types";
+import { Command } from "../types";
 
 class Guides implements Command {
   name = "guide";
   description = "Get some guide links for the raid boss of your choice";
-  args = true;
-  usage = "bossname";
+  data = new SlashCommandBuilder()
+    .setName(this.name)
+    .setDescription(this.description)
+    .addStringOption(option =>
+      option.setName("boss")
+        .setDescription("Boss to show the guide for")
+        .setRequired(true)
+    );
 
-  async execute({ message, args }: CommandParams) {
-    const boss = await Bosses.findOne({ name: args.join(" ") });
+  async execute(interaction: CommandInteraction) {
+    const selectedBoss = interaction.options.getString("boss");
+    const bossData = await Bosses.findOne({ name: selectedBoss });
 
-    if (!boss) {
-      return message.reply("I couldn't find info about that boss");
+    if (!bossData) {
+      interaction.reply("I couldn't find info about that boss");
+      return;
     }
 
-    const bossName = boss.name.charAt(0).toUpperCase() + boss.name.slice(1);
+    const bossName = bossData.name.charAt(0).toUpperCase() + bossData.name.slice(1);
 
-    message.reply(`${bossName} - ${boss.raidIndex}
-    \nWiki Guide: ${boss.wiki}
-    \nVideo Guide: ${boss.video}
+    interaction.reply(`${bossName} - ${bossData.raidIndex}
+    \nWiki Guide: ${bossData.wiki}
+    \nVideo Guide: ${bossData.video}
     \nGood luck!`);
   }
 }

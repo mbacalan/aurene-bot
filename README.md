@@ -31,7 +31,6 @@ TOKEN=client_token
 OWNER=your_discord_id
 LEADERS=highest_role_id
 OFFICERS=officers_role_id
-PREFIX=prefix_of_your_choice
 GIVEAWAY_CHANNEL=channel_id_for_giveaways
 MISSIONS_CHANNEL=channel_id_for_missions
 STARBOARD_CHANNEL=channel_id_for_starboarrd
