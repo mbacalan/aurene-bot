@@ -1,11 +1,7 @@
 import { connect, connection } from "mongoose";
 import { logger } from "./";
 
-connect(process.env.MONGO_URI || "mongodb://localhost:27017/local", ({
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-}));
+connect(process.env.MONGO_URI);
 
 export const db = connection;
 
