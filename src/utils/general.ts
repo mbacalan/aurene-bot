@@ -23,7 +23,7 @@ async function checkNewBuild(bot: Client) {
 }
 
 async function checkGiveawayOnStartup(bot: Client, guild: IGuild & Document) {
-  if (!guild.giveaways && !guild.giveaways.length) {
+  if (!(guild.giveaways && !guild.giveaways.length) || !guild.config.giveawayChannel) {
     return false;
   }
 
@@ -185,6 +185,10 @@ function sortAlphabetically(a: string, b: string) {
 }
 
 async function checkReactionValidity(bot: Client, reaction: MessageReaction | PartialMessageReaction, author: User | PartialUser) {
+  if (!process.env.STARBOARD_CHANNEL) {
+    return;
+  }
+
   const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
   const message = reaction.message;
 

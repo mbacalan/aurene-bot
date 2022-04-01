@@ -91,18 +91,18 @@ bot.on("interactionCreate", async interaction => {
 
 bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard: StaticCommand = bot.statics.get("starboard");
-  const roles: StaticCommand = bot.statics.get("roles");
+  // const roles: StaticCommand = bot.statics.get("roles");
 
   const reactionIsValid = await checkReactionValidity(bot, reaction, author);
-  const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
+  // const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
     await starboard.handleReaction(bot, reaction);
   }
 
-  if (!author.bot && reaction.message.channel === rolesChannel) {
-    await roles.handleReaction(bot, reaction, author);
-  }
+  // if (!author.bot && reaction.message.channel === rolesChannel) {
+    // await roles.handleReaction(bot, reaction, author);
+  // }
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
@@ -119,15 +119,15 @@ bot.on("messageReactionRemove", async (reaction, author) => {
   }
 
   const reactionIsValid = await checkReactionValidity(bot, reaction, author);
-  const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
+  // const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
     await starboard.handleReaction(bot, reaction, true);
   }
 
-  if (!author.bot && reaction.message.channel === rolesChannel) {
-    await roles.handleReaction(bot, reaction, author, true);
-  }
+  // if (!author.bot && reaction.message.channel === rolesChannel) {
+    // await roles.handleReaction(bot, reaction, author, true);
+  // }
 });
 
 bot.on("guildCreate", async (guild) => {
