@@ -4,7 +4,7 @@
   "description": "A Guild Wars 2 themed bot for Discord",
   "main": "bot.js",
   "scripts": {
-    "start": "node build/bot.js",
+    "start": "node dist/bot.js",
     "dev": "tsc-watch --onSuccess \"npm start\"",
     "build": "tsc"
   },
@@ -15,8 +15,8 @@
   "author": "Penemue#8514",
   "license": "MIT",
   "dependencies": {
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "discord-api-types": "^0.23.1",
+    "@discordjs/rest": "0.3.0",
+    "discord-api-types": "^0.30.0",
     "discord.js": "^13.6.0",
     "dotenv": "^9.0.2",
     "emoji-dictionary": "^1.0.11",
