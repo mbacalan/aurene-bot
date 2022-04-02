@@ -6,7 +6,7 @@ config({ path: resolve(__dirname, "../.env") });
 import "./utils/db";
 import { Client, Collection, Intents } from "discord.js";
 import glob from "glob";
-import { Guilds } from "./models/guilds";
+import { Guilds } from "@mbacalan/aurene-database";
 import { StaticCommand } from "./types";
 import { logger, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } from "./utils";
 

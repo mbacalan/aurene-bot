@@ -1,6 +1,6 @@
 import { Types, Document } from "mongoose";
 import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
-import { Keys, Builds, Winners, Guilds } from "../models";
+import { Keys, Builds, Winners, Guilds } from "@mbacalan/aurene-database";
 import { IGuild } from "../types";
 import { logger, gw2api, buildDbFromApi } from "./";
 

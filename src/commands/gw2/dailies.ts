@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, sortAlphabetically } from "../../utils";
 import { gameData } from "../../data/";
-import { Achievements } from "../../models";
+import { Achievements } from "@mbacalan/aurene-database";
 import { Command } from "../../types";
 
 class Dailies implements Command {

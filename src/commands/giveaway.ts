@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed, TextChannel } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { logger, endGiveaway, createGiveawayEntryCollector } from "../utils";
-import { Guilds } from "../models";
+import { Guilds } from "@mbacalan/aurene-database";
 import { Command, IGiveaway } from "../types";
 
 class Giveaway implements Command {

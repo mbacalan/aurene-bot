@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, getLeadingGuilds, formatAge, filterExpansions } from "../../utils";
-import { Keys, Worlds } from "../../models";
+import { Keys, Worlds } from "@mbacalan/aurene-database";
 import { Command } from "../../types";
 
 class Account implements Command {

@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, logger, validateKey } from "../utils";
-import { Keys } from "../models";
+import { Keys } from "@mbacalan/aurene-database";
 import { Command } from "../types";
 
 class Key implements Command {

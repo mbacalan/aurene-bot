@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, formatAge, sortAlphabetically, logger } from "../../utils";
 import { gameData } from "../../data/";
-import { Keys } from "../../models";
+import { Keys } from "@mbacalan/aurene-database";
 import { Command } from "../../types";
 
 class Character implements Command {

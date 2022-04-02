@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Bosses } from "../models";
+import { Bosses } from "@mbacalan/aurene-database";
 import { Command } from "../types";
 
 class Guides implements Command {
