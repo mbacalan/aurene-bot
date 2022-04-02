@@ -25,14 +25,14 @@ const bot = new Client({
 bot.statics = new Collection();
 bot.commands = new Collection();
 
-glob("./commands/statics/**/*.js", { cwd: 'build' }, (_error, files) => {
+glob("./commands/statics/**/*.js", { cwd: 'dist' }, (_error, files) => {
   files.forEach((file) => {
     const command = require(file);
     bot.statics.set(command.name, command);
   });
 });
 
-const globCommands = glob.sync("./commands/**/*.js", { cwd: 'build' });
+const globCommands = glob.sync("./commands/**/*.js", { cwd: 'dist' });
 
 globCommands.forEach((file) => {
   const command = require(file);

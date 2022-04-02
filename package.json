@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/bot.js",
     "dev": "tsc-watch --onSuccess \"npm start\"",
-    "build": "tsc"
+    "build": "tsc",
+    "register-commands": "npm run build && node dist/register-commands.js"
   },
   "repository": {
     "type": "git",
