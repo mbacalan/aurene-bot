@@ -32,9 +32,7 @@ glob("./commands/statics/**/*.js", { cwd: 'dist' }, (_error, files) => {
   });
 });
 
-const globCommands = glob.sync("./commands/**/*.js", { cwd: 'dist' });
-
-globCommands.forEach((file) => {
+glob.sync("./commands/**/*.js", { cwd: 'dist' }).forEach((file) => {
   const command = require(file);
   bot.commands.set(command.name, command);
 });
@@ -75,11 +73,15 @@ bot.on("ready", async () => {
 });
 
 bot.on("interactionCreate", async interaction => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isCommand()) {
+    return;
+  }
 
   const command = bot.commands.get(interaction.commandName);
 
-  if (!command) return;
+  if (!command) {
+    return;
+  }
 
   try {
     await command.execute(interaction);
@@ -107,7 +109,7 @@ bot.on("messageReactionAdd", async (reaction, author) => {
 
 bot.on("messageReactionRemove", async (reaction, author) => {
   const starboard: StaticCommand = bot.statics.get("starboard");
-  const roles: StaticCommand = bot.statics.get("roles");
+  // const roles: StaticCommand = bot.statics.get("roles");
 
   if (reaction.message.partial) {
     try {
