@@ -185,6 +185,10 @@ function sortAlphabetically(a: string, b: string) {
 }
 
 async function checkReactionValidity(bot: Client, reaction: MessageReaction | PartialMessageReaction, author: User | PartialUser) {
+  if (process.env.NODE_ENV == "development") {
+    return true;
+  }
+
   if (!process.env.STARBOARD_CHANNEL) {
     return;
   }
