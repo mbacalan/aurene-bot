@@ -27,8 +27,11 @@ class Starboard implements StaticCommand {
     // Send a new embed if the message not on the starboard
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
+      const starThreshold = process.env.NODE_ENV === "production" ? 2 : 0;
 
-      if (!starReactions || (starReactions?.count < 2)) return;
+      if (!starReactions || (starReactions?.count < starThreshold)) {
+        return;
+      }
 
       const embed = new MessageEmbed()
         .addField("Author", message.author.username, true)
