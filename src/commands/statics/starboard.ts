@@ -28,7 +28,7 @@ class Starboard implements StaticCommand {
     if (!stars) {
       const starReactions = message.reactions.cache.get("⭐");
 
-      if (!starReactions || (starReactions && starReactions.count < 2)) return;
+      if (!starReactions || (starReactions?.count < 2)) return;
 
       const embed = new MessageEmbed()
         .addField("Author", message.author.username, true)
@@ -36,7 +36,7 @@ class Starboard implements StaticCommand {
         .addField("Message", message.cleanContent)
         .addField("Go To", `[Message](${message.url})`)
         .setTimestamp(new Date())
-        .setFooter(`⭐ 3 | ${message.id}`);
+        .setFooter({ text: `⭐ ${starReactions.count} | ${message.id}`});
 
       await starChannel.send({ embeds: [embed] });
     }
@@ -58,12 +58,12 @@ class Starboard implements StaticCommand {
       // Reduce the amount of stars if the message is already on starboard, remove if no stars left
         if (parseInt(star[1]) - 1 == 0) return starEmbed.delete();
 
-        embed.setFooter(`⭐ ${parseInt(star[1]) - 1} | ${message.id}`);
+        embed.setFooter({ text: `⭐ ${parseInt(star[1]) - 1} | ${message.id}`});
 
         return await starEmbed.edit({ embeds: [embed] });
       }
 
-      embed.setFooter(`⭐ ${parseInt(star[1]) + 1} | ${message.id}`);
+      embed.setFooter({ text: `⭐ ${parseInt(star[1]) + 1} | ${message.id}`});
 
       await starEmbed.edit({ embeds: [embed] });
     }
