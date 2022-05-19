@@ -13,7 +13,8 @@ class Starboard implements StaticCommand {
       try {
         await message.fetch();
       } catch (error) {
-        return logger.error("Something went wrong when fetching the message: ", error);
+        logger.error("Something went wrong when fetching the message: ", error);
+        return;
       }
     }
 
@@ -58,12 +59,14 @@ class Starboard implements StaticCommand {
         .setTimestamp();
 
       if (remove) {
-      // Reduce the amount of stars if the message is already on starboard, remove if no stars left
-        if (parseInt(star[1]) - 1 == 0) return starEmbed.delete();
+        // Reduce the amount of stars if the message is already on starboard, remove if no stars left
+        if (parseInt(star[1]) - 1 == 0) {
+          return starEmbed.delete();
+        }
 
         embed.setFooter({ text: `⭐ ${parseInt(star[1]) - 1} | ${message.id}`});
-
-        return await starEmbed.edit({ embeds: [embed] });
+        await starEmbed.edit({ embeds: [embed] });
+        return;
       }
 
       embed.setFooter({ text: `⭐ ${parseInt(star[1]) + 1} | ${message.id}`});
