@@ -35,7 +35,7 @@ class Starboard implements StaticCommand {
 
       const embed = new MessageEmbed()
         .addField("Author", message.author.username, true)
-        .addField("Channel", message.channel.id, true)
+        .addField("Channel", `<#${message.channel.id}>`, true)
         .addField("Message", message.cleanContent)
         .addField("Go To", `[Message](${message.url})`)
         .setTimestamp(new Date())
@@ -52,7 +52,7 @@ class Starboard implements StaticCommand {
       const foundStarMessage = foundStarEmbed.fields.find(field => field.name === "Message");
       const embed = new MessageEmbed()
         .addField("Author", message.author.username, true)
-        .addField("Channel", message.channel.id, true)
+        .addField("Channel", `<#${message.channel.id}>`, true)
         .addField("Message", foundStarMessage.value)
         .addField("Go To", `[Message](${message.url})`)
         .setTimestamp();
