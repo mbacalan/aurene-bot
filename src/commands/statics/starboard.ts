@@ -1,12 +1,12 @@
-import { Client, TextChannel, MessageReaction, MessageEmbed } from "discord.js";
+import { TextChannel, MessageReaction, MessageEmbed } from "discord.js";
 import { StaticCommand } from "../../types";
 import { logger } from "../../utils/";
 
 class Starboard implements StaticCommand {
   name = "starboard";
 
-  async handleReaction(bot: Client, reaction: MessageReaction, remove = false) {
-    const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL) as TextChannel;
+  async handleReaction(reaction: MessageReaction, remove = false) {
+    const starChannel = reaction.client.channels.cache.get(process.env.STARBOARD_CHANNEL) as TextChannel;
     const message = reaction.message;
 
     if (message.partial) {

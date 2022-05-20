@@ -1,10 +1,10 @@
 import { Types, Document } from "mongoose";
-import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import { ChannelManager, ClientUser, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Keys, Builds, Winners, Guilds } from "@mbacalan/aurene-database";
 import { IGuild } from "../types";
 import { logger, gw2api, buildDbFromApi } from "./";
 
-async function checkNewBuild(bot: Client) {
+async function checkNewBuild(botUser: ClientUser) {
   const currentBuild = await Builds.findOne({});
   const liveBuild = await gw2api.build().live().get();
 
@@ -14,29 +14,29 @@ async function checkNewBuild(bot: Client) {
     await Builds.create({ build: liveBuild });
 
     logger.info("(Re)building API cache");
-    bot.user.setStatus("dnd");
-    bot.user.setActivity("Building API Cache", { type: "LISTENING" });
+    botUser.setStatus("dnd");
+    botUser.setActivity("Building API Cache", { type: "LISTENING" });
     await buildDbFromApi();
-    bot.user.setStatus("online");
-    bot.user.setActivity("Guild Wars 2");
+    botUser.setStatus("online");
+    botUser.setActivity("Guild Wars 2");
   }
 }
 
-async function checkGiveawayOnStartup(bot: Client, guild: IGuild & Document) {
-  if (!(guild.giveaways && !guild.giveaways.length) || !guild.config.giveawayChannel) {
+async function checkGiveawayOnStartup(channels: ChannelManager, guildDoc: IGuild & Document) {
+  if (!(guildDoc.giveaways && !guildDoc.giveaways.length) || !guildDoc.config.giveawayChannel) {
     return false;
   }
 
-  const giveawayChannel = await bot.channels.fetch(guild.config.giveawayChannel) as TextChannel;
+  const giveawayChannel = await channels.fetch(guildDoc.config.giveawayChannel) as TextChannel;
 
-  guild.giveaways.forEach(async (giveaway) => {
+  guildDoc.giveaways.forEach(async (giveaway) => {
     const giveawayMessage = await giveawayChannel.messages.fetch(giveaway._id);
 
     if (!giveawayMessage) {
       return false;
     }
 
-    const entryCollector = createGiveawayEntryCollector(guild, giveawayChannel, giveawayMessage);
+    const entryCollector = createGiveawayEntryCollector(guildDoc, giveawayChannel, giveawayMessage);
 
     setTimeout(async () => {
       await endGiveaway(giveawayMessage, giveawayChannel);
@@ -184,7 +184,7 @@ function sortAlphabetically(a: string, b: string) {
   return 0;
 }
 
-async function checkReactionValidity(bot: Client, reaction: MessageReaction | PartialMessageReaction, author: User | PartialUser) {
+async function checkReactionValidity(reaction: MessageReaction | PartialMessageReaction, author: User | PartialUser) {
   if (process.env.NODE_ENV == "development") {
     return true;
   }
@@ -193,7 +193,7 @@ async function checkReactionValidity(bot: Client, reaction: MessageReaction | Pa
     return;
   }
 
-  const starChannel = bot.channels.cache.get(process.env.STARBOARD_CHANNEL);
+  const starChannel = reaction.client.channels.cache.get(process.env.STARBOARD_CHANNEL);
   const message = reaction.message;
 
   if (message.partial) {

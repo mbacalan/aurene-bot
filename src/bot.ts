@@ -62,14 +62,14 @@ bot.on("ready", async () => {
       return false;
     }
 
-    await checkGiveawayOnStartup(bot, guildDoc);
+    await checkGiveawayOnStartup(bot.channels, guildDoc);
   });
 
   if (process.env.PUBLIC_ROLES) {
     await roles.execute(bot);
   }
 
-  setInterval(async () => await checkNewBuild(bot), 300000);
+  setInterval(async () => await checkNewBuild(bot.user), 300000);
 });
 
 bot.on("interactionCreate", async interaction => {
@@ -95,11 +95,11 @@ bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard: StaticCommand = bot.statics.get("starboard");
   // const roles: StaticCommand = bot.statics.get("roles");
 
-  const reactionIsValid = await checkReactionValidity(bot, reaction, author);
+  const reactionIsValid = await checkReactionValidity(reaction, author);
   // const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
-    await starboard.handleReaction(bot, reaction);
+    await starboard.handleReaction(reaction);
   }
 
   // if (!author.bot && reaction.message.channel === rolesChannel) {
@@ -120,11 +120,11 @@ bot.on("messageReactionRemove", async (reaction, author) => {
     }
   }
 
-  const reactionIsValid = await checkReactionValidity(bot, reaction, author);
+  const reactionIsValid = await checkReactionValidity(reaction, author);
   // const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
-    await starboard.handleReaction(bot, reaction, true);
+    await starboard.handleReaction(reaction, true);
   }
 
   // if (!author.bot && reaction.message.channel === rolesChannel) {
