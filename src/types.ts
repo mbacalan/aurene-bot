@@ -1,4 +1,4 @@
-import { Collection, CommandInteraction, Message } from "discord.js";
+import { Collection, CommandInteraction, Message, MessageReaction, PartialMessageReaction } from "discord.js";
 import { Types, Document } from "mongoose";
 
 declare module "discord.js" {
@@ -17,7 +17,7 @@ declare module "winston" {
 export interface StaticCommand {
   name: string,
   description?: string,
-  handleReaction?: Function,
+  handleReaction?: (reaction: MessageReaction | PartialMessageReaction, remove?: boolean) => Promise<Message<boolean>>,
 };
 
 export interface Command {
