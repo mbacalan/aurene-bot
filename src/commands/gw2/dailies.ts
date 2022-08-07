@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, sortAlphabetically } from "../../utils";
 import { gameData } from "../../data/";
@@ -12,11 +12,11 @@ class Dailies implements Command {
     .setName(this.name)
     .setDescription(this.description);
 
-  async execute(interaction: CommandInteraction) {
-    interaction.deferReply();
+  async execute(interaction: ChatInputCommandInteraction) {
+    await interaction.deferReply();
 
     const dailies = await gw2api.achievements().daily().get();
-    const DailiesEmbed = new MessageEmbed().setTitle("Dailies");
+    const DailiesEmbed = new EmbedBuilder().setTitle("Dailies");
     const categories = ["PvE", "PvP", "WvW", "Fractals"];
     const normFractals = new Set();
     const recFractals = [];
@@ -38,7 +38,9 @@ class Dailies implements Command {
             for (const [key, value] of Object.entries(gameData.fractals)) {
               const recFractalScale = parseInt(tempFractal.replace(/[^\d.]/g, ""), 10);
 
-              if (value.includes(recFractalScale)) recFractals.push(`${tempFractal} - ${key}`);
+              if (value.includes(recFractalScale)) {
+                recFractals.push(`${tempFractal} - ${key}`);
+              }
             }
           }
 
@@ -56,10 +58,10 @@ class Dailies implements Command {
       if (category === "fractals") {
         // TODO: ts(2569) requires downlevelIteration
         const dailyFractals = [...normFractals, ...recFractals].sort((a, b) => sortAlphabetically(a, b)).join("\n");
-        DailiesEmbed.addField("Fractals", dailyFractals);
+        DailiesEmbed.addFields({ name: "Fractals", value: dailyFractals });
       } else {
         const dailyArr = arr.sort((a: string, b: string) => sortAlphabetically(a, b)).join("\n");
-        DailiesEmbed.addField(categories[i], dailyArr);
+        DailiesEmbed.addFields({ name: categories[i], value: dailyArr });
       }
     }
 

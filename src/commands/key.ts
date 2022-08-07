@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, logger, validateKey } from "../utils";
 import { Keys } from "@mbacalan/aurene-database";
@@ -32,10 +32,10 @@ class Key implements Command {
         .setDescription("Delete your saved GW2 API key")
     );
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const subCommand = interaction.options.getSubcommand();
 
-    interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     switch (subCommand) {
       case "add": {
@@ -85,11 +85,13 @@ class Key implements Command {
           return;
         }
 
-        const keyEmbed = new MessageEmbed()
+        const keyEmbed = new EmbedBuilder()
           .setColor("#1a9306")
           .setTitle(key.keyName)
-          .addField("Key", key.key)
-          .addField("Permissions", key.permissions.join(", "));
+          .addFields([
+            { name: "Key", value: key.key },
+            { name: "Permissions", value: key.permissions.join(", ") },
+          ]);
 
         interaction.editReply({ embeds: [keyEmbed] }).catch(() => {
           interaction.editReply({ content: `Saved key is ${key.keyName} - ${key.key}` });

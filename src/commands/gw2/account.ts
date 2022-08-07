@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, getLeadingGuilds, formatAge, filterExpansions } from "../../utils";
 import { Keys, Worlds } from "@mbacalan/aurene-database";
@@ -11,7 +11,7 @@ class Account implements Command {
     .setName(this.name)
     .setDescription(this.description);
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const { key } = await Keys.findOne({ discordId: interaction.user.id });
 
     if (!key) {
@@ -23,7 +23,7 @@ class Account implements Command {
       return;
     }
 
-    interaction.deferReply();
+    await interaction.deferReply();
 
     gw2api.authenticate(key);
 
@@ -37,21 +37,23 @@ class Account implements Command {
     const pvp = await gw2api.account().pvp().stats().get();
     const { pvp_rank } = pvp;
 
-    const accountEmbed = new MessageEmbed()
+    const accountEmbed = new EmbedBuilder()
       .setTitle(name)
-      .addField("Created at", creationDate, true)
-      .addField("Age", age, true)
-      .addField("\u200b", "\u200b", true)
-      .addField("Has Expansions", expansions, true)
-      .addField("World", world.name, true)
-      .addField("\u200b", "\u200b", true)
-      .addField("WvW Rank", String(wvw_rank), true)
-      .addField("PvP Rank", String(pvp_rank), true)
-      .addField("\u200b", "\u200b", true)
-      .addField("Fractal Level", String(fractal_level), true)
-      .addField("Commander", commander ? "Yes" : "No", true)
-      .addField("\u200b", "\u200b", true)
-      .addField("Leads", guilds, true);
+      .addFields([
+        { name: "Created at", value: creationDate },
+        { name: "Age", value: age },
+        { name: "\u200b", value: "\u200b" },
+        { name: "Has Expansions", value: expansions },
+        { name: "World", value: world.name },
+        { name: "\u200b", value: "\u200b" },
+        { name: "WvW Rank", value: String(wvw_rank) },
+        { name: "PvP Rank", value: String(pvp_rank) },
+        { name: "\u200b", value: "\u200b" },
+        { name: "Fractal Level", value: String(fractal_level) },
+        { name: "Commander", value: commander ? "Yes" : "No" },
+        { name: "\u200b", value: "\u200b" },
+        { name: "Leads", value: guilds },
+      ])
 
     interaction.editReply({ embeds: [accountEmbed]} ).catch(() => {
       interaction.editReply({ content: "I'm lacking permissions to send an embed!" });

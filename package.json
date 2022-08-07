@@ -1,6 +1,6 @@
 {
   "name": "aurenebot",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "A Guild Wars 2 themed bot for Discord",
   "main": "bot.js",
   "scripts": {
@@ -16,14 +16,14 @@
   "author": "Penemue#8514",
   "license": "MIT",
   "dependencies": {
-    "@discordjs/rest": "0.4.1",
+    "@discordjs/rest": "1.0.1",
     "@mbacalan/aurene-database": "^0.1.2",
-    "discord-api-types": "^0.31.2",
-    "discord.js": "^13.6.0",
+    "discord-api-types": "^0.37.1",
+    "discord.js": "^14.1.2",
     "dotenv": "^9.0.2",
     "emoji-dictionary": "^1.0.11",
     "glob": "^7.1.7",
-    "gw2api-client": "^7.5.1",
+    "gw2api-client": "^7.5.2",
     "mongoose": "^6.2.6",
     "redis": "^3.1.2",
     "winston": "^3.3.3",
@@ -36,6 +36,6 @@
     "@types/webpack": "^5.28.0",
     "eslint": "^4.19.1",
     "tsc-watch": "^5.0.3",
-    "typescript": "^4.6.3"
+    "typescript": "^4.7.4"
   }
 }

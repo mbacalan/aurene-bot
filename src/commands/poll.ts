@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { pollEmojis, pollEmojiUnicodes } from "../data/";
 import { Command } from "../types";
@@ -27,12 +27,12 @@ class Poll implements Command {
         .setDescription("Optionally, mention a role with the poll")
     );
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const role = interaction.options.getMentionable("role");
     const question = interaction.options.getString("title");
     const options = interaction.options.getString("options");
 
-    const pollEmbed = new MessageEmbed().setTitle(question);
+    const pollEmbed = new EmbedBuilder().setTitle(question);
     const parsedOptions = options.split("-");
     const pollOptions = [];
 
@@ -51,7 +51,7 @@ class Poll implements Command {
 
     if (!poll) return;
 
-    interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     for (let i = 0; i < parsedOptions.length; i++) {
       await poll.react(pollEmojiUnicodes[i]);

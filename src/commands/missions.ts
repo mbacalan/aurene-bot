@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { Command } from "../types";
 
@@ -9,7 +9,7 @@ class Missions implements Command {
     .setName(this.name)
     .setDescription(this.description);
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // TODO: Add owner / ranking permissons
     return interaction.reply(
       {

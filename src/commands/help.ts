@@ -1,5 +1,5 @@
+import { ChannelType } from "discord.js";
 import { Command, CommandParams } from "../types";
-import { Util } from 'discord.js';
 
 class Help implements Command {
   name = "help";
@@ -32,7 +32,7 @@ class Help implements Command {
 
     message.author.send({ content: data.join("\n") })
       .then(() => {
-        if (message.channel.type !== "DM") {
+        if (message.channel.type !== ChannelType.DM) {
           message.reply("I've sent you a DM with all my commands!");
         }
       })

@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { Bosses } from "@mbacalan/aurene-database";
 import { Command } from "../types";
@@ -15,7 +15,7 @@ class Guides implements Command {
         .setRequired(true)
     );
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const selectedBoss = interaction.options.getString("boss");
     const bossData = await Bosses.findOne({ name: selectedBoss });
 

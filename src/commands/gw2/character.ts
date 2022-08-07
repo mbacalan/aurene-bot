@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { gw2api, formatAge, sortAlphabetically, logger } from "../../utils";
 import { gameData } from "../../data/";
@@ -29,7 +29,7 @@ class Character implements Command {
         )
     );
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const subCommand = interaction.options.getSubcommand();
     const { key, accountName } = await Keys.findOne({ discordId: interaction.user.id });
 
@@ -38,7 +38,7 @@ class Character implements Command {
       return;
     }
 
-    interaction.deferReply();
+    await interaction.deferReply();
 
     gw2api.authenticate(key);
 
@@ -51,9 +51,9 @@ class Character implements Command {
           .slice().sort((a, b) => sortAlphabetically(a, b))
           .join("\n");
 
-        const characterListEmbed = new MessageEmbed()
+        const characterListEmbed = new EmbedBuilder()
           .setTitle(`${accountName}'s Characters`)
-          .addField("\u200b", characterList);
+          .addFields([{ name: "\u200b", value: characterList }]);
 
         await interaction.editReply({ embeds: [characterListEmbed] }).catch(() => {
           interaction.editReply("I'm lacking permissions to send an embed!");
@@ -81,20 +81,23 @@ class Character implements Command {
         const createdAt = new Date(created).toDateString();
         const formattedAge = formatAge(age);
 
-        const characterEmbed = new MessageEmbed()
+        const characterEmbed = new EmbedBuilder()
           .setTitle(name)
           .setDescription(`${gender} ${race} ${profession}`)
           .setThumbnail(professionIcon)
-          .addField("Level", String(character.level), true)
-          .addField("Title", title.name ? title.name : title, true)
-          .addField("\u200b", "\u200b", true)
-          .addField("Created At", createdAt, true)
-          .addField("Played For", formattedAge, true)
-          .addField("\u200b", "\u200b", true)
-          .addField("Deaths", String(deaths), true)
-          .addField("Deaths Per Hour", String(deathsPerHour), true)
-          .addField("\u200b", "\u200b", true)
-          .addField("Representing", `${guild.name} [${guild.tag}]`);
+          .addFields([
+            { name: "Level", value: String(character.level) },
+            { name: "\u200b", value: "\u200b" },
+            { name: "Title", value: title.name ? title.name : title },
+            { name: "\u200b", value: "\u200b" },
+            { name: "Created At", value: createdAt },
+            { name: "Played For", value: formattedAge },
+            { name: "\u200b", value: "\u200b" },
+            { name: "Deaths", value: String(deaths) },
+            { name: "Deaths Per Hour", value: String(deathsPerHour) },
+            { name: "\u200b", value: "\u200b" },
+            { name: "Representing", value: `${guild.name} [${guild.tag}]` },
+          ])
 
         interaction.editReply({ embeds: [characterEmbed] }).catch(() => {
           interaction.editReply({ content: "I'm lacking permissions to send an embed!" });

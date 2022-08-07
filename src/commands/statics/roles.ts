@@ -1,4 +1,4 @@
-import { TextChannel, MessageEmbed } from "discord.js";
+import { TextChannel, EmbedBuilder } from "discord.js";
 import emoji from "emoji-dictionary";
 import { Command, CommandParams } from "../../types";
 import { logger } from "../../utils/";
@@ -30,7 +30,7 @@ class Roles implements Command {
         this.roleEmbedFields.push({ name: "\u200b", value: `${roleEmojis[i]} <@&${this.roles[i]}>` });
 
         if (!field || !field.value.includes(`<@&${role}>`) || totalFieldAmount != this.roles.length) {
-          const embed = new MessageEmbed();
+          const embed = new EmbedBuilder();
 
           embed.setTitle("Public Roles").addFields(this.roleEmbedFields);
 
@@ -48,7 +48,7 @@ class Roles implements Command {
     }
 
     if (!this.oldEmbed) {
-      const rolesEmbed = new MessageEmbed();
+      const rolesEmbed = new EmbedBuilder();
 
       this.roles.forEach((role, i) => {
         this.roleEmbedFields.push({ name: "\u200b", value: `${roleEmojis[i]} <@&${this.roles[i]}>` });
