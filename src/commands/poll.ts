@@ -51,7 +51,7 @@ class Poll implements Command {
 
     if (!poll) return;
 
-    interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     for (let i = 0; i < parsedOptions.length; i++) {
       await poll.react(pollEmojiUnicodes[i]);

@@ -12,13 +12,15 @@ class RebuildCache implements Command {
     .setDefaultMemberPermissions(0);
 
   async execute(interaction: ChatInputCommandInteraction) {
-    interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
+
     logger.info("(Re)building API cache");
     interaction.client.user.setStatus("dnd");
     interaction.client.user.setActivity("Building API Cache", { type: ActivityType.Listening });
     await buildDbFromApi();
     interaction.client.user.setStatus("online");
     interaction.client.user.setActivity("Guild Wars 2");
+
     interaction.editReply({ content: "Done" });
   }
 }

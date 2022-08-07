@@ -92,7 +92,7 @@ class Giveaway implements Command {
       endTime.setHours(endTime.getHours() + intDuration);
     }
 
-    interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     const infoEmbed = new EmbedBuilder()
       .setTitle(item)

@@ -23,7 +23,7 @@ class Account implements Command {
       return;
     }
 
-    interaction.deferReply();
+    await interaction.deferReply();
 
     gw2api.authenticate(key);
 

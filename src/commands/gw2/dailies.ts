@@ -13,7 +13,7 @@ class Dailies implements Command {
     .setDescription(this.description);
 
   async execute(interaction: ChatInputCommandInteraction) {
-    interaction.deferReply();
+    await interaction.deferReply();
 
     const dailies = await gw2api.achievements().daily().get();
     const DailiesEmbed = new EmbedBuilder().setTitle("Dailies");
@@ -58,10 +58,10 @@ class Dailies implements Command {
       if (category === "fractals") {
         // TODO: ts(2569) requires downlevelIteration
         const dailyFractals = [...normFractals, ...recFractals].sort((a, b) => sortAlphabetically(a, b)).join("\n");
-        DailiesEmbed.addFields([{ name: "Fractals", value: dailyFractals }]);
+        DailiesEmbed.addFields({ name: "Fractals", value: dailyFractals });
       } else {
         const dailyArr = arr.sort((a: string, b: string) => sortAlphabetically(a, b)).join("\n");
-        DailiesEmbed.addFields([{ name: categories[i], value: dailyArr }]);
+        DailiesEmbed.addFields({ name: categories[i], value: dailyArr });
       }
     }
 

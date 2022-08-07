@@ -35,7 +35,7 @@ class Key implements Command {
   async execute(interaction: ChatInputCommandInteraction) {
     const subCommand = interaction.options.getSubcommand();
 
-    interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     switch (subCommand) {
       case "add": {
