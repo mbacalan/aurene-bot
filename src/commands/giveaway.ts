@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed, TextChannel } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, TextChannel } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { logger, endGiveaway, createGiveawayEntryCollector } from "../utils";
 import { Guilds } from "@mbacalan/aurene-database";
@@ -34,7 +34,7 @@ class Giveaway implements Command {
         )
     );
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const guild = await Guilds.findOne({ _id: interaction.guild.id });
     this.giveawayChannel = await interaction.client.channels.fetch(guild.config.giveawayChannel) as TextChannel;
 
@@ -44,7 +44,7 @@ class Giveaway implements Command {
     // to display information about any given active giveaway without cluttering the channel.
   }
 
-  async create(interaction: CommandInteraction) {
+  async create(interaction: ChatInputCommandInteraction) {
     if (!this.giveawayChannel) {
       interaction.reply({
         content: "There is no givewaay channel set! Complain to your server owner about it!",
@@ -94,11 +94,13 @@ class Giveaway implements Command {
 
     interaction.deferReply({ ephemeral: true });
 
-    const infoEmbed = new MessageEmbed()
+    const infoEmbed = new EmbedBuilder()
       .setTitle(item)
-      .addField("Hosted By", interaction.user.tag, true)
-      .addField("Duration", duration, true)
-      .setFooter("Enter this giveaway by reacting with checkmark below.");
+      .addFields([
+        { name: "Hosted By", value: interaction.user.tag },
+        { name: "Duration", value: duration },
+      ])
+      .setFooter({ text: "Enter this giveaway by reacting with checkmark below." });
 
     const giveawayMessage = await interaction.channel.send({
       content: role?.toString() || "Here's a giveaway for you!",

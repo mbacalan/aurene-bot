@@ -4,7 +4,7 @@ import { config } from "dotenv";
 config({ path: resolve(__dirname, "../.env") });
 
 import "./utils/db";
-import { Client, Collection, Intents } from "discord.js";
+import { ActivityType, Client, Collection, GatewayIntentBits, InteractionType, Partials } from "discord.js";
 import glob from "glob";
 import { Guilds } from "@mbacalan/aurene-database";
 import { StaticCommand } from "./types";
@@ -12,14 +12,14 @@ import { logger, checkGiveawayOnStartup, checkReactionValidity, checkNewBuild } 
 
 const bot = new Client({
   intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.GUILD_MEMBERS,
-    Intents.FLAGS.GUILD_PRESENCES,
-    Intents.FLAGS.GUILD_MESSAGE_TYPING
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildMessageTyping
   ],
-  partials: ["MESSAGE", "REACTION"]
+  partials: [Partials.Message, Partials.Reaction]
 });
 
 bot.statics = new Collection();
@@ -40,7 +40,7 @@ glob.sync("./commands/**/*.js", { cwd: 'dist' }).forEach((file) => {
 bot.on("ready", async () => {
   const roles = bot.commands.get("roles");
 
-  bot.user.setPresence({ activities: [{ name: "Guild Wars 2", type: "PLAYING" }] });
+  bot.user.setPresence({ activities: [{ name: "Guild Wars 2", type: ActivityType.Playing }] });
 
   [
     `Logged in as ${bot.user.username}#${bot.user.discriminator} (ID:${bot.user.id})`,
@@ -73,7 +73,7 @@ bot.on("ready", async () => {
 });
 
 bot.on("interactionCreate", async interaction => {
-  if (!interaction.isCommand()) {
+  if (interaction.type != InteractionType.ApplicationCommand) {
     return;
   }
 

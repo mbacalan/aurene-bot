@@ -1,5 +1,5 @@
 import { Types, Document } from "mongoose";
-import { ChannelManager, ClientUser, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import { ActivityType, ChannelManager, ClientUser, Message, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Keys, Builds, Winners, Guilds } from "@mbacalan/aurene-database";
 import { IGuild } from "../types";
 import { logger, gw2api, buildDbFromApi } from "./";
@@ -15,7 +15,7 @@ async function checkNewBuild(botUser: ClientUser) {
 
     logger.info("(Re)building API cache");
     botUser.setStatus("dnd");
-    botUser.setActivity("Building API Cache", { type: "LISTENING" });
+    botUser.setActivity("Building API Cache", { type: ActivityType.Listening });
     await buildDbFromApi();
     botUser.setStatus("online");
     botUser.setActivity("Guild Wars 2");

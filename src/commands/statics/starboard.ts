@@ -1,4 +1,4 @@
-import { TextChannel, MessageReaction, MessageEmbed } from "discord.js";
+import { TextChannel, MessageReaction, EmbedBuilder } from "discord.js";
 import { StaticCommand } from "../../types";
 import { logger } from "../../utils/";
 
@@ -34,13 +34,14 @@ class Starboard implements StaticCommand {
         return;
       }
 
-      const embed = new MessageEmbed()
-        .addField("Author", message.author.username, true)
-        .addField("Channel", `<#${message.channel.id}>`, true)
-        .addField("Message", message.cleanContent)
-        .addField("Go To", `[Message](${message.url})`)
+      const embed = new EmbedBuilder()
         .setTimestamp(new Date())
-        .setFooter({ text: `⭐ ${starReactions.count} | ${message.id}`});
+        .setFooter({ text: `⭐ ${starReactions.count} | ${message.id}`})
+        .addFields([
+          { name: "Author", value: message.author.username },
+          { name: "Channel", value: `<#${message.channel.id}>` },
+          { name: "Go To", value: `[Message](${message.url})` },
+        ])
 
       await starChannel.send({ embeds: [embed] });
     }
@@ -51,12 +52,14 @@ class Starboard implements StaticCommand {
       const starEmbed = await starChannel.messages.fetch(stars.id);
       const foundStarEmbed = stars.embeds[0];
       const foundStarMessage = foundStarEmbed.fields.find(field => field.name === "Message");
-      const embed = new MessageEmbed()
-        .addField("Author", message.author.username, true)
-        .addField("Channel", `<#${message.channel.id}>`, true)
-        .addField("Message", foundStarMessage.value)
-        .addField("Go To", `[Message](${message.url})`)
-        .setTimestamp();
+      const embed = new EmbedBuilder()
+        .setTimestamp()
+        .addFields([
+          { name: "Author", value: message.author.username },
+          { name: "Channel", value: `<#${message.channel.id}>` },
+          { name: "Message", value: foundStarMessage.value },
+          { name: "Go To", value: `[Message](${message.url})` },
+        ])
 
       if (remove) {
         // Reduce the amount of stars if the message is already on starboard, remove if no stars left

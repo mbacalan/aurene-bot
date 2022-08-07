@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { Command } from "../types";
 
@@ -9,11 +9,13 @@ class Ping implements Command {
     .setName(this.name)
     .setDescription(this.description);
 
-  async execute(interaction: CommandInteraction) {
-    const pingEmbed = new MessageEmbed()
+  async execute(interaction: ChatInputCommandInteraction) {
+    const pingEmbed = new EmbedBuilder()
       .setColor("#1a9306")
       .setTitle("Pong 🏓")
-      .addField("Websocket Latency:", `${Math.round(interaction.client.ws.ping)}ms`, true);
+      .addFields([
+        { name: "Websocket Latency:", value: `${Math.round(interaction.client.ws.ping)}ms` }
+      ]);
 
     interaction.reply({ embeds: [pingEmbed] }).catch(() => {
       interaction.reply(`Websocket latency is ${Math.round(interaction.client.ws.ping)}ms.`);
