@@ -162,10 +162,11 @@ function formatAge(age: number) {
   return `${minutes} minutes`;
 }
 
+// TODO: Type out account obj
 function filterExpansions(account) {
   return account.access
-    .filter(i => !["PlayForFree", "GuildWars2"].includes(i))
-    .map(i => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
+    .filter((i: string) => !["PlayForFree", "GuildWars2"].includes(i))
+    .map((i: string) => i.replace(/([a-z])([A-Z])/g, "$1 $2"))
     .join("\n");
 }
 
@@ -200,7 +201,8 @@ async function checkReactionValidity(reaction: MessageReaction | PartialMessageR
     try {
       await message.fetch();
     } catch (error) {
-      return logger.error("Something went wrong when fetching the message: ", error);
+      logger.error("Something went wrong when fetching the message: ", error);
+      return false;
     }
   }
 

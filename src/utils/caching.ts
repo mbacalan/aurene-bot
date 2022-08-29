@@ -18,7 +18,7 @@ const endpoints = [
   // "traits",
 ];
 
-async function cacheToDbFromApi(endpoint) {
+async function cacheToDbFromApi(endpoint: string) {
   const response = await gw2api[endpoint.toLowerCase()]().live().all().catch(() => {
     errors = true;
     logger.error(`Error getting all ${endpoint} from API`);

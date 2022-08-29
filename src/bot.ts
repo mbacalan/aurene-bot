@@ -86,30 +86,30 @@ bot.on("interactionCreate", async interaction => {
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
   }
 });
 
 bot.on("messageReactionAdd", async (reaction, author) => {
   const starboard: StaticCommand = bot.statics.get("starboard");
-  // const roles: StaticCommand = bot.statics.get("roles");
+  const roles: StaticCommand = bot.statics.get("roles");
 
   const reactionIsValid = await checkReactionValidity(reaction, author);
-  // const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
+  const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
     await starboard.handleReaction(reaction);
   }
 
-  // if (!author.bot && reaction.message.channel === rolesChannel) {
-    // await roles.handleReaction(bot, reaction, author);
-  // }
+  if (!author.bot && reaction.message.channel === rolesChannel) {
+    await roles.handleReaction(reaction);
+  }
 });
 
 bot.on("messageReactionRemove", async (reaction, author) => {
   const starboard: StaticCommand = bot.statics.get("starboard");
-  // const roles: StaticCommand = bot.statics.get("roles");
+  const roles: StaticCommand = bot.statics.get("roles");
 
   if (reaction.message.partial) {
     try {
@@ -121,15 +121,15 @@ bot.on("messageReactionRemove", async (reaction, author) => {
   }
 
   const reactionIsValid = await checkReactionValidity(reaction, author);
-  // const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
+  const rolesChannel = bot.channels.cache.get(process.env.ROLES_CHANNEL);
 
   if (reactionIsValid) {
     await starboard.handleReaction(reaction, true);
   }
 
-  // if (!author.bot && reaction.message.channel === rolesChannel) {
-    // await roles.handleReaction(bot, reaction, author, true);
-  // }
+  if (!author.bot && reaction.message.channel === rolesChannel) {
+    await roles.handleReaction(reaction, true);
+  }
 });
 
 bot.on("guildCreate", async (guild) => {
