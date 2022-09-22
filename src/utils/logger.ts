@@ -22,7 +22,7 @@ const logTransports = {
   ),
   mongodb: new transports.MongoDB(
     {
-      db: process.env.MONGO_URI,
+      db: process.env.MONGO_URI || 'mongodb://localhost:27017',
       options: { useUnifiedTopology: true, useNewUrlParser: true },
       level: "info",
     },
